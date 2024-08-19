@@ -29,7 +29,7 @@ describe("Propcorn", function () {
     const secondsToUnlock = 18;
     const minAmountRequested = parseEther("1");
     // 2%
-    const protocolFeeBasisPoints = 2 * 100;
+    const feeBasisPoints = 2 * 100;
 
     beforeEach(async () => {
       ({ propcorn } = await loadFixture(deployPropcornFixture));
@@ -43,7 +43,7 @@ describe("Propcorn", function () {
             url,
             secondsToUnlock,
             minAmountRequested,
-            protocolFeeBasisPoints,
+            feeBasisPoints,
           ),
       )
         .to.emit(propcorn, "ProposalCreated")
@@ -53,7 +53,7 @@ describe("Propcorn", function () {
           url,
           secondsToUnlock,
           minAmountRequested,
-          protocolFeeBasisPoints,
+          feeBasisPoints,
         );
     });
 
@@ -68,7 +68,7 @@ describe("Propcorn", function () {
           url,
           secondsToUnlock,
           minAmountRequested,
-          protocolFeeBasisPoints,
+          feeBasisPoints,
         );
       await expect(
         propcorn
@@ -77,7 +77,7 @@ describe("Propcorn", function () {
             url,
             secondsToUnlock,
             minAmountRequested,
-            protocolFeeBasisPoints,
+            feeBasisPoints,
           ),
       )
         .to.emit(propcorn, "ProposalCreated")
@@ -87,7 +87,7 @@ describe("Propcorn", function () {
           url,
           secondsToUnlock,
           minAmountRequested,
-          protocolFeeBasisPoints,
+          feeBasisPoints,
         );
     });
   });
@@ -98,7 +98,7 @@ describe("Propcorn", function () {
     const minAmountRequested = parseEther("1");
     const index = 0;
     // 2%
-    const protocolFeeBasisPoints = 2 * 100;
+    const feeBasisPoints = 2 * 100;
 
     beforeEach(async () => {
       ({ propcorn } = await loadFixture(deployPropcornFixture));
@@ -108,7 +108,7 @@ describe("Propcorn", function () {
           url,
           secondsToUnlock,
           minAmountRequested,
-          protocolFeeBasisPoints,
+          feeBasisPoints,
         );
     });
 
@@ -171,7 +171,7 @@ describe("Propcorn", function () {
     const secondsToUnlock = 666;
     const minAmountRequested = parseEther("1");
     // 2%
-    const protocolFeeBasisPoints = 2 * 100;
+    const feeBasisPoints = 2 * 100;
     const index = 0;
 
     beforeEach(async () => {
@@ -182,7 +182,7 @@ describe("Propcorn", function () {
           url,
           secondsToUnlock,
           minAmountRequested,
-          protocolFeeBasisPoints,
+          feeBasisPoints,
         );
     });
 
@@ -242,8 +242,8 @@ describe("Propcorn", function () {
         [
           -minAmountRequested,
           minAmountRequested -
-            (minAmountRequested * BigInt(protocolFeeBasisPoints)) / 10000n,
-          (minAmountRequested * BigInt(protocolFeeBasisPoints)) / 10000n,
+            (minAmountRequested * BigInt(feeBasisPoints)) / 10000n,
+          (minAmountRequested * BigInt(feeBasisPoints)) / 10000n,
         ],
       );
     });
@@ -262,7 +262,7 @@ describe("Propcorn", function () {
           bob.address,
           index,
           minAmountRequested -
-            (minAmountRequested * BigInt(protocolFeeBasisPoints)) / 10000n,
+            (minAmountRequested * BigInt(feeBasisPoints)) / 10000n,
           dan.address,
         );
     });

@@ -15,7 +15,7 @@ contract Propcorn {
         string url,
         uint256 secondsToUnlock,
         uint256 minAmountRequested,
-        uint256 protocolFeeBasisPoints
+        uint256 feeBasisPoints
     );
 
     event ProposalFunded(
@@ -40,7 +40,7 @@ contract Propcorn {
         uint256 minAmountRequested;
         uint256 balance;
         uint256 fundingCompletedAt;
-        uint256 protocolFeeBasisPoints;
+        uint256 feeBasisPoints;
         bool closed;
     }
 
@@ -62,7 +62,7 @@ contract Propcorn {
         string calldata url,
         uint256 secondsToUnlock,
         uint256 minAmountRequested,
-        uint256 protocolFeeBasisPoints
+        uint256 feeBasisPoints
     ) public {
         _proposals[msg.sender].push(
             Proposal(
@@ -71,7 +71,7 @@ contract Propcorn {
                 minAmountRequested,
                 0,
                 0,
-                protocolFeeBasisPoints,
+                feeBasisPoints,
                 false
             )
         );
@@ -82,7 +82,7 @@ contract Propcorn {
             url,
             secondsToUnlock,
             minAmountRequested,
-            protocolFeeBasisPoints
+            feeBasisPoints
         );
     }
 
@@ -138,8 +138,8 @@ contract Propcorn {
 
         proposal.closed = true;
 
-        uint256 protocolFee = (proposal.balance *
-            proposal.protocolFeeBasisPoints) / 10_000;
+        uint256 protocolFee = (proposal.balance * proposal.feeBasisPoints) /
+            10_000;
 
         payable(receiver).transfer(proposal.balance - protocolFee);
         payable(_protocolFeeReceiver).transfer(protocolFee);
