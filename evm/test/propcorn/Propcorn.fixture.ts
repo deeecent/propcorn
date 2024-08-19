@@ -4,10 +4,12 @@ import { Propcorn, Propcorn__factory } from "../../types";
 
 export async function deployPropcornFixture() {
   // Contracts are deployed using the first signer/account by default
-  const [owner, otherAccount] = await ethers.getSigners();
+  const [owner] = await ethers.getSigners();
 
-  const Propcorn = (await ethers.getContractFactory("Propcorn")) as Propcorn__factory;
-  const propcorn = (await Propcorn.deploy()) as Propcorn;
+  const Propcorn = (await ethers.getContractFactory(
+    "Propcorn",
+  )) as Propcorn__factory;
+  const propcorn = (await Propcorn.deploy(owner.address)) as Propcorn;
 
-  return { propcorn, owner, otherAccount };
+  return { propcorn, owner };
 }

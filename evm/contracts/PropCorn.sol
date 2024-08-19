@@ -1,42 +1,57 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.8.9;
 
-error NonexistentProposal();
+import "./IPropcorn.sol";
 
 contract Propcorn {
-    struct Proposal {
-        string url;
-        uint256 daysToUnlock;
-        uint256 minAmountRequested;
-        uint256 balance;
-        uint256 fundingCompletedAt;
-        bool finished;
-    }
+    // Errors
+    error NonexistentProposal();
+    error ProposalInProgress();
+    error ProposalClosed();
+    error InvalidOwner();
 
-    mapping(address => Proposal[]) internal _proposals;
-
+    // Events
     event ProposalCreated(
         address indexed from,
         uint256 index,
         string url,
-        uint256 daysToUnlock,
-        uint256 minAmountRequested
+        uint256 secondsToUnlock,
+        uint256 minAmountRequested,
+        uint256 protocolFeeBasisPoints
     );
 
     event ProposalFunded(
-        address from,
-        address account,
+        address indexed from,
+        address indexed account,
         uint256 index,
         uint256 amount,
         uint256 fundingCompletedAt
     );
 
     event FundsWithdrawn(
-        address from,
+        address indexed from,
         uint256 index,
         uint256 amount,
-        address to
+        address indexed to
     );
+
+    // Structs and data
+    struct Proposal {
+        string url;
+        uint256 secondsToUnlock;
+        uint256 minAmountRequested;
+        uint256 balance;
+        uint256 fundingCompletedAt;
+        uint256 protocolFeeBasisPoints;
+        bool closed;
+    }
+
+    mapping(address => Proposal[]) internal _proposals;
+    address payable internal _protocolFeeReceiver;
+
+    constructor(address payable protocolFeeReceiver) {
+        _protocolFeeReceiver = protocolFeeReceiver;
+    }
 
     modifier proposalExists(address account, uint256 index) {
         if (_proposals[account].length <= index) {
@@ -45,26 +60,31 @@ contract Propcorn {
         _;
     }
 
-    /*
-    To do:
-    -Timestamp from the Date the user wants in days(daysToUnlock)
-    -daysToUnlock 
-    */
     function createProposal(
         string calldata url,
-        uint256 daysToUnlock,
-        uint256 minAmountRequested
+        uint256 secondsToUnlock,
+        uint256 minAmountRequested,
+        uint256 protocolFeeBasisPoints
     ) public {
         _proposals[msg.sender].push(
-            Proposal(url, daysToUnlock, minAmountRequested, 0, 0, false)
+            Proposal(
+                url,
+                secondsToUnlock,
+                minAmountRequested,
+                0,
+                0,
+                protocolFeeBasisPoints,
+                false
+            )
         );
 
         emit ProposalCreated(
             msg.sender,
             _proposals[msg.sender].length - 1,
             url,
-            daysToUnlock,
-            minAmountRequested
+            secondsToUnlock,
+            minAmountRequested,
+            protocolFeeBasisPoints
         );
     }
 
@@ -73,7 +93,12 @@ contract Propcorn {
         uint256 index
     ) public payable proposalExists(account, index) {
         Proposal storage proposal = _proposals[account][index];
+        if (proposal.closed) {
+            revert ProposalClosed();
+        }
+
         proposal.balance += msg.value;
+
         if (
             proposal.fundingCompletedAt == 0 &&
             proposal.balance >= proposal.minAmountRequested
@@ -90,47 +115,49 @@ contract Propcorn {
         );
     }
 
-    /* TODO:
-    -require time passed
-    - replace require with error
-    */
-    //WIP
-    function withdrawFunds(address account, uint256 index) public {
-        require(account != address(0));
-        require(_proposals[account][index].balance > 0);
-        require(
-            _proposals[account][index].fundingCompletedAt - block.timestamp >=
-                _proposals[account][index].daysToUnlock
+    function withdrawFunds(
+        address account,
+        uint256 index,
+        address receiver
+    ) public proposalExists(account, index) {
+        Proposal storage proposal = _proposals[account][index];
+
+        if (account != msg.sender) {
+            revert InvalidOwner();
+        }
+
+        if (proposal.closed) {
+            revert ProposalClosed();
+        }
+
+        if (
+            proposal.fundingCompletedAt == 0 ||
+            block.timestamp - proposal.fundingCompletedAt <
+            proposal.secondsToUnlock
+        ) {
+            revert ProposalInProgress();
+        }
+
+        proposal.closed = true;
+
+        uint256 protocolFee = (proposal.balance *
+            proposal.protocolFeeBasisPoints) / 10_000;
+
+        payable(receiver).transfer(proposal.balance - protocolFee);
+        payable(_protocolFeeReceiver).transfer(protocolFee);
+
+        emit FundsWithdrawn(
+            msg.sender,
+            index,
+            proposal.balance - protocolFee,
+            receiver
         );
-        uint256 _amount = address(this).balance;
-        payable(account).transfer(_amount);
-        _proposals[account][index].finished = true;
     }
 
     function getProposalByAccount(
         address account,
         uint256 index
-    ) public view returns (Proposal memory) {
+    ) public view proposalExists(account, index) returns (Proposal memory) {
         return _proposals[account][index];
     }
-
-    //WIP
-    function getTimeLeftToUnlock(
-        address account,
-        uint256 index
-    ) public view returns (uint256) {
-        return _proposals[account][index].fundingCompletedAt - block.timestamp;
-    }
-
-    receive() external payable {}
-
-    /* 
-      - Write:
-        - create a proposal
-        - fund a proposal with eth
-        - redeem funds
-      - Read:
-        - get a proposal by address + proposal id
-    // function listProposalsByAccount(address account, uint256 page) public view returns (Proposal[50] memory) {}
-    */
 }
