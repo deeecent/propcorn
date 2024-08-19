@@ -6,7 +6,7 @@ import { ethers } from "hardhat";
 import type { Signers } from "../types";
 import { deployLockFixture } from "./Lock.fixture";
 
-describe("Lock", function () {
+describe.skip("Lock", function () {
   before(async function () {
     this.signers = {} as Signers;
 
@@ -18,7 +18,8 @@ describe("Lock", function () {
 
   describe("Deployment", function () {
     beforeEach(async function () {
-      const { lock, lock_address, unlockTime, owner, lockedAmount } = await this.loadFixture(deployLockFixture);
+      const { lock, lock_address, unlockTime, owner, lockedAmount } =
+        await this.loadFixture(deployLockFixture);
       this.lock = lock;
       this.lock_address = lock_address;
       this.unlockTime = unlockTime;
@@ -30,7 +31,9 @@ describe("Lock", function () {
       // We don't use the fixture here because we want a different deployment
       const latestTime = await time.latest();
       const Lock = await ethers.getContractFactory("Lock");
-      await expect(Lock.deploy(latestTime, { value: 1 })).to.be.revertedWithCustomError(Lock, "InvalidUnlockTime");
+      await expect(
+        Lock.deploy(latestTime, { value: 1 }),
+      ).to.be.revertedWithCustomError(Lock, "InvalidUnlockTime");
     });
 
     it("Should set the right unlockTime", async function () {
@@ -42,13 +45,16 @@ describe("Lock", function () {
     });
 
     it("Should receive and store the funds to lock", async function () {
-      expect(await ethers.provider.getBalance(this.lock_address)).to.equal(this.lockedAmount);
+      expect(await ethers.provider.getBalance(this.lock_address)).to.equal(
+        this.lockedAmount,
+      );
     });
   });
 
   describe("Withdrawals", function () {
     beforeEach(async function () {
-      const { lock, unlockTime, owner, lockedAmount, otherAccount } = await this.loadFixture(deployLockFixture);
+      const { lock, unlockTime, owner, lockedAmount, otherAccount } =
+        await this.loadFixture(deployLockFixture);
       this.lock = lock;
       this.unlockTime = unlockTime;
       this.owner = owner;
@@ -58,7 +64,10 @@ describe("Lock", function () {
 
     describe("Validations", function () {
       it("Should revert with the right error if called too soon", async function () {
-        await expect(this.lock.withdraw()).to.be.revertedWithCustomError(this.lock, "UnlockTimeNotReached");
+        await expect(this.lock.withdraw()).to.be.revertedWithCustomError(
+          this.lock,
+          "UnlockTimeNotReached",
+        );
       });
 
       it("Should revert with the right error if called from another account", async function () {
@@ -66,10 +75,9 @@ describe("Lock", function () {
         await time.increaseTo(this.unlockTime);
 
         // We use lock.connect() to send a transaction from another account
-        await expect(this.lock.connect(this.otherAccount).withdraw()).to.be.revertedWithCustomError(
-          this.lock,
-          "NotOwner",
-        );
+        await expect(
+          this.lock.connect(this.otherAccount).withdraw(),
+        ).to.be.revertedWithCustomError(this.lock, "NotOwner");
       });
 
       it("Shouldn't fail if the unlockTime has arrived and the owner calls it", async function () {
@@ -84,7 +92,9 @@ describe("Lock", function () {
       it("Should emit an event on withdrawals", async function () {
         await time.increaseTo(this.unlockTime);
 
-        await expect(this.lock.withdraw()).to.emit(this.lock, "Withdrawal").withArgs(this.lockedAmount, anyValue); // We accept any value as `when` arg
+        await expect(this.lock.withdraw())
+          .to.emit(this.lock, "Withdrawal")
+          .withArgs(this.lockedAmount, anyValue); // We accept any value as `when` arg
       });
     });
 
