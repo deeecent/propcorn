@@ -1,46 +1,26 @@
-import { useAccount, useConnect, useDisconnect } from 'wagmi'
+import {
+  Box,
+  Button,
+  Flex,
+  Heading,
+  HStack,
+  Spacer,
+  VStack,
+} from "@chakra-ui/react";
+import { useAccount, useConnect, useDisconnect } from "wagmi";
+import ConnectButton from "./ConnectButton";
 
 function App() {
-  const account = useAccount()
-  const { connectors, connect, status, error } = useConnect()
-  const { disconnect } = useDisconnect()
-
   return (
-    <>
-      <div>
-        <h2>Account</h2>
-
-        <div>
-          status: {account.status}
-          <br />
-          addresses: {JSON.stringify(account.addresses)}
-          <br />
-          chainId: {account.chainId}
-        </div>
-
-        {account.status === 'connected' && (
-          <button type="button" onClick={() => disconnect()}>
-            Disconnect
-          </button>
-        )}
-      </div>
-
-      <div>
-        <h2>Connect</h2>
-        {connectors.map((connector) => (
-          <button
-            key={connector.uid}
-            onClick={() => connect({ connector })}
-            type="button"
-          >
-            {connector.name}
-          </button>
-        ))}
-        <div>{status}</div>
-        <div>{error?.message}</div>
-      </div>
-    </>
-  )
+    <VStack>
+      <Flex flexDir="row" width="100%" padding="10px">
+        <Button variant="primary">ABOUT</Button>
+        <Spacer />
+        <ConnectButton />
+      </Flex>
+      <Heading as="h1">Propcorn</Heading>
+    </VStack>
+  );
 }
 
-export default App
+export default App;
