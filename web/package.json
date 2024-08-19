@@ -8,7 +8,7 @@
     "build": "tsc && vite build",
     "lint": "biome check .",
     "preview": "vite preview",
-    "deploy": "gh-pages -d dist"
+    "deploy": "pnpm build && gh-pages -d dist"
   },
   "dependencies": {
     "@chakra-ui/react": "^2.8.2",
