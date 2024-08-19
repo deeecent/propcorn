@@ -11,7 +11,6 @@ import {
   defineStyleConfig,
   extendTheme,
 } from "@chakra-ui/react";
-
 import "./index.css";
 import { ConnectKitProvider } from "connectkit";
 
@@ -42,6 +41,10 @@ const Button = defineStyleConfig({
 });
 
 const theme = extendTheme({
+  fonts: {
+    heading: `"FiraCodeHeading", "Arial", "serif"`,
+    body: `"FiraCode", "Arial", "serif"`,
+  },
   styles: {
     global: {
       html: {

@@ -19,3 +19,18 @@
     color: #181818;
   }
 }
+
+@font-face {
+  font-family: "FiraCode";
+  src:
+    local("FiraCode"),
+    url(./fonts/Fira_Code/static/FiraCode-Regular.ttf) format("truetype");
+}
+
+@font-face {
+  font-family: "FiraCodeHeading";
+  font-weight: 700;
+  src:
+    local("FiraCode"),
+    url(./fonts/Fira_Code/static/FiraCode-Bold.ttf) format("truetype");
+}

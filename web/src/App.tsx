@@ -4,7 +4,6 @@ import {
   Heading,
   HStack,
   Spacer,
-  Text,
   VStack,
 } from "@chakra-ui/react";
 import ConnectButton from "./ConnectButton";
@@ -23,7 +22,7 @@ function App() {
         Propcorn
       </Heading>
       <Spacer />
-      <Heading as="h2" size="xl">
+      <Heading as="h2" size="l">
         Get funds for your opensource work.
       </Heading>
       <Spacer />
