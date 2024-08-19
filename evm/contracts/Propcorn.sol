@@ -1,8 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.8.9;
 
-import "./IPropcorn.sol";
-
 contract Propcorn {
     // Errors
     error NonexistentProposal();
@@ -32,7 +30,7 @@ contract Propcorn {
         address indexed from,
         uint256 index,
         uint256 amount,
-        address indexed to
+        address to
     );
 
     // Structs and data
