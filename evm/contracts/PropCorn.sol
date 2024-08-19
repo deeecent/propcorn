@@ -14,11 +14,11 @@ contract PropCorn {
 
     constructor() {}
 
-    function createProposal(Proposal memory proposal) public {}
+    function createProposal(string calldata url, uint256 daysToUnlock, uint256 minAmountRequested) public {}
 
-    function fundProposal(address account, uint256 id) public payable {}
+    function fundProposal(address account, uint256 index) public payable {}
 
-    function withdrawFunds(address user) public {}
+    function withdrawFunds(address account, uint256 index) public {}
 
     function getProposalByAccount(address account, uint256 index) public view returns (Proposal memory) {
         return _proposals[account][index];
