@@ -32,13 +32,10 @@ function Create() {
   const { data: hash, writeContract } = useWriteContract();
   const navigate = useNavigate();
 
-  const {
-    isLoading: isConfirming,
-    isSuccess: isConfirmed,
-    data,
-  } = useWaitForTransactionReceipt({
-    hash,
-  });
+  const { isLoading: isConfirming, isSuccess: isConfirmed } =
+    useWaitForTransactionReceipt({
+      hash,
+    });
 
   const chainId = useChainId();
 
@@ -62,6 +59,7 @@ function Create() {
       navigate(`/proposals/${account.address}/${logs[0].args.index}`);
     },
   });
+  console.log(unwatch);
 
   async function submit() {
     if (link === undefined || amount === undefined || days === undefined) {
@@ -142,7 +140,7 @@ function Create() {
       <HStack width="100%">
         <Text width="20%">Creator:</Text>
         <ConnectKitButton.Custom>
-          {({ isConnected, show, truncatedAddress, ensName, chain }) => {
+          {({ isConnected, show, truncatedAddress, ensName }) => {
             return (
               <Box>
                 {isConnected && (ensName ?? truncatedAddress)}

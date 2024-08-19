@@ -4,7 +4,7 @@ import { ConnectKitButton } from "connectkit";
 function ConnectButton() {
   return (
     <ConnectKitButton.Custom>
-      {({ isConnected, show, truncatedAddress, ensName, chain }) => {
+      {({ isConnected, show, truncatedAddress, ensName }) => {
         return (
           <Button onClick={show} variant="primary">
             {isConnected ? (ensName ?? truncatedAddress) : "connect"}

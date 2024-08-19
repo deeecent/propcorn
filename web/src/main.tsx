@@ -5,7 +5,6 @@ import ReactDOM from "react-dom/client";
 import { WagmiProvider } from "wagmi";
 
 import App from "./App.tsx";
-import Proposal from "./Show.tsx";
 import { config } from "./wagmi.ts";
 import {
   ChakraProvider,
@@ -26,11 +25,11 @@ const Button = defineStyleConfig({
     borderWidth: "0.5px",
   },
   variants: {
-    primary: (props) => ({
+    primary: () => ({
       color: "white",
       backgroundColor: "black",
     }),
-    disabled: (props) => ({
+    disabled: () => ({
       fontSize: "md",
       backgroundColor: "black",
       color: "grey",
