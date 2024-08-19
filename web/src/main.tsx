@@ -5,7 +5,7 @@ import ReactDOM from "react-dom/client";
 import { WagmiProvider } from "wagmi";
 
 import App from "./App.tsx";
-import Show from "./Show.tsx";
+import Proposal from "./Show.tsx";
 import { config } from "./wagmi.ts";
 import {
   ChakraProvider,

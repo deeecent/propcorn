@@ -2,7 +2,7 @@ import { Button, Flex, Heading, Spacer, VStack } from "@chakra-ui/react";
 import ConnectButton from "./ConnectButton";
 import Landing from "./Landing";
 import { useParams } from "react-router-dom";
-import Show from "./Show";
+import Proposal from "./Proposal";
 
 type ProposalParams = {
   author: `0x${string}`;
@@ -25,7 +25,7 @@ function App() {
       </Heading>
       <Spacer />
       {author !== undefined && index !== undefined && (
-        <Show author={author} index={index} />
+        <Proposal author={author} index={index} />
       )}
       {(author === undefined || index === undefined) && <Landing />}
     </VStack>

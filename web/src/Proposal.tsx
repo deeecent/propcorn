@@ -2,6 +2,7 @@ import {
   Button,
   Heading,
   HStack,
+  Link,
   NumberInput,
   NumberInputField,
   Spacer,
@@ -22,14 +23,13 @@ import { propcornAbi as abi, propcornAddress } from "./generated";
 import { useEffect, useState } from "react";
 import { formatEther, parseEther } from "viem";
 import useCountdown from "./Countdown";
-import { useParams } from "react-router-dom";
 
-type ProposalParams = {
+interface ProposalParams {
   author: `0x${string}`;
   index: string;
-};
+}
 
-interface Proposal {
+interface ProposalData {
   url: string;
   daysToUnlock: bigint;
   minAmountRequested: bigint;
@@ -38,10 +38,8 @@ interface Proposal {
   finished: boolean;
 }
 
-function Show() {
-  //const { author, index } =  useParams<ProposalParams>();
-  const author = "0x9575eB2a7804c43F68dC7998EB0f250832DF9f10";
-  const index = "1";
+function Proposal(props: ProposalParams) {
+  const { author, index } = props;
   const toast = useToast();
 
   const account = useAccount();
@@ -55,7 +53,7 @@ function Show() {
     args: [author!, BigInt(index!)],
   });
 
-  const { data: hash, writeContract } = useWriteContract();
+  const { data: hash, writeContract, error } = useWriteContract();
 
   const { isLoading: isConfirming, isSuccess: isConfirmed } =
     useWaitForTransactionReceipt({
@@ -69,13 +67,15 @@ function Show() {
   const [balance, setBalance] = useState<bigint>();
   const { days, hours, minutes, seconds } = useCountdown(
     fundCompletedAt && daysToUnlock
-      ? Number(fundCompletedAt) + Number(daysToUnlock)
+      ? Number(fundCompletedAt) + Number(daysToUnlock) * 86400
       : 0
   );
 
   const [fundAmount, setFundAmount] = useState<string>();
-  const handleFundAmountChange = (event: any) =>
-    setFundAmount(event.target.value);
+  const handleFundAmountChange = (event: any) => {
+    console.log(event);
+    setFundAmount(event);
+  };
 
   async function submit() {
     if (fundAmount === undefined) {
@@ -89,24 +89,32 @@ function Show() {
       return;
     }
 
+    console.log("funding...");
+
     writeContract({
       abi,
       address: propcornAddress[chainId],
       functionName: "fundProposal",
-      args: [author!, BigInt(index!)],
+      args: [author, BigInt(index)],
       value: parseEther(fundAmount),
     });
   }
 
   useEffect(() => {
+    if (error) {
+      console.log(error);
+    }
+  }, [error]);
+
+  useEffect(() => {
     if (isConfirmed) {
-      console.log("succes");
+      result.refetch();
     }
   }, [isConfirmed]);
 
   useEffect(() => {
     if (result && result.data) {
-      const data = result.data as Proposal;
+      const data = result.data as ProposalData;
       setUrl(data.url);
       setDaysToUnlock(data.daysToUnlock);
       setMinAmountRequested(data.minAmountRequested);
@@ -116,20 +124,15 @@ function Show() {
   }, [result]);
 
   return (
-    <VStack
-      className="form"
-      borderTopWidth="1px"
-      borderTopColor="white"
-      paddingTop="30px"
-      height="50vh"
-      width="60%"
-    >
-      <Heading as="h3" size="l">
+    <VStack className="form" height="70vh" width="60%">
+      <Heading as="h3" size="xl">
         Proposal
       </Heading>
       <HStack width="100%">
         <Text width="20%">Github Issue:</Text>
-        <Text width="80%">{url}</Text>
+        <Link href={url} target="blank" width="80%" textAlign="left">
+          {url}
+        </Link>
       </HStack>
       <HStack width="100%">
         <Text width="20%">Requested Amount:</Text>
@@ -141,7 +144,9 @@ function Show() {
       </HStack>
       <HStack width="100%">
         <Text width="20%">Current Funding:</Text>
-        <Text>{balance ? `${formatEther(balance)} ETH` : "..."}</Text>
+        <Text>
+          {balance !== undefined ? `${formatEther(balance)} ETH` : "..."}
+        </Text>
       </HStack>
       <HStack width="100%">
         <Text width="20%">Days of work:</Text>
@@ -150,8 +155,8 @@ function Show() {
       {fundCompletedAt !== undefined && fundCompletedAt > 0 && (
         <HStack width="100%">
           <Text width="20%">Completes in:</Text>
-          <Text width="20%">
-            {days}:{hours}:{minutes}:{seconds}
+          <Text width="20%" textAlign="left">
+            {days}d {hours}h {minutes}m {seconds}s
           </Text>
         </HStack>
       )}
@@ -159,9 +164,7 @@ function Show() {
         <Text width="20%">Author:</Text>
         <Text>{ensName && ensName.data ? ensName.data : author}</Text>
       </HStack>
-      <Spacer />
-      <HStack width="100%">
-        <Text width="20%">Fund:</Text>
+      <HStack width="40%">
         <NumberInput
           isInvalid={fundAmount === undefined}
           value={fundAmount}
@@ -170,7 +173,7 @@ function Show() {
           <NumberInputField placeholder="e.g. 0.5 (ETH)" />
         </NumberInput>
         <Button
-          width="100%"
+          width="80%"
           variant="primary"
           disabled={!account.isConnected || isConfirming}
           onClick={submit}

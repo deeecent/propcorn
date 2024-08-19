@@ -87,7 +87,7 @@ function Create() {
       abi,
       address: propcornAddress[chainId],
       functionName: "createProposal",
-      args: [link, parseEther(amount), BigInt(days)],
+      args: [link, BigInt(days), parseEther(amount)],
     });
   }
 
