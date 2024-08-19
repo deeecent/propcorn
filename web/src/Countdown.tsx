@@ -7,18 +7,22 @@ interface Countdown {
   seconds: number;
 }
 
+export function decompose(time: number) {
+  return {
+    days: Math.floor(time / (60 * 60 * 24)),
+    hours: Math.floor((time / (60 * 60)) % 24),
+    minutes: Math.floor((time / 60) % 60),
+    seconds: Math.floor(time % 60),
+  };
+}
+
 const useCountdown = (targetTimestamp: number): Countdown => {
   const calculateTimeLeft = () => {
     const now = Date.now();
     const difference = targetTimestamp * 1000 - now;
 
     if (difference > 0) {
-      return {
-        days: Math.floor(difference / (1000 * 60 * 60 * 24)),
-        hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
-        minutes: Math.floor((difference / (1000 * 60)) % 60),
-        seconds: Math.floor((difference / 1000) % 60),
-      };
+      return decompose(difference / 1000);
     } else {
       return { days: 0, hours: 0, minutes: 0, seconds: 0 };
     }

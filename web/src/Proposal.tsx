@@ -22,7 +22,7 @@ import {
 import { propcornAbi as abi, propcornAddress } from "./generated";
 import { useEffect, useState } from "react";
 import { formatEther, parseEther } from "viem";
-import useCountdown from "./Countdown";
+import useCountdown, { decompose } from "./Countdown";
 
 interface ProposalParams {
   author: `0x${string}`;
@@ -31,11 +31,12 @@ interface ProposalParams {
 
 interface ProposalData {
   url: string;
-  daysToUnlock: bigint;
+  secondsToUnlock: bigint;
   minAmountRequested: bigint;
+  feeBasisPoints: bigint;
   balance: bigint;
   fundingCompletedAt: bigint;
-  finished: boolean;
+  closed: boolean;
 }
 
 function Proposal(props: ProposalParams) {
@@ -61,15 +62,23 @@ function Proposal(props: ProposalParams) {
     });
 
   const [url, setUrl] = useState<string>("");
-  const [daysToUnlock, setDaysToUnlock] = useState<bigint>();
+  const [secondsToUnlock, setSecondsToUnlock] = useState<bigint>();
   const [fundCompletedAt, setFundCompletedAt] = useState<bigint>();
   const [minAmountRequested, setMinAmountRequested] = useState<bigint>();
+  const [feeBasisPoints, setFeeBasisPoints] = useState<bigint>();
   const [balance, setBalance] = useState<bigint>();
   const { days, hours, minutes, seconds } = useCountdown(
-    fundCompletedAt && daysToUnlock
-      ? Number(fundCompletedAt) + Number(daysToUnlock) * 86400
+    fundCompletedAt && secondsToUnlock
+      ? Number(fundCompletedAt) + Number(secondsToUnlock)
       : 0
   );
+
+  const {
+    days: sDays,
+    hours: sHours,
+    minutes: sMinutes,
+    seconds: sSeconds,
+  } = decompose(Number(secondsToUnlock));
 
   const [fundAmount, setFundAmount] = useState<string>();
   const handleFundAmountChange = (event: any) => {
@@ -116,15 +125,22 @@ function Proposal(props: ProposalParams) {
     if (result && result.data) {
       const data = result.data as ProposalData;
       setUrl(data.url);
-      setDaysToUnlock(data.daysToUnlock);
+      setSecondsToUnlock(data.secondsToUnlock);
       setMinAmountRequested(data.minAmountRequested);
+      setFeeBasisPoints(data.feeBasisPoints);
       setBalance(data.balance);
       setFundCompletedAt(data.fundingCompletedAt);
     }
   }, [result]);
 
   return (
-    <VStack className="form" height="70vh" width="60%">
+    <VStack
+      className="form"
+      height="70vh"
+      width="75%"
+      alignContent="center"
+      alignItems="center"
+    >
       <Heading as="h3" size="xl">
         Proposal
       </Heading>
@@ -149,8 +165,12 @@ function Proposal(props: ProposalParams) {
         </Text>
       </HStack>
       <HStack width="100%">
-        <Text width="20%">Days of work:</Text>
-        <Text>{daysToUnlock ? Number(daysToUnlock) : "..."}</Text>
+        <Text width="20%">Estimated work time:</Text>
+        <Text>
+          {secondsToUnlock !== undefined
+            ? `${sDays}d ${sHours}h ${sMinutes}m ${sSeconds}s`
+            : "..."}
+        </Text>
       </HStack>
       {fundCompletedAt !== undefined && fundCompletedAt > 0 && (
         <HStack width="100%">
@@ -161,6 +181,14 @@ function Proposal(props: ProposalParams) {
         </HStack>
       )}
       <HStack width="100%">
+        <Text width="20%">Protocol fee:</Text>
+        <Text>
+          {feeBasisPoints !== undefined
+            ? `${Number(feeBasisPoints) / 100}%`
+            : "..."}
+        </Text>
+      </HStack>
+      <HStack width="100%">
         <Text width="20%">Author:</Text>
         <Text>{ensName && ensName.data ? ensName.data : author}</Text>
       </HStack>
@@ -170,7 +198,7 @@ function Proposal(props: ProposalParams) {
           value={fundAmount}
           onChange={handleFundAmountChange}
         >
-          <NumberInputField placeholder="e.g. 0.5 (ETH)" />
+          <NumberInputField fontSize="13px" placeholder="e.g. 0.5" />
         </NumberInput>
         <Button
           width="80%"
@@ -178,7 +206,7 @@ function Proposal(props: ProposalParams) {
           disabled={!account.isConnected || isConfirming}
           onClick={submit}
         >
-          {isConfirming ? "Confirming..." : "Fund"}
+          {isConfirming ? "Confirming..." : "Fund (ETH)"}
         </Button>
       </HStack>
       <Spacer />

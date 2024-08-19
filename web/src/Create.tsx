@@ -48,14 +48,15 @@ function Create() {
   const [days, setDays] = useState<number>();
   const handleDaysChange = (event: any) => setDays(event);
 
+  const [fee, setFee] = useState<number>(5);
+  const handleFeeChange = (event: any) => setFee(event);
+
   const unwatch = useWatchContractEvent({
     address: propcornAddress[chainId],
     abi: abi,
     eventName: "ProposalCreated",
     args: { from: account.address },
     onLogs: (logs) => {
-      console.log(logs);
-      console.log(logs[0].args.index);
       navigate(`/proposals/${account.address}/${logs[0].args.index}`);
     },
   });
@@ -85,7 +86,7 @@ function Create() {
       abi,
       address: propcornAddress[chainId],
       functionName: "createProposal",
-      args: [link, BigInt(days), parseEther(amount)],
+      args: [link, BigInt(days * 86400), parseEther(amount), BigInt(fee * 100)],
     });
   }
 
@@ -136,6 +137,25 @@ function Create() {
         >
           <NumberInputField placeholder="Number of days" />
         </NumberInput>
+      </HStack>
+      <HStack width="100%">
+        <Text width="20%">Protocol fee:</Text>
+        <NumberInput
+          isInvalid={fee === undefined}
+          value={fee}
+          onChange={handleFeeChange}
+        >
+          <NumberInputField placeholder="Protocol fee" />
+        </NumberInput>
+        <Button variant="primary" onClick={() => setFee(10)}>
+          10%
+        </Button>
+        <Button variant="primary" onClick={() => setFee(5)}>
+          5%
+        </Button>
+        <Button variant="primary" onClick={() => setFee(15)}>
+          15%
+        </Button>
       </HStack>
       <HStack width="100%">
         <Text width="20%">Creator:</Text>
