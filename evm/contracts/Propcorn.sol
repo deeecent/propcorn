@@ -7,6 +7,7 @@ contract Propcorn {
     error ProposalInProgress();
     error ProposalClosed();
     error InvalidOwner();
+    error InvalidFee();
 
     // Events
     event ProposalCreated(
@@ -64,6 +65,9 @@ contract Propcorn {
         uint256 minAmountRequested,
         uint256 feeBasisPoints
     ) public {
+        if (feeBasisPoints > 10000) {
+            revert InvalidFee();
+        }
         _proposals[msg.sender].push(
             Proposal(
                 url,
