@@ -30,7 +30,7 @@ contract Propcorn {
         address indexed from,
         uint256 index,
         uint256 amount,
-        address indexed to
+        address to
     );
 
     // Structs and data
