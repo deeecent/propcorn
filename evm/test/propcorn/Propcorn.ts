@@ -89,7 +89,7 @@ describe("Propcorn", function () {
         .withArgs(carol.address, bob.address, index, parseEther("0.4"), 0);
     });
 
-    it("should emit an event with `minAmountTimestamp` set on funding when reaches the threshold", async () => {
+    it("should emit an event with `fundingCompletedAt` set on funding when reaches the threshold", async () => {
       const nextTimestamp = 2000000000;
       await time.setNextBlockTimestamp(nextTimestamp);
       await expect(

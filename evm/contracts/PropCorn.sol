@@ -9,7 +9,7 @@ contract Propcorn {
         uint256 daysToUnlock;
         uint256 minAmountRequested;
         uint256 balance;
-        uint256 minAmountTimestamp;
+        uint256 fundingCompletedAt;
         bool finished;
     }
 
@@ -28,7 +28,7 @@ contract Propcorn {
         address account,
         uint256 index,
         uint256 amount,
-        uint256 minAmountTimestamp
+        uint256 fundingCompletedAt
     );
 
     event FundsWithdrawn(
@@ -75,10 +75,10 @@ contract Propcorn {
         Proposal storage proposal = _proposals[account][index];
         proposal.balance += msg.value;
         if (
-            proposal.minAmountTimestamp == 0 &&
+            proposal.fundingCompletedAt == 0 &&
             proposal.balance >= proposal.minAmountRequested
         ) {
-            proposal.minAmountTimestamp = block.timestamp;
+            proposal.fundingCompletedAt = block.timestamp;
         }
 
         emit ProposalFunded(
@@ -86,7 +86,7 @@ contract Propcorn {
             account,
             index,
             msg.value,
-            proposal.minAmountTimestamp
+            proposal.fundingCompletedAt
         );
     }
 
@@ -99,7 +99,7 @@ contract Propcorn {
         require(account != address(0));
         require(_proposals[account][index].balance > 0);
         require(
-            _proposals[account][index].minAmountTimestamp - block.timestamp >=
+            _proposals[account][index].fundingCompletedAt - block.timestamp >=
                 _proposals[account][index].daysToUnlock
         );
         uint256 _amount = address(this).balance;
@@ -119,7 +119,7 @@ contract Propcorn {
         address account,
         uint256 index
     ) public view returns (uint256) {
-        return _proposals[account][index].minAmountTimestamp - block.timestamp;
+        return _proposals[account][index].fundingCompletedAt - block.timestamp;
     }
 
     receive() external payable {}
