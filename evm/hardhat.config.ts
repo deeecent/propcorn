@@ -6,6 +6,7 @@ import type { NetworkUserConfig } from "hardhat/types";
 
 import "./tasks/accounts";
 import "./tasks/lock";
+import "./tasks/propcorn";
 
 // Run 'npx hardhat vars setup' to see the list of variables that need to be set
 

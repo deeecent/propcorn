@@ -1,8 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.8.9;
 
-contract PropCorn {
-
+contract Propcorn {
     struct Proposal {
         string url;
         uint256 daysToUnlock;
@@ -13,8 +12,7 @@ contract PropCorn {
 
     mapping(address => Proposal[]) internal _proposals;
 
-    constructor() {
-    }
+    constructor() {}
 
     function createProposal(string calldata url, uint256 daysToUnlock, uint256 minAmountRequested) public {
         _proposals[msg.sender].push(Proposal(url, daysToUnlock, minAmountRequested, address(this).balance, false));
@@ -24,16 +22,15 @@ contract PropCorn {
         _proposals[account][index].balance += msg.value;
     }
 
-
     /* TODO:
     -require time passed
     */
     function withdrawFunds(address account, uint256 index) public {
-      require(account != address(0));
-      require(address(this).balance > 0);
-      uint256 _amount = address(this).balance;
-      payable(account).transfer(_amount);
-      _proposals[account][index].finished = true;
+        require(account != address(0));
+        require(address(this).balance > 0);
+        uint256 _amount = address(this).balance;
+        payable(account).transfer(_amount);
+        _proposals[account][index].finished = true;
     }
 
     function getProposalByAccount(address account, uint256 index) public view returns (Proposal memory) {

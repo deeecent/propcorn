@@ -4,9 +4,9 @@ import { expect } from "chai";
 import { ethers } from "hardhat";
 
 import type { Signers } from "../types";
-import { deployPropCornFixture } from "./PropCorn.fixture";
+import { deployPropcornFixture } from "./Propcorn.fixture";
 
-describe("PropCorn", function () {
+describe("Propcorn", function () {
   before(async function () {
     this.signers = {} as Signers;
 
@@ -18,15 +18,15 @@ describe("PropCorn", function () {
 
   describe("Deployment", function () {
     beforeEach(async function () {
-      const { propCorn } = await this.loadFixture(deployPropCornFixture);
-      this.propCorn = propCorn;
+      const { propcorn } = await this.loadFixture(deployPropcornFixture);
+      this.propCorn = propcorn;
     });
   });
 
   describe("createProposal", function () {
     beforeEach(async function () {
-      const { propCorn } = await this.loadFixture(deployPropCornFixture);
-      this.propCorn = propCorn;
+      const { propcorn } = await this.loadFixture(deployPropcornFixture);
+      this.propCorn = propcorn;
     });
 
     describe("should create a proposal", function () {
