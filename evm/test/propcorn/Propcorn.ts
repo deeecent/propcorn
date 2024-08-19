@@ -12,9 +12,10 @@ describe("Propcorn", function () {
   let alice: SignerWithAddress;
   let bob: SignerWithAddress;
   let carol: SignerWithAddress;
+  let dan: SignerWithAddress;
 
   before(async () => {
-    [alice, bob, carol] = await ethers.getSigners();
+    [alice, bob, carol, dan] = await ethers.getSigners();
   });
 
   describe("Deployment", function () {
@@ -25,8 +26,10 @@ describe("Propcorn", function () {
 
   describe("createProposal", function () {
     const url = "https://github.com/deeecent/propcorn/issues/1";
-    const daysToUnlock = 18;
+    const secondsToUnlock = 18;
     const minAmountRequested = parseEther("1");
+    // 2%
+    const protocolFeeBasisPoints = 2 * 100;
 
     beforeEach(async () => {
       ({ propcorn } = await loadFixture(deployPropcornFixture));
@@ -36,47 +39,102 @@ describe("Propcorn", function () {
       await expect(
         propcorn
           .connect(bob)
-          .createProposal(url, daysToUnlock, minAmountRequested),
+          .createProposal(
+            url,
+            secondsToUnlock,
+            minAmountRequested,
+            protocolFeeBasisPoints,
+          ),
       )
         .to.emit(propcorn, "ProposalCreated")
-        .withArgs(bob.address, 0, url, daysToUnlock, minAmountRequested);
+        .withArgs(
+          bob.address,
+          0,
+          url,
+          secondsToUnlock,
+          minAmountRequested,
+          protocolFeeBasisPoints,
+        );
     });
 
     it("should increment the index on every new submission by the same user", async () => {
       const url = "https://github.com/deeecent/propcorn/issues/1";
-      const daysToUnlock = 18;
+      const secondsToUnlock = 666;
       const minAmountRequested = parseEther("1");
 
       await propcorn
         .connect(bob)
-        .createProposal(url, daysToUnlock, minAmountRequested);
+        .createProposal(
+          url,
+          secondsToUnlock,
+          minAmountRequested,
+          protocolFeeBasisPoints,
+        );
       await expect(
         propcorn
           .connect(bob)
-          .createProposal(url, daysToUnlock, minAmountRequested),
+          .createProposal(
+            url,
+            secondsToUnlock,
+            minAmountRequested,
+            protocolFeeBasisPoints,
+          ),
       )
         .to.emit(propcorn, "ProposalCreated")
-        .withArgs(bob.address, 1, url, daysToUnlock, minAmountRequested);
+        .withArgs(
+          bob.address,
+          1,
+          url,
+          secondsToUnlock,
+          minAmountRequested,
+          protocolFeeBasisPoints,
+        );
     });
   });
 
   describe("fundProposal", function () {
     const url = "https://github.com/deeecent/propcorn/issues/1";
-    const daysToUnlock = 18;
+    const secondsToUnlock = 18;
     const minAmountRequested = parseEther("1");
     const index = 0;
+    // 2%
+    const protocolFeeBasisPoints = 2 * 100;
 
     beforeEach(async () => {
       ({ propcorn } = await loadFixture(deployPropcornFixture));
       await propcorn
         .connect(bob)
-        .createProposal(url, daysToUnlock, minAmountRequested);
+        .createProposal(
+          url,
+          secondsToUnlock,
+          minAmountRequested,
+          protocolFeeBasisPoints,
+        );
     });
 
     it("should fail if the proposal doesn't exist", async () => {
       await expect(
         propcorn.connect(carol).fundProposal(bob.address, 9999),
       ).revertedWithCustomError(propcorn, "NonexistentProposal");
+    });
+
+    it("should fail if the proposal is closed", async () => {
+      // Fund the full proposal
+      await propcorn
+        .connect(carol)
+        .fundProposal(bob.address, index, { value: minAmountRequested });
+
+      // Let time passes
+      await time.increase(secondsToUnlock);
+
+      // Withdraw the full amount
+      await propcorn
+        .connect(bob)
+        .withdrawFunds(bob.address, index, dan.address);
+
+      await expect(
+        propcorn.connect(carol).fundProposal(bob.address, 0),
+      ).revertedWithCustomError(propcorn, "ProposalClosed");
     });
 
     it("should emit an event on funding", async () => {
@@ -104,6 +162,108 @@ describe("Propcorn", function () {
           0,
           parseEther("1"),
           nextTimestamp,
+        );
+    });
+  });
+
+  describe("withdrawFunds", function () {
+    const url = "https://github.com/deeecent/propcorn/issues/1";
+    const secondsToUnlock = 666;
+    const minAmountRequested = parseEther("1");
+    // 2%
+    const protocolFeeBasisPoints = 2 * 100;
+    const index = 0;
+
+    beforeEach(async () => {
+      ({ propcorn } = await loadFixture(deployPropcornFixture));
+      await propcorn
+        .connect(bob)
+        .createProposal(
+          url,
+          secondsToUnlock,
+          minAmountRequested,
+          protocolFeeBasisPoints,
+        );
+    });
+
+    it("should fail if the proposal doesn't exist", async () => {
+      await expect(
+        propcorn.connect(bob).withdrawFunds(bob.address, 9999, bob.address),
+      ).revertedWithCustomError(propcorn, "NonexistentProposal");
+    });
+
+    it("should fail if the sender is not the owner of the proposal", async () => {
+      await expect(
+        propcorn.connect(carol).withdrawFunds(bob.address, index, bob.address),
+      ).revertedWithCustomError(propcorn, "InvalidOwner");
+    });
+
+    it("should fail if the proposal is not funded yet", async () => {
+      await expect(
+        propcorn.connect(bob).withdrawFunds(bob.address, index, bob.address),
+      ).revertedWithCustomError(propcorn, "ProposalInProgress");
+    });
+
+    it("should fail if the proposal reaches the amount threshold but not the temporal one", async () => {
+      await propcorn
+        .connect(carol)
+        .fundProposal(bob.address, index, { value: minAmountRequested });
+      await expect(
+        propcorn.connect(bob).withdrawFunds(bob.address, index, bob.address),
+      ).revertedWithCustomError(propcorn, "ProposalInProgress");
+    });
+
+    it("should fail if the funds has already been withdrawn", async () => {
+      await propcorn
+        .connect(carol)
+        .fundProposal(bob.address, index, { value: minAmountRequested });
+
+      await time.increase(secondsToUnlock);
+
+      await propcorn
+        .connect(bob)
+        .withdrawFunds(bob.address, index, dan.address);
+
+      await expect(
+        propcorn.connect(bob).withdrawFunds(bob.address, index, dan.address),
+      ).revertedWithCustomError(propcorn, "ProposalClosed");
+    });
+
+    it("should transfer funds if the proposal reaches the min amount and enough time has passed", async () => {
+      await propcorn
+        .connect(carol)
+        .fundProposal(bob.address, index, { value: minAmountRequested });
+      await time.increase(secondsToUnlock);
+
+      await expect(
+        propcorn.connect(bob).withdrawFunds(bob.address, index, dan.address),
+      ).to.changeEtherBalances(
+        [await propcorn.getAddress(), dan.address, alice.address],
+        [
+          -minAmountRequested,
+          minAmountRequested -
+            (minAmountRequested * BigInt(protocolFeeBasisPoints)) / 10000n,
+          (minAmountRequested * BigInt(protocolFeeBasisPoints)) / 10000n,
+        ],
+      );
+    });
+
+    it("should emit an event if the proposal reaches the min amount and enough time has passed", async () => {
+      await propcorn
+        .connect(carol)
+        .fundProposal(bob.address, index, { value: minAmountRequested });
+      await time.increase(secondsToUnlock);
+
+      await expect(
+        propcorn.connect(bob).withdrawFunds(bob.address, index, dan.address),
+      )
+        .to.emit(propcorn, "FundsWithdrawn")
+        .withArgs(
+          bob.address,
+          index,
+          minAmountRequested -
+            (minAmountRequested * BigInt(protocolFeeBasisPoints)) / 10000n,
+          dan.address,
         );
     });
   });
