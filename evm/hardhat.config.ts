@@ -11,7 +11,7 @@ import "./tasks/propcorn";
 // Run 'npx hardhat vars setup' to see the list of variables that need to be set
 
 const mnemonic: string = vars.get("MNEMONIC");
-const infuraApiKey: string = vars.get("INFURA_API_KEY");
+const alchemyApiKey: string = vars.get("ALCHEMY_API_KEY");
 
 const chainIds = {
   "arbitrum-mainnet": 42161,
@@ -36,7 +36,7 @@ function getChainConfig(chain: keyof typeof chainIds): NetworkUserConfig {
       jsonRpcUrl = "https://bsc-dataseed1.binance.org";
       break;
     default:
-      jsonRpcUrl = "https://" + chain + ".infura.io/v3/" + infuraApiKey;
+      jsonRpcUrl = "https://eth-sepolia.g.alchemy.com/v2/" + alchemyApiKey;
   }
   return {
     accounts: {
@@ -102,7 +102,7 @@ const config: HardhatUserConfig = {
     tests: "./test",
   },
   solidity: {
-    version: "0.8.19",
+    version: "0.8.23",
     settings: {
       metadata: {
         // Not including the metadata hash
