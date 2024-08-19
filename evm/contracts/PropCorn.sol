@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.8.9;
 
-error InvalidUnlockTime(uint256 unlockTime);
-error NotOwner(address owner);
-error UnlockTimeNotReached(uint256 unlockTime);
-
 contract PropCorn {
     struct Proposal {
         string url;
