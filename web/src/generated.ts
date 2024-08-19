@@ -80,7 +80,97 @@ export const lockAbi = [
  *
  */
 export const propcornAbi = [
-  { type: 'constructor', inputs: [], stateMutability: 'nonpayable' },
+  { type: 'error', inputs: [], name: 'NonexistentProposal' },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      {
+        name: 'from',
+        internalType: 'address',
+        type: 'address',
+        indexed: false,
+      },
+      {
+        name: 'index',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: false,
+      },
+      {
+        name: 'amount',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: false,
+      },
+      { name: 'to', internalType: 'address', type: 'address', indexed: false },
+    ],
+    name: 'FundsWithdrawn',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      { name: 'from', internalType: 'address', type: 'address', indexed: true },
+      {
+        name: 'index',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: false,
+      },
+      { name: 'url', internalType: 'string', type: 'string', indexed: false },
+      {
+        name: 'daysToUnlock',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: false,
+      },
+      {
+        name: 'minAmountRequested',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: false,
+      },
+    ],
+    name: 'ProposalCreated',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      {
+        name: 'from',
+        internalType: 'address',
+        type: 'address',
+        indexed: false,
+      },
+      {
+        name: 'account',
+        internalType: 'address',
+        type: 'address',
+        indexed: false,
+      },
+      {
+        name: 'index',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: false,
+      },
+      {
+        name: 'amount',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: false,
+      },
+      {
+        name: 'fundingCompletedAt',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: false,
+      },
+    ],
+    name: 'ProposalFunded',
+  },
   {
     type: 'function',
     inputs: [
@@ -123,10 +213,25 @@ export const propcornAbi = [
             type: 'uint256',
           },
           { name: 'balance', internalType: 'uint256', type: 'uint256' },
+          {
+            name: 'fundingCompletedAt',
+            internalType: 'uint256',
+            type: 'uint256',
+          },
           { name: 'finished', internalType: 'bool', type: 'bool' },
         ],
       },
     ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'account', internalType: 'address', type: 'address' },
+      { name: 'index', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'getTimeLeftToUnlock',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
     stateMutability: 'view',
   },
   {
@@ -146,7 +251,7 @@ export const propcornAbi = [
  *
  */
 export const propcornAddress = {
-  1337: '0x8a22225eD7eD460D7ee3842bce2402B9deaD23D3',
+  1337: '0xA1bBDd84b304EDcfc6dEFE7ABaD8e803F8A408ae',
 } as const
 
 /**
@@ -251,6 +356,18 @@ export const useReadPropcornGetProposalByAccount =
   })
 
 /**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link propcornAbi}__ and `functionName` set to `"getTimeLeftToUnlock"`
+ *
+ *
+ */
+export const useReadPropcornGetTimeLeftToUnlock =
+  /*#__PURE__*/ createUseReadContract({
+    abi: propcornAbi,
+    address: propcornAddress,
+    functionName: 'getTimeLeftToUnlock',
+  })
+
+/**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link propcornAbi}__
  *
  *
@@ -340,4 +457,50 @@ export const useSimulatePropcornWithdrawFunds =
     abi: propcornAbi,
     address: propcornAddress,
     functionName: 'withdrawFunds',
+  })
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link propcornAbi}__
+ *
+ *
+ */
+export const useWatchPropcornEvent = /*#__PURE__*/ createUseWatchContractEvent({
+  abi: propcornAbi,
+  address: propcornAddress,
+})
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link propcornAbi}__ and `eventName` set to `"FundsWithdrawn"`
+ *
+ *
+ */
+export const useWatchPropcornFundsWithdrawnEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({
+    abi: propcornAbi,
+    address: propcornAddress,
+    eventName: 'FundsWithdrawn',
+  })
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link propcornAbi}__ and `eventName` set to `"ProposalCreated"`
+ *
+ *
+ */
+export const useWatchPropcornProposalCreatedEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({
+    abi: propcornAbi,
+    address: propcornAddress,
+    eventName: 'ProposalCreated',
+  })
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link propcornAbi}__ and `eventName` set to `"ProposalFunded"`
+ *
+ *
+ */
+export const useWatchPropcornProposalFundedEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({
+    abi: propcornAbi,
+    address: propcornAddress,
+    eventName: 'ProposalFunded',
   })

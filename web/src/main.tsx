@@ -5,6 +5,7 @@ import ReactDOM from "react-dom/client";
 import { WagmiProvider } from "wagmi";
 
 import App from "./App.tsx";
+import Show from "./Show.tsx";
 import { config } from "./wagmi.ts";
 import {
   ChakraProvider,
@@ -13,6 +14,7 @@ import {
 } from "@chakra-ui/react";
 import "./index.css";
 import { ConnectKitProvider } from "connectkit";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
 const Button = defineStyleConfig({
   // The styles all button have in common
@@ -67,13 +69,24 @@ globalThis.Buffer = Buffer;
 
 const queryClient = new QueryClient();
 
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <App />,
+  },
+  {
+    path: "/proposals/:author/:index",
+    element: <App />,
+  },
+]);
+
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <WagmiProvider config={config}>
       <QueryClientProvider client={queryClient}>
         <ChakraProvider theme={theme}>
           <ConnectKitProvider>
-            <App />
+            <RouterProvider router={router} />
           </ConnectKitProvider>
         </ChakraProvider>
       </QueryClientProvider>

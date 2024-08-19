@@ -1,16 +1,18 @@
-import {
-  Button,
-  Flex,
-  Heading,
-  HStack,
-  Spacer,
-  VStack,
-} from "@chakra-ui/react";
+import { Button, Flex, Heading, Spacer, VStack } from "@chakra-ui/react";
 import ConnectButton from "./ConnectButton";
-import Example from "./Example";
-import Create from "./Create";
+import Landing from "./Landing";
+import { useParams } from "react-router-dom";
+import Show from "./Show";
+
+type ProposalParams = {
+  author: `0x${string}`;
+  index: string;
+};
 
 function App() {
+  const { author, index } = useParams<ProposalParams>();
+  console.log(author);
+
   return (
     <VStack height="100vh">
       <Flex flexDir="row" width="100%" padding="10px">
@@ -22,20 +24,10 @@ function App() {
         Propcorn
       </Heading>
       <Spacer />
-      <Heading as="h2" size="l">
-        Get funds for your opensource work.
-      </Heading>
-      <Spacer />
-      <VStack>
-        <Heading as="h2">Examples</Heading>
-      </VStack>
-      <HStack>
-        <Example />
-        <Example />
-        <Example />
-      </HStack>
-      <Spacer />
-      <Create />
+      {author !== undefined && index !== undefined && (
+        <Show author={author} index={index} />
+      )}
+      {(author === undefined || index === undefined) && <Landing />}
     </VStack>
   );
 }

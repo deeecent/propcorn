@@ -16,7 +16,7 @@ contract Propcorn {
     mapping(address => Proposal[]) internal _proposals;
 
     event ProposalCreated(
-        address from,
+        address indexed from,
         uint256 index,
         string url,
         uint256 daysToUnlock,

@@ -16,23 +16,29 @@ import {
   useAccount,
   useChainId,
   useWaitForTransactionReceipt,
+  useWatchContractEvent,
   useWriteContract,
 } from "wagmi";
 import { ConnectKitButton } from "connectkit";
 import { propcornAbi as abi, propcornAddress } from "./generated";
 import { useEffect, useState } from "react";
 import { parseEther } from "viem";
+import { useNavigate } from "react-router-dom";
 
 function Create() {
   const toast = useToast();
 
   const account = useAccount();
   const { data: hash, writeContract } = useWriteContract();
+  const navigate = useNavigate();
 
-  const { isLoading: isConfirming, isSuccess: isConfirmed } =
-    useWaitForTransactionReceipt({
-      hash,
-    });
+  const {
+    isLoading: isConfirming,
+    isSuccess: isConfirmed,
+    data,
+  } = useWaitForTransactionReceipt({
+    hash,
+  });
 
   const chainId = useChainId();
 
@@ -44,6 +50,18 @@ function Create() {
 
   const [days, setDays] = useState<number>();
   const handleDaysChange = (event: any) => setDays(event);
+
+  const unwatch = useWatchContractEvent({
+    address: propcornAddress[chainId],
+    abi: abi,
+    eventName: "ProposalCreated",
+    args: { from: account.address },
+    onLogs: (logs) => {
+      console.log(logs);
+      console.log(logs[0].args.index);
+      navigate(`/proposals/${account.address}/${logs[0].args.index}`);
+    },
+  });
 
   async function submit() {
     if (link === undefined || amount === undefined || days === undefined) {
