@@ -77,20 +77,30 @@ export const lockAbi = [
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- *
+ * -
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xf614E8Cc3e5b8b17d370E21011a82641B2a953f6)
  */
 export const propcornAbi = [
+  {
+    type: 'constructor',
+    inputs: [
+      {
+        name: 'protocolFeeReceiver',
+        internalType: 'address payable',
+        type: 'address',
+      },
+    ],
+    stateMutability: 'nonpayable',
+  },
+  { type: 'error', inputs: [], name: 'InvalidOwner' },
   { type: 'error', inputs: [], name: 'NonexistentProposal' },
+  { type: 'error', inputs: [], name: 'ProposalClosed' },
+  { type: 'error', inputs: [], name: 'ProposalInProgress' },
   {
     type: 'event',
     anonymous: false,
     inputs: [
-      {
-        name: 'from',
-        internalType: 'address',
-        type: 'address',
-        indexed: false,
-      },
+      { name: 'from', internalType: 'address', type: 'address', indexed: true },
       {
         name: 'index',
         internalType: 'uint256',
@@ -120,13 +130,19 @@ export const propcornAbi = [
       },
       { name: 'url', internalType: 'string', type: 'string', indexed: false },
       {
-        name: 'daysToUnlock',
+        name: 'secondsToUnlock',
         internalType: 'uint256',
         type: 'uint256',
         indexed: false,
       },
       {
         name: 'minAmountRequested',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: false,
+      },
+      {
+        name: 'protocolFeeBasisPoints',
         internalType: 'uint256',
         type: 'uint256',
         indexed: false,
@@ -138,17 +154,12 @@ export const propcornAbi = [
     type: 'event',
     anonymous: false,
     inputs: [
-      {
-        name: 'from',
-        internalType: 'address',
-        type: 'address',
-        indexed: false,
-      },
+      { name: 'from', internalType: 'address', type: 'address', indexed: true },
       {
         name: 'account',
         internalType: 'address',
         type: 'address',
-        indexed: false,
+        indexed: true,
       },
       {
         name: 'index',
@@ -175,8 +186,13 @@ export const propcornAbi = [
     type: 'function',
     inputs: [
       { name: 'url', internalType: 'string', type: 'string' },
-      { name: 'daysToUnlock', internalType: 'uint256', type: 'uint256' },
+      { name: 'secondsToUnlock', internalType: 'uint256', type: 'uint256' },
       { name: 'minAmountRequested', internalType: 'uint256', type: 'uint256' },
+      {
+        name: 'protocolFeeBasisPoints',
+        internalType: 'uint256',
+        type: 'uint256',
+      },
     ],
     name: 'createProposal',
     outputs: [],
@@ -206,7 +222,7 @@ export const propcornAbi = [
         type: 'tuple',
         components: [
           { name: 'url', internalType: 'string', type: 'string' },
-          { name: 'daysToUnlock', internalType: 'uint256', type: 'uint256' },
+          { name: 'secondsToUnlock', internalType: 'uint256', type: 'uint256' },
           {
             name: 'minAmountRequested',
             internalType: 'uint256',
@@ -218,7 +234,12 @@ export const propcornAbi = [
             internalType: 'uint256',
             type: 'uint256',
           },
-          { name: 'finished', internalType: 'bool', type: 'bool' },
+          {
+            name: 'protocolFeeBasisPoints',
+            internalType: 'uint256',
+            type: 'uint256',
+          },
+          { name: 'closed', internalType: 'bool', type: 'bool' },
         ],
       },
     ],
@@ -229,33 +250,26 @@ export const propcornAbi = [
     inputs: [
       { name: 'account', internalType: 'address', type: 'address' },
       { name: 'index', internalType: 'uint256', type: 'uint256' },
-    ],
-    name: 'getTimeLeftToUnlock',
-    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
-    stateMutability: 'view',
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'account', internalType: 'address', type: 'address' },
-      { name: 'index', internalType: 'uint256', type: 'uint256' },
+      { name: 'receiver', internalType: 'address', type: 'address' },
     ],
     name: 'withdrawFunds',
     outputs: [],
     stateMutability: 'nonpayable',
   },
-  { type: 'receive', stateMutability: 'payable' },
 ] as const
 
 /**
- *
+ * -
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xf614E8Cc3e5b8b17d370E21011a82641B2a953f6)
  */
 export const propcornAddress = {
   1337: '0xA1bBDd84b304EDcfc6dEFE7ABaD8e803F8A408ae',
+  11155111: '0xf614E8Cc3e5b8b17d370E21011a82641B2a953f6',
 } as const
 
 /**
- *
+ * -
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xf614E8Cc3e5b8b17d370E21011a82641B2a953f6)
  */
 export const propcornConfig = {
   address: propcornAddress,
@@ -336,7 +350,8 @@ export const useWatchLockWithdrawalEvent =
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link propcornAbi}__
  *
- *
+ * -
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xf614E8Cc3e5b8b17d370E21011a82641B2a953f6)
  */
 export const useReadPropcorn = /*#__PURE__*/ createUseReadContract({
   abi: propcornAbi,
@@ -346,7 +361,8 @@ export const useReadPropcorn = /*#__PURE__*/ createUseReadContract({
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link propcornAbi}__ and `functionName` set to `"getProposalByAccount"`
  *
- *
+ * -
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xf614E8Cc3e5b8b17d370E21011a82641B2a953f6)
  */
 export const useReadPropcornGetProposalByAccount =
   /*#__PURE__*/ createUseReadContract({
@@ -356,21 +372,10 @@ export const useReadPropcornGetProposalByAccount =
   })
 
 /**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link propcornAbi}__ and `functionName` set to `"getTimeLeftToUnlock"`
- *
- *
- */
-export const useReadPropcornGetTimeLeftToUnlock =
-  /*#__PURE__*/ createUseReadContract({
-    abi: propcornAbi,
-    address: propcornAddress,
-    functionName: 'getTimeLeftToUnlock',
-  })
-
-/**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link propcornAbi}__
  *
- *
+ * -
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xf614E8Cc3e5b8b17d370E21011a82641B2a953f6)
  */
 export const useWritePropcorn = /*#__PURE__*/ createUseWriteContract({
   abi: propcornAbi,
@@ -380,7 +385,8 @@ export const useWritePropcorn = /*#__PURE__*/ createUseWriteContract({
 /**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link propcornAbi}__ and `functionName` set to `"createProposal"`
  *
- *
+ * -
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xf614E8Cc3e5b8b17d370E21011a82641B2a953f6)
  */
 export const useWritePropcornCreateProposal =
   /*#__PURE__*/ createUseWriteContract({
@@ -392,7 +398,8 @@ export const useWritePropcornCreateProposal =
 /**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link propcornAbi}__ and `functionName` set to `"fundProposal"`
  *
- *
+ * -
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xf614E8Cc3e5b8b17d370E21011a82641B2a953f6)
  */
 export const useWritePropcornFundProposal =
   /*#__PURE__*/ createUseWriteContract({
@@ -404,7 +411,8 @@ export const useWritePropcornFundProposal =
 /**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link propcornAbi}__ and `functionName` set to `"withdrawFunds"`
  *
- *
+ * -
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xf614E8Cc3e5b8b17d370E21011a82641B2a953f6)
  */
 export const useWritePropcornWithdrawFunds =
   /*#__PURE__*/ createUseWriteContract({
@@ -416,7 +424,8 @@ export const useWritePropcornWithdrawFunds =
 /**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link propcornAbi}__
  *
- *
+ * -
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xf614E8Cc3e5b8b17d370E21011a82641B2a953f6)
  */
 export const useSimulatePropcorn = /*#__PURE__*/ createUseSimulateContract({
   abi: propcornAbi,
@@ -426,7 +435,8 @@ export const useSimulatePropcorn = /*#__PURE__*/ createUseSimulateContract({
 /**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link propcornAbi}__ and `functionName` set to `"createProposal"`
  *
- *
+ * -
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xf614E8Cc3e5b8b17d370E21011a82641B2a953f6)
  */
 export const useSimulatePropcornCreateProposal =
   /*#__PURE__*/ createUseSimulateContract({
@@ -438,7 +448,8 @@ export const useSimulatePropcornCreateProposal =
 /**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link propcornAbi}__ and `functionName` set to `"fundProposal"`
  *
- *
+ * -
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xf614E8Cc3e5b8b17d370E21011a82641B2a953f6)
  */
 export const useSimulatePropcornFundProposal =
   /*#__PURE__*/ createUseSimulateContract({
@@ -450,7 +461,8 @@ export const useSimulatePropcornFundProposal =
 /**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link propcornAbi}__ and `functionName` set to `"withdrawFunds"`
  *
- *
+ * -
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xf614E8Cc3e5b8b17d370E21011a82641B2a953f6)
  */
 export const useSimulatePropcornWithdrawFunds =
   /*#__PURE__*/ createUseSimulateContract({
@@ -462,7 +474,8 @@ export const useSimulatePropcornWithdrawFunds =
 /**
  * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link propcornAbi}__
  *
- *
+ * -
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xf614E8Cc3e5b8b17d370E21011a82641B2a953f6)
  */
 export const useWatchPropcornEvent = /*#__PURE__*/ createUseWatchContractEvent({
   abi: propcornAbi,
@@ -472,7 +485,8 @@ export const useWatchPropcornEvent = /*#__PURE__*/ createUseWatchContractEvent({
 /**
  * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link propcornAbi}__ and `eventName` set to `"FundsWithdrawn"`
  *
- *
+ * -
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xf614E8Cc3e5b8b17d370E21011a82641B2a953f6)
  */
 export const useWatchPropcornFundsWithdrawnEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
@@ -484,7 +498,8 @@ export const useWatchPropcornFundsWithdrawnEvent =
 /**
  * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link propcornAbi}__ and `eventName` set to `"ProposalCreated"`
  *
- *
+ * -
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xf614E8Cc3e5b8b17d370E21011a82641B2a953f6)
  */
 export const useWatchPropcornProposalCreatedEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
@@ -496,7 +511,8 @@ export const useWatchPropcornProposalCreatedEvent =
 /**
  * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link propcornAbi}__ and `eventName` set to `"ProposalFunded"`
  *
- *
+ * -
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xf614E8Cc3e5b8b17d370E21011a82641B2a953f6)
  */
 export const useWatchPropcornProposalFundedEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
