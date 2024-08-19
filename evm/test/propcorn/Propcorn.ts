@@ -35,6 +35,14 @@ describe("Propcorn", function () {
       ({ propcorn } = await loadFixture(deployPropcornFixture));
     });
 
+    it("shouldn't allow to create a proposal with a fee greater than 10000", async () => {
+      await expect(
+        propcorn
+          .connect(bob)
+          .createProposal(url, secondsToUnlock, minAmountRequested, 10001),
+      ).revertedWithCustomError(propcorn, "InvalidFee");
+    });
+
     it("should create a proposal and emit an event", async () => {
       await expect(
         propcorn
