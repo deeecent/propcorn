@@ -5,6 +5,8 @@ contract Propcorn {
     // Errors
     error NonexistentProposal();
     error ProposalInProgress();
+    error FundsLocked();
+    error NoFundsToReturn();
     error ProposalClosed();
     error InvalidOwner();
     error InvalidFee();
@@ -27,6 +29,13 @@ contract Propcorn {
         uint256 fundingCompletedAt
     );
 
+    event ProposalDefunded(
+        address indexed from,
+        address indexed account,
+        uint256 index,
+        uint256 amount
+    );
+
     event FundsWithdrawn(
         address indexed from,
         uint256 index,
@@ -45,6 +54,8 @@ contract Propcorn {
         bool closed;
     }
 
+    // keccak256(address, proposal index) is the key to the balance;
+    mapping(uint256 => uint256) internal _addressAndProposalToBalance;
     mapping(address => Proposal[]) internal _proposals;
     address payable internal _protocolFeeReceiver;
 
@@ -99,6 +110,10 @@ contract Propcorn {
             revert ProposalClosed();
         }
 
+        _addressAndProposalToBalance[
+            uint256(keccak256(abi.encodePacked(msg.sender, account, index)))
+        ] += msg.value;
+
         proposal.balance += msg.value;
 
         if (
@@ -115,6 +130,37 @@ contract Propcorn {
             msg.value,
             proposal.fundingCompletedAt
         );
+    }
+
+    function defundProposal(
+        address account,
+        uint256 index
+    ) public proposalExists(account, index) {
+        Proposal storage proposal = _proposals[account][index];
+
+        if (proposal.closed) {
+            revert ProposalClosed();
+        }
+
+        if (proposal.fundingCompletedAt > 0) {
+            revert FundsLocked();
+        }
+
+        uint256 key = uint256(
+            keccak256(abi.encodePacked(msg.sender, account, index))
+        );
+
+        uint256 toReturn = _addressAndProposalToBalance[key];
+
+        if (toReturn == 0) {
+            revert NoFundsToReturn();
+        }
+        _addressAndProposalToBalance[key] = 0;
+
+        proposal.balance -= toReturn;
+        payable(msg.sender).transfer(toReturn);
+
+        emit ProposalDefunded(msg.sender, account, index, toReturn);
     }
 
     function withdrawFunds(

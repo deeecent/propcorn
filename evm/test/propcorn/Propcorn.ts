@@ -174,6 +174,102 @@ describe("Propcorn", function () {
     });
   });
 
+  describe("defundProposal", function () {
+    const url = "https://github.com/deeecent/propcorn/issues/1";
+    const secondsToUnlock = 18;
+    const minAmountRequested = parseEther("1");
+    const index = 0;
+    // 2%
+    const feeBasisPoints = 2 * 100;
+
+    beforeEach(async () => {
+      ({ propcorn } = await loadFixture(deployPropcornFixture));
+      await propcorn
+        .connect(bob)
+        .createProposal(
+          url,
+          secondsToUnlock,
+          minAmountRequested,
+          feeBasisPoints,
+        );
+    });
+
+    it("should fail if the proposal doesn't exist", async () => {
+      await expect(
+        propcorn.connect(carol).defundProposal(bob.address, 9999),
+      ).revertedWithCustomError(propcorn, "NonexistentProposal");
+    });
+
+    it("should fail if the proposal's funds are locked", async () => {
+      // Fund the full proposal
+      await propcorn
+        .connect(carol)
+        .fundProposal(bob.address, index, { value: minAmountRequested });
+
+      await expect(
+        propcorn.connect(carol).defundProposal(bob.address, 0),
+      ).revertedWithCustomError(propcorn, "FundsLocked");
+    });
+
+    it("should fail if the proposal is closed", async () => {
+      // Fund the full proposal
+      await propcorn
+        .connect(carol)
+        .fundProposal(bob.address, index, { value: minAmountRequested });
+
+      // Let time passes
+      await time.increase(secondsToUnlock);
+
+      // Withdraw the full amount
+      await propcorn
+        .connect(bob)
+        .withdrawFunds(bob.address, index, dan.address);
+
+      await expect(
+        propcorn.connect(carol).defundProposal(bob.address, 0),
+      ).revertedWithCustomError(propcorn, "ProposalClosed");
+    });
+
+    it("should emit an event on defunding", async () => {
+      await propcorn
+        .connect(carol)
+        .fundProposal(bob.address, index, { value: parseEther("0.4") });
+      await expect(propcorn.connect(carol).defundProposal(bob.address, index))
+        .to.emit(propcorn, "ProposalDefunded")
+        .withArgs(carol.address, bob.address, index, parseEther("0.4"));
+    });
+
+    it("should transfer the funds to the user", async () => {
+      await propcorn
+        .connect(carol)
+        .fundProposal(bob.address, index, { value: parseEther("0.4") });
+
+      await expect(
+        propcorn.connect(carol).defundProposal(bob.address, index),
+      ).to.changeEtherBalances(
+        [await propcorn.getAddress(), carol.address],
+        [-parseEther("0.4"), parseEther("0.4")],
+      );
+    });
+
+    it("should not transfer the funds to a user that didn't fund the proposal", async () => {
+      await expect(
+        propcorn.connect(carol).defundProposal(bob.address, index),
+      ).revertedWithCustomError(propcorn, "NoFundsToReturn");
+    });
+
+    it("should not transfer the funds twice to the user", async () => {
+      await propcorn
+        .connect(carol)
+        .fundProposal(bob.address, index, { value: parseEther("0.4") });
+
+      await propcorn.connect(carol).defundProposal(bob.address, index);
+      await expect(
+        propcorn.connect(carol).defundProposal(bob.address, index),
+      ).revertedWithCustomError(propcorn, "NoFundsToReturn");
+    });
+  });
+
   describe("withdrawFunds", function () {
     const url = "https://github.com/deeecent/propcorn/issues/1";
     const secondsToUnlock = 666;
