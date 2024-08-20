@@ -1,6 +1,5 @@
 import {
   Button,
-  Heading,
   HStack,
   Link,
   NumberInput,
@@ -47,6 +46,8 @@ function Proposal(props: ProposalParams) {
   const chainId = useChainId();
   const ensName = useEnsName({ address: author });
 
+  const accountIsAuthor = account.address === props.author;
+
   const result = useReadContract({
     abi,
     address: propcornAddress[chainId],
@@ -86,6 +87,16 @@ function Proposal(props: ProposalParams) {
     setFundAmount(event);
   };
 
+  function canWithdraw() {
+    const currentTimestampInSeconds = Math.floor(Date.now() / 1000);
+    return (
+      fundCompletedAt !== undefined &&
+      fundCompletedAt > 0 &&
+      Number(fundCompletedAt) + Number(secondsToUnlock) <
+        currentTimestampInSeconds
+    );
+  }
+
   async function submit() {
     if (fundAmount === undefined) {
       toast({
@@ -106,6 +117,28 @@ function Proposal(props: ProposalParams) {
       functionName: "fundProposal",
       args: [author, BigInt(index)],
       value: parseEther(fundAmount),
+    });
+  }
+
+  async function withdraw() {
+    if (!accountIsAuthor || account.address === undefined) {
+      toast({
+        title: "Unauthorized",
+        description: `You are the proposal owner`,
+        status: "error",
+        duration: 9000,
+        isClosable: true,
+      });
+      return;
+    }
+
+    console.log("funding...");
+
+    writeContract({
+      abi,
+      address: propcornAddress[chainId],
+      functionName: "withdrawFunds",
+      args: [account.address, BigInt(index), account.address],
     });
   }
 
@@ -134,24 +167,18 @@ function Proposal(props: ProposalParams) {
   }, [result]);
 
   return (
-    <VStack
-      className="form"
-      height="70vh"
-      width="75%"
-      alignContent="center"
-      alignItems="center"
-    >
-      <Heading as="h3" size="xl">
+    <VStack className="form" height="70vh" width="50%">
+      <Text width="100%" fontSize="30px">
         Proposal
-      </Heading>
+      </Text>
       <HStack width="100%">
-        <Text width="20%">Github Issue:</Text>
-        <Link href={url} target="blank" width="80%" textAlign="left">
+        <Text width="30%">Github Issue:</Text>
+        <Link href={url} target="blank" textAlign="left">
           {url}
         </Link>
       </HStack>
       <HStack width="100%">
-        <Text width="20%">Requested Amount:</Text>
+        <Text width="30%">Requested Amount:</Text>
         <Text>
           {minAmountRequested
             ? `${formatEther(minAmountRequested)} ETH`
@@ -159,13 +186,13 @@ function Proposal(props: ProposalParams) {
         </Text>
       </HStack>
       <HStack width="100%">
-        <Text width="20%">Current Funding:</Text>
+        <Text width="30%">Current Funding:</Text>
         <Text>
           {balance !== undefined ? `${formatEther(balance)} ETH` : "..."}
         </Text>
       </HStack>
       <HStack width="100%">
-        <Text width="20%">Estimated work time:</Text>
+        <Text width="30%">Estimated work time:</Text>
         <Text>
           {secondsToUnlock !== undefined
             ? `${sDays}d ${sHours}h ${sMinutes}m ${sSeconds}s`
@@ -174,14 +201,14 @@ function Proposal(props: ProposalParams) {
       </HStack>
       {fundCompletedAt !== undefined && fundCompletedAt > 0 && (
         <HStack width="100%">
-          <Text width="20%">Completes in:</Text>
+          <Text width="30%">Completes in:</Text>
           <Text width="20%" textAlign="left">
             {days}d {hours}h {minutes}m {seconds}s
           </Text>
         </HStack>
       )}
       <HStack width="100%">
-        <Text width="20%">Protocol fee:</Text>
+        <Text width="30%">Protocol fee:</Text>
         <Text>
           {feeBasisPoints !== undefined
             ? `${Number(feeBasisPoints) / 100}%`
@@ -189,26 +216,40 @@ function Proposal(props: ProposalParams) {
         </Text>
       </HStack>
       <HStack width="100%">
-        <Text width="20%">Author:</Text>
+        <Text width="30%">Author:</Text>
         <Text>{ensName && ensName.data ? ensName.data : author}</Text>
       </HStack>
-      <HStack width="40%">
-        <NumberInput
-          isInvalid={fundAmount === undefined}
-          value={fundAmount}
-          onChange={handleFundAmountChange}
-        >
-          <NumberInputField fontSize="13px" placeholder="e.g. 0.5" />
-        </NumberInput>
-        <Button
-          width="80%"
-          variant="primary"
-          disabled={!account.isConnected || isConfirming}
-          onClick={submit}
-        >
-          {isConfirming ? "Confirming..." : "Fund (ETH)"}
-        </Button>
-      </HStack>
+      {accountIsAuthor && canWithdraw() && (
+        <HStack width="40%">
+          <Button
+            width="80%"
+            variant="primary"
+            disabled={!account.isConnected || isConfirming}
+            onClick={withdraw}
+          >
+            {isConfirming ? "Confirming..." : "Withdraw"}
+          </Button>
+        </HStack>
+      )}
+      {(!accountIsAuthor || !canWithdraw()) && (
+        <HStack width="40%">
+          <NumberInput
+            isInvalid={fundAmount === undefined}
+            value={fundAmount}
+            onChange={handleFundAmountChange}
+          >
+            <NumberInputField fontSize="13px" placeholder="e.g. 0.5" />
+          </NumberInput>
+          <Button
+            width="80%"
+            variant="primary"
+            disabled={!account.isConnected || isConfirming}
+            onClick={submit}
+          >
+            {isConfirming ? "Confirming..." : "Fund (ETH)"}
+          </Button>
+        </HStack>
+      )}
       <Spacer />
     </VStack>
   );

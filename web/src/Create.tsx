@@ -4,8 +4,11 @@ import {
   Heading,
   HStack,
   Input,
+  NumberDecrementStepper,
+  NumberIncrementStepper,
   NumberInput,
   NumberInputField,
+  NumberInputStepper,
   Spacer,
   Text,
   useToast,
@@ -23,9 +26,11 @@ import { ConnectKitButton } from "connectkit";
 import { propcornAbi as abi, propcornAddress } from "./generated";
 import { useEffect, useState } from "react";
 import { parseEther } from "viem";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 function Create() {
+  const [searchParams] = useSearchParams();
+
   const toast = useToast();
 
   const account = useAccount();
@@ -46,7 +51,7 @@ function Create() {
   const handleAmountChange = (event: any) => setAmount(event);
 
   const [days, setDays] = useState<number>();
-  const handleDaysChange = (event: any) => setDays(event);
+  const [hours, setHours] = useState<number>();
 
   const [fee, setFee] = useState<number>(5);
   const handleFeeChange = (event: any) => setFee(event);
@@ -62,14 +67,36 @@ function Create() {
   });
   console.log(unwatch);
 
+  useEffect(() => {
+    if (searchParams) {
+      const link = searchParams.get("link");
+      const fund = searchParams.get("fund");
+      if (link !== null && fund !== null && Number(fund) > 0) {
+        setLink(link);
+        setAmount(fund);
+
+        toast({
+          title: "ATTENTION",
+          description: `Once you create the proposal, remember to post the link as comment to the original issue, so that the bounty creator can know about it.`,
+          status: "info",
+          duration: 100000,
+          isClosable: true,
+        });
+      }
+    }
+  }, [searchParams]);
+
   async function submit() {
-    if (link === undefined || amount === undefined || days === undefined) {
+    const totalTime =
+      (hours !== undefined ? Number(hours) * 3600 : 0) +
+      (days !== undefined ? Number(days) * 86400 : 0);
+    if (link === undefined || amount === undefined || totalTime === 0) {
       const missing = [
         { value: link, title: "github link" },
         { value: amount, title: "fund amount" },
-        { value: days, title: "work days" },
+        { value: totalTime, title: "working time" },
       ]
-        .filter((x) => x.value === undefined)
+        .filter((x) => x.value === undefined || x.value === 0)
         .map((x) => x.title)
         .join(", ");
       toast({
@@ -82,11 +109,13 @@ function Create() {
       return;
     }
 
+    console.log(totalTime);
+
     writeContract({
       abi,
       address: propcornAddress[chainId],
       functionName: "createProposal",
-      args: [link, BigInt(days * 86400), parseEther(amount), BigInt(fee * 100)],
+      args: [link, BigInt(totalTime), parseEther(amount), BigInt(fee * 100)],
     });
   }
 
@@ -129,13 +158,31 @@ function Create() {
         </NumberInput>
       </HStack>
       <HStack width="100%">
-        <Text width="20%">Days of work:</Text>
+        <Text width="20%">Required time:</Text>
         <NumberInput
-          isInvalid={days === undefined}
-          value={days}
-          onChange={handleDaysChange}
+          width="100px"
+          step={1}
+          min={0}
+          onChange={(event: string) => setHours(Number(event))}
         >
-          <NumberInputField placeholder="Number of days" />
+          <NumberInputField placeholder="hours" />
+          <NumberInputStepper>
+            <NumberIncrementStepper bg="white" />
+            <NumberDecrementStepper bg="white" />
+          </NumberInputStepper>
+        </NumberInput>
+        <NumberInput
+          width="100px"
+          color="white"
+          step={1}
+          min={0}
+          onChange={(event: string) => setDays(Number(event))}
+        >
+          <NumberInputField placeholder="days" />
+          <NumberInputStepper>
+            <NumberIncrementStepper bg="white" />
+            <NumberDecrementStepper bg="white" />
+          </NumberInputStepper>
         </NumberInput>
       </HStack>
       <HStack width="100%">

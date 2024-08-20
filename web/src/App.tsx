@@ -1,7 +1,7 @@
 import { Button, Flex, Heading, Spacer, VStack } from "@chakra-ui/react";
 import ConnectButton from "./ConnectButton";
 import Landing from "./Landing";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import Proposal from "./Proposal";
 
 type ProposalParams = {
@@ -21,7 +21,7 @@ function App() {
         <ConnectButton />
       </Flex>
       <Heading as="h1" size="4xl">
-        Propcorn
+        <Link to="/">Propcorn</Link>
       </Heading>
       <Spacer />
       {author !== undefined && index !== undefined && (
