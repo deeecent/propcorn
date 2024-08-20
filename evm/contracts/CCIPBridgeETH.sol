@@ -7,7 +7,7 @@ import "@chainlink/contracts-ccip/src/v0.8/ccip/libraries/Client.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "./Propcorn.sol";
 
-contract TwoWayBridgeETH is CCIPReceiver, Ownable, Propcorn {
+contract Propcornccip is CCIPReceiver, Ownable, Propcorn {
     IRouterClient private s_router;
 
     uint256 public bridgeFee = 0;
