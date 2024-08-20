@@ -13,7 +13,7 @@ import {
 } from "@chakra-ui/react";
 import "./index.css";
 import { ConnectKitProvider } from "connectkit";
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { createHashRouter, RouterProvider } from "react-router-dom";
 
 const Button = defineStyleConfig({
   // The styles all button have in common
@@ -49,10 +49,10 @@ const theme = extendTheme({
   styles: {
     global: {
       html: {
-        background: "rgb(0, 0, 0)",
+        background: "black",
       },
       body: {
-        background: "transparent",
+        background: "black",
         color: "rgb(255, 255, 255)",
         textAlign: "center",
         height: "100vh",
@@ -68,7 +68,7 @@ globalThis.Buffer = Buffer;
 
 const queryClient = new QueryClient();
 
-const router = createBrowserRouter([
+const router = createHashRouter([
   {
     path: "/",
     element: <App />,

@@ -10,8 +10,7 @@ export default defineConfig({
       project: "../evm",
       deployments: {
         Propcorn: {
-          1337: "0xA1bBDd84b304EDcfc6dEFE7ABaD8e803F8A408ae",
-          11155111: "0xf614E8Cc3e5b8b17d370E21011a82641B2a953f6",
+          10: "0x7A84A2A73bA9ef05dFeaBB5d7A248B87102835e6",
         },
       },
     }),
