@@ -26,9 +26,11 @@ import { ConnectKitButton } from "connectkit";
 import { propcornAbi as abi, propcornAddress } from "./generated";
 import { useEffect, useState } from "react";
 import { parseEther } from "viem";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 function Create() {
+  const [searchParams] = useSearchParams();
+
   const toast = useToast();
 
   const account = useAccount();
@@ -64,6 +66,25 @@ function Create() {
     },
   });
   console.log(unwatch);
+
+  useEffect(() => {
+    if (searchParams) {
+      const link = searchParams.get("link");
+      const fund = searchParams.get("fund");
+      if (link !== null && fund !== null && Number(fund) > 0) {
+        setLink(link);
+        setAmount(fund);
+
+        toast({
+          title: "ATTENTION",
+          description: `Once you create the proposal, remember to post it as comment to the original issue, so that the bounty creator can know about it.`,
+          status: "info",
+          duration: 19000,
+          isClosable: true,
+        });
+      }
+    }
+  }, [searchParams]);
 
   async function submit() {
     const totalTime =

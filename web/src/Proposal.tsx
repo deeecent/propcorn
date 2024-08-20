@@ -1,6 +1,5 @@
 import {
   Button,
-  Heading,
   HStack,
   Link,
   NumberInput,
