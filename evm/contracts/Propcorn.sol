@@ -54,7 +54,7 @@ contract Propcorn {
         bool closed;
     }
 
-    // keccak256(address, proposal index) is the key to the balance;
+    // keccak256(address, proposal creator address, proposal index) is the key to the balance;
     mapping(uint256 => uint256) internal _addressAndProposalToBalance;
     mapping(address => Proposal[]) internal _proposals;
     address payable internal _protocolFeeReceiver;
