@@ -77,9 +77,9 @@ function Create() {
 
         toast({
           title: "ATTENTION",
-          description: `Once you create the proposal, remember to post it as comment to the original issue, so that the bounty creator can know about it.`,
+          description: `Once you create the proposal, remember to post the link as comment to the original issue, so that the bounty creator can know about it.`,
           status: "info",
-          duration: 19000,
+          duration: 100000,
           isClosable: true,
         });
       }
