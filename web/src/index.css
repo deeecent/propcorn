@@ -13,6 +13,10 @@
   -webkit-text-size-adjust: 100%;
 }
 
+.form {
+  text-align: left;
+}
+
 @media (prefers-color-scheme: light) {
   :root {
     background-color: #f8f8f8;
