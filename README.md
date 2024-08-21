@@ -32,5 +32,7 @@ There are other similar platforms:
 
 - https://gitcoin.co/
 - https://app.onlydust.com/
+- https://octant.app/projects
+- https://clr.fund/
 
 Propcorn is different because it's just a simple protocol that does one simple thing: micro-funding for small features. Just connect with your wallet, create a proposal and share a link, or fund it.
