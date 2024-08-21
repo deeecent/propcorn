@@ -1,6 +1,6 @@
 # 🍿 Propcorn 🍿
 
-_Micro-funding for small features_
+_A public good for micro-funding small features_
 
 ## TL;DR
 
