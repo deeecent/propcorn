@@ -4,10 +4,7 @@ _A public good for micro-funding small features_
 
 ## TL;DR
 
-- Propcorn is a protocol that incentivizes open source devs to get paid for their work
-- Propcorn incentivizes project maintainers to create bounties to help with the development
-- Once you create your proposal or bounty, take the link and share it in a github issue
-- Here is an example of a bounty: https://github.com/deeecent/propcorn/issues/2
+Propcorn is a public good designed to incentivize open-source developers by enabling micro-funding for small features or fixes on GitHub. It allows developers to create proposals for issues they find interesting, set a price, and share the link to gather funding from the community. Once the funding goal is met, the funds are released to the developer after a waiting period, ensuring community approval. Propcorn is simple on purpose, focusing only on micro-funding for small development tasks.
 
 ## Problem
 
@@ -15,7 +12,7 @@ Currently, there is little incentive for external contributors to fix issues on 
 
 ## Solution
 
-Propcorn is a micro sponsorship good where developers can propose and fund fixes for GitHub issues. Here’s how it work:
+Propcorn is a micro-funding public good where developers can propose and fund fixes for GitHub issues. Here’s how it work:
 
 - A developer finds an interesting issue on GitHub and creates a proposal on the platform, linking it to the issue and setting a price tag.
 - The developer shares this proposal via social media, encouraging others to sponsor the fix or feature with cryptocurrency.
