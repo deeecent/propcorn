@@ -7,7 +7,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 
   const lock = await deploy("Propcorn", {
     from: deployer,
-    args: [],
+    args: [deployer],
     log: true,
   });
 
