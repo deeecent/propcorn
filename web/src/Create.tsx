@@ -27,10 +27,17 @@ import { propcornAbi as abi, propcornAddress } from "./generated";
 import { useEffect, useState } from "react";
 import { parseEther } from "viem";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import axios from 'axios'
+
+interface issueData {
+  title: string;
+  state: string;
+  author: string;
+}
 
 function Create() {
   const [searchParams] = useSearchParams();
-
+  const [issueData,setIssueData] = useState<issueData | null>(null)
   const toast = useToast();
 
   const account = useAccount();
@@ -85,6 +92,21 @@ function Create() {
       }
     }
   }, [searchParams]);
+
+    useEffect(() => {
+    const getissuedata = async () => {
+      const issue_path = link?.slice(19)
+      const response = await axios.get(`https://api.github.com/repos/${issue_path}`)
+      const {title, state } = response.data
+      const author = response.data.user.login
+      setIssueData({
+      title,
+      state,
+      author
+    })
+  }
+  getissuedata()
+},[link])
 
   async function submit() {
     const totalTime =
@@ -146,6 +168,13 @@ function Create() {
           width="80%"
           placeholder="Github Issue link"
         ></Input>
+      </HStack>
+      <HStack width="100%">
+        <Text width="100%">Title: {issueData?.title ?? 'No data available'}</Text>
+      </HStack>
+      <HStack width="100%">
+      <Text width="70%">Author: {issueData?.author ?? 'No data available'}</Text>
+        <Text width="30%">Status: {issueData?.state ?? 'No data available'}</Text>
       </HStack>
       <HStack width="100%">
         <Text width="20%">Requested Amount:</Text>
