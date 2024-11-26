@@ -54,6 +54,10 @@ Create a privacy policy and terms of use that cover how Propcorn handles data, f
 
 ## Outreach and Community Engagement
 
+### Create Telegram group
+
+Create a Telegram group to keep the community together.
+
 ### Contact potential projects interested in trying Propcorn
 
 Identify and reach out to open-source projects that might benefit from micro-funding through Propcorn.
