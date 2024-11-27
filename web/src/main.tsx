@@ -6,63 +6,10 @@ import { WagmiProvider } from "wagmi";
 
 import App from "./App.tsx";
 import { config } from "./wagmi.ts";
-import {
-  ChakraProvider,
-  defineStyleConfig,
-  extendTheme,
-} from "@chakra-ui/react";
-import "./index.css";
+import { ChakraProvider } from "@chakra-ui/react";
 import { ConnectKitProvider } from "connectkit";
 import { createHashRouter, RouterProvider } from "react-router-dom";
-
-const Button = defineStyleConfig({
-  // The styles all button have in common
-  baseStyle: {
-    fontWeight: "bold",
-    textTransform: "uppercase",
-    borderRadius: "0", // <-- border radius is same for all variants and sizes
-    borderColor: "#ffffff",
-    borderWidth: "0.5px",
-  },
-  variants: {
-    primary: () => ({
-      color: "white",
-      backgroundColor: "black",
-    }),
-    disabled: () => ({
-      fontSize: "md",
-      backgroundColor: "black",
-      color: "grey",
-      _hover: {
-        color: "white",
-        backgroundColor: "black",
-      },
-    }),
-  },
-});
-
-const theme = extendTheme({
-  fonts: {
-    heading: `"FiraCodeHeading", "Arial", "serif"`,
-    body: `"FiraCode", "Arial", "serif"`,
-  },
-  styles: {
-    global: {
-      html: {
-        background: "black",
-      },
-      body: {
-        background: "black",
-        color: "rgb(255, 255, 255)",
-        textAlign: "center",
-        height: "100vh",
-      },
-    },
-  },
-  components: {
-    Button,
-  },
-});
+import { theme } from "./theme.ts";
 
 globalThis.Buffer = Buffer;
 
