@@ -11,7 +11,7 @@ export default defineConfig({
       deployments: {
         Propcorn: {
           1337: "0xf6018dffAc9B1C63e8f1097148664551CEaEc5A2",
-          10: "0x7A84A2A73bA9ef05dFeaBB5d7A248B87102835e6",
+          10: "0x8055684657B6024A317Ca22593ad759384A62a28",
         },
       },
     }),
