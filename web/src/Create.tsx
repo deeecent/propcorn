@@ -14,7 +14,6 @@ import {
   useToast,
   VStack,
 } from "@chakra-ui/react";
-import "./Create.css";
 import {
   useAccount,
   useChainId,
