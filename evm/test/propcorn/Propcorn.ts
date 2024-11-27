@@ -2,9 +2,14 @@ import { SignerWithAddress } from "@nomicfoundation/hardhat-ethers/signers";
 import { loadFixture, time } from "@nomicfoundation/hardhat-network-helpers";
 import { expect } from "chai";
 import { parseEther } from "ethers";
-import { ethers } from "hardhat";
+import { ethers, upgrades } from "hardhat";
 
-import { Propcorn } from "../../types";
+import {
+  Propcorn,
+  PropcornNoMoreUpgrades__factory,
+  PropcornUpgraded,
+  PropcornUpgraded__factory,
+} from "../../types";
 import { deployPropcornFixture } from "./Propcorn.fixture";
 
 describe("Propcorn", function () {
@@ -21,6 +26,43 @@ describe("Propcorn", function () {
   describe("Deployment", function () {
     beforeEach(async () => {
       ({ propcorn } = await loadFixture(deployPropcornFixture));
+    });
+  });
+
+  describe("Upgrade", function () {
+    beforeEach(async () => {
+      ({ propcorn } = await loadFixture(deployPropcornFixture));
+    });
+
+    it("should upgrade to a new implementation", async () => {
+      const PropcornUpgraded = (await ethers.getContractFactory(
+        "PropcornUpgraded",
+      )) as PropcornUpgraded__factory;
+
+      const newImplementation = await upgrades.upgradeProxy(
+        await propcorn.getAddress(),
+        PropcornUpgraded,
+      );
+
+      expect(await newImplementation.newFunction()).equal(42);
+    });
+
+    it("should prevent any further upgrade when authorization is revoked", async () => {
+      const PropcornNoMoreUpgrades = (await ethers.getContractFactory(
+        "PropcornNoMoreUpgrades",
+      )) as PropcornNoMoreUpgrades__factory;
+
+      await upgrades.upgradeProxy(
+        await propcorn.getAddress(),
+        PropcornNoMoreUpgrades,
+      );
+
+      await expect(
+        upgrades.upgradeProxy(
+          await propcorn.getAddress(),
+          PropcornNoMoreUpgrades,
+        ),
+      ).revertedWith("no more upgrades");
     });
   });
 

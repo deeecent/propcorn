@@ -1,7 +1,11 @@
 // SPDX-License-Identifier: MIT
-pragma solidity >=0.8.9;
+pragma solidity 0.8.23;
 
-contract Propcorn {
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+
+contract Propcorn is Initializable, UUPSUpgradeable, OwnableUpgradeable {
     // Errors
     error NonexistentProposal();
     error ProposalInProgress();
@@ -59,9 +63,18 @@ contract Propcorn {
     mapping(address => Proposal[]) internal _proposals;
     address payable internal _protocolFeeReceiver;
 
-    constructor(address payable protocolFeeReceiver) {
+    function initialize(
+        address payable protocolFeeReceiver
+    ) public initializer {
         _protocolFeeReceiver = protocolFeeReceiver;
+        __Ownable_init(msg.sender);
+        __UUPSUpgradeable_init();
     }
+
+    /// @custom:oz-upgrades-unsafe-allow constructor
+    constructor() initializer {}
+
+    function _authorizeUpgrade(address) internal virtual override onlyOwner {}
 
     modifier proposalExists(address account, uint256 index) {
         if (_proposals[account].length <= index) {
