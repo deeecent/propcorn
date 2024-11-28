@@ -1,3 +1,4 @@
+import "@nomicfoundation/hardhat-ignition-ethers";
 import "@nomicfoundation/hardhat-toolbox";
 import "@openzeppelin/hardhat-upgrades";
 import "hardhat-deploy";
@@ -5,12 +6,12 @@ import type { HardhatUserConfig } from "hardhat/config";
 import { vars } from "hardhat/config";
 
 import "./tasks/accounts";
-import "./tasks/propcorn";
 
 // Run 'npx hardhat vars setup' to see the list of variables that need to be set
 const NETWORK: string = vars.get("NETWORK");
 const RPC_URL: string = vars.get("RPC_URL");
 const PRIVATE_KEY: string = vars.get("PRIVATE_KEY");
+const ETHERSCAN_API_KEY: string = vars.get("ETHERSCAN_API_KEY");
 
 const config: HardhatUserConfig = {
   defaultNetwork: "hardhat",
@@ -18,10 +19,7 @@ const config: HardhatUserConfig = {
     deployer: 0,
   },
   etherscan: {
-    apiKey: {
-      optimisticEthereum: vars.get("OPTIMISM_API_KEY", ""),
-      sepolia: vars.get("ETHERSCAN_API_KEY", ""),
-    },
+    apiKey: ETHERSCAN_API_KEY,
   },
   gasReporter: {
     currency: "USD",
