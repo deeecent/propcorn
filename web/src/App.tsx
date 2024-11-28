@@ -17,7 +17,7 @@ function App() {
     <VStack height="100vh">
       <Flex flexDir="row" width="100%" padding="10px">
         <Link to="https://github.com/deeecent/propcorn" target="blank">
-          <Button variant="primary">ABOUT</Button>
+          <Button>ABOUT</Button>
         </Link>
         <Spacer />
         <ConnectButton />

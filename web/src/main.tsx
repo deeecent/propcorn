@@ -37,5 +37,5 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
         </ChakraProvider>
       </QueryClientProvider>
     </WagmiProvider>
-  </React.StrictMode>
+  </React.StrictMode>,
 );
