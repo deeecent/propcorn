@@ -70,7 +70,7 @@ function Proposal(props: ProposalParams) {
   const { days, hours, minutes, seconds } = useCountdown(
     fundCompletedAt && secondsToUnlock
       ? Number(fundCompletedAt) + Number(secondsToUnlock)
-      : 0
+      : 0,
   );
 
   const {
@@ -123,7 +123,7 @@ function Proposal(props: ProposalParams) {
     if (!accountIsAuthor || account.address === undefined) {
       toast({
         title: "Unauthorized",
-        description: `You are the proposal owner`,
+        description: "You are the proposal owner",
         status: "error",
         duration: 9000,
         isClosable: true,
@@ -154,7 +154,7 @@ function Proposal(props: ProposalParams) {
   }, [isConfirmed]);
 
   useEffect(() => {
-    if (result && result.data) {
+    if (result?.data) {
       const data = result.data as ProposalData;
       setUrl(data.url);
       setSecondsToUnlock(data.secondsToUnlock);

@@ -23,7 +23,7 @@ import {
 } from "wagmi";
 import { ConnectKitButton } from "connectkit";
 import { propcornAbi as abi, propcornAddress } from "./generated";
-import { useEffect, useState } from "react";
+import { type ChangeEvent, useEffect, useState } from "react";
 import { parseEther } from "viem";
 import { useNavigate, useSearchParams } from "react-router-dom";
 
@@ -44,16 +44,19 @@ function Create() {
   const chainId = useChainId();
 
   const [link, setLink] = useState<string>();
-  const handleLinkChange = (event: any) => setLink(event.target.value);
+  const handleLinkChange = (event: ChangeEvent<HTMLInputElement>) =>
+    setLink(event.target.value);
 
   const [amount, setAmount] = useState<string>();
-  const handleAmountChange = (event: any) => setAmount(event);
+  const handleAmountChange = (valueAsString: string) =>
+    setAmount(valueAsString);
 
   const [days, setDays] = useState<number>();
   const [hours, setHours] = useState<number>();
 
   const [fee, setFee] = useState<number>(5);
-  const handleFeeChange = (event: any) => setFee(event);
+  const handleFeeChange = (_: unknown, valueAsNumber: number | undefined) =>
+    setFee(valueAsNumber ?? 0);
 
   const unwatch = useWatchContractEvent({
     address: propcornAddress[chainId],
@@ -76,14 +79,15 @@ function Create() {
 
         toast({
           title: "ATTENTION",
-          description: `Once you create the proposal, remember to post the link as comment to the original issue, so that the bounty creator can know about it.`,
+          description:
+            "Once you create the proposal, remember to post the link as comment to the original issue, so that the bounty creator can know about it.",
           status: "info",
           duration: 100000,
           isClosable: true,
         });
       }
     }
-  }, [searchParams]);
+  }, [searchParams, toast]);
 
   async function submit() {
     const totalTime =
@@ -144,7 +148,7 @@ function Create() {
           onChange={handleLinkChange}
           width="80%"
           placeholder="Github Issue link"
-        ></Input>
+        />
       </HStack>
       <HStack width="100%">
         <Text width="20%">Requested Amount:</Text>
