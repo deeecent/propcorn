@@ -14,14 +14,11 @@ const PropcornModule = buildModule("PropcornModule", (m) => {
   );
 
   // Deploy the ERC1967 Proxy, pointing to the implementation
-  const proxy = m.contract("ERC1967Proxy", [implementation, initializeData]);
-
-  // Create a contract instance using the deployed proxy's address
-  const instance = m.contractAt("Propcorn", proxy, {
-    id: "Propcorn_Instance",
+  const proxy = m.contract("ERC1967Proxy", [implementation, initializeData], {
+    id: "Proxy",
   });
 
-  return { proxy, instance };
+  return { proxy };
 }) as ReturnType<typeof buildModule>; // Explicitly cast the return type here
 
 export default PropcornModule;

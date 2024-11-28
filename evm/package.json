@@ -1,10 +1,10 @@
 {
-  "name": "@prb/hardhat-template",
-  "description": "Hardhat-based template for developing Solidity smart contracts",
+  "name": "Propcorn",
+  "description": "Propcorn",
   "version": "1.0.0",
   "author": {
-    "name": "Paul Razvan Berg",
-    "url": "https://github.com/PaulRBerg"
+    "name": "Deeecent",
+    "url": "https://github.com/deeecent"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-chai-matchers": "^2.0.2",
@@ -65,8 +65,9 @@
     "clean": "rimraf ./artifacts ./cache ./coverage ./types ./coverage.json && bun run typechain",
     "compile": "cross-env TS_NODE_TRANSPILE_ONLY=true hardhat compile",
     "coverage": "hardhat coverage --solcoverjs ./.solcover.js --temp artifacts --testfiles \"test/**/*.ts\" && bun run typechain",
-    "deploy:optimism": "source .env.optimism && hardhat task:deployPropcorn",
-    "deploy:sepolia": "source .env.sepolia && hardhat task:deployPropcorn",
+    "deploy:optimism": "source .env.optimism && bun run deploy",
+    "deploy:sepolia": "source .env.sepolia && bun run deploy",
+    "deploy": "npx hardhat ignition deploy ignition/modules/Propcorn.ts --network $HARDHAT_VAR_NETWORK --verify",
     "lint": "bun run lint:sol && bun run lint:ts && bun run prettier:check",
     "lint:sol": "solhint --max-warnings 0 \"contracts/**/*.sol\"",
     "lint:ts": "eslint --ignore-path ./.eslintignore --ext .js,.ts .",

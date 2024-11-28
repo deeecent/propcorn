@@ -1,5 +1,4 @@
 {
-  "PropcornModule#Propcorn": "0xE6bAE2997598013e1825c5979B4c7970D3fB04c1",
-  "PropcornModule#ERC1967Proxy": "0x48A125C3BB5d68B8668bc433778b4b727d0C4891",
-  "PropcornModule#Propcorn_Instance": "0x48A125C3BB5d68B8668bc433778b4b727d0C4891"
+  "PropcornModule#Propcorn": "0x8055684657B6024A317Ca22593ad759384A62a28",
+  "PropcornModule#Proxy": "0xa1430c9c87D3c534EEfC429F4F29577282b8dE0F"
 }
