@@ -8,7 +8,7 @@ import {
   Container,
   Button,
 } from "@chakra-ui/react";
-import ProposalCard from "./ProposalCard";
+//import ProposalCard from "./ProposalCard";
 import Link from "./Link";
 
 const Hero = () => (
@@ -80,6 +80,7 @@ const OneTwoThree = () => (
   </VStack>
 );
 
+/*
 const LastProposals = () => (
   <Container>
     <Heading as="h2">Last Proposals</Heading>
@@ -96,6 +97,7 @@ const LastProposals = () => (
     </VStack>
   </Container>
 );
+*/
 
 const CreateProposal = () => (
   <Link to="/new">

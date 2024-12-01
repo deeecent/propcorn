@@ -9,7 +9,7 @@ type ProposalParams = {
 function ProposalPage() {
   const { author, index } = useParams<ProposalParams>();
 
-  return <Proposal author={author} index={index} />;
+  return <Proposal author={author!} index={index!} />;
 }
 
 export default ProposalPage;

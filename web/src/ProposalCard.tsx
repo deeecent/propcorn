@@ -1,20 +1,12 @@
 import {
-  Box,
-  VStack,
   Heading,
   Text,
-  Link,
-  Progress,
-  HStack,
-  Spinner,
   Card,
   CardHeader,
   CardBody,
   CardFooter,
 } from "@chakra-ui/react";
 import Markdown from "react-markdown";
-import { formatEther } from "viem";
-import { fetchIssueData, GitHubIssueData } from "./github";
 import { useGitHubIssueData } from "./hooks";
 
 interface ProposalCardProps {
@@ -38,6 +30,7 @@ const ProposalCard: React.FC<ProposalCardProps> = ({
 }) => {
   const { data, isLoading, error } = useGitHubIssueData(url);
 
+  console.log(author, feeBasisPoints, secondsToUnlock, fundCompletedAt);
   if (isLoading) {
     return <p>Loading issue metadata...</p>;
   }
@@ -69,7 +62,7 @@ const ProposalCard: React.FC<ProposalCardProps> = ({
           <Markdown>{data.body}</Markdown>
         </Text>
       </CardBody>
-      <CardFooter>ciao</CardFooter>
+      <CardFooter>{progress}</CardFooter>
     </Card>
   );
 };
