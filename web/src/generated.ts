@@ -649,6 +649,7 @@ export const propcornAbi = [
  */
 export const propcornAddress = {
   10: '0xa1430c9c87D3c534EEfC429F4F29577282b8dE0F',
+  31337: '0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512'
 } as const
 
 /**
