@@ -9,7 +9,7 @@ import {
 import Markdown from "react-markdown";
 import { useGitHubIssueData } from "./hooks";
 
-interface ProposalCardProps {
+type ProposalCardProps = {
   url: string;
   author: string;
   minAmountRequested: bigint;
@@ -17,7 +17,7 @@ interface ProposalCardProps {
   feeBasisPoints: bigint;
   secondsToUnlock: bigint;
   fundCompletedAt?: bigint;
-}
+};
 
 const ProposalCard: React.FC<ProposalCardProps> = ({
   url,

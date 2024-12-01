@@ -5,7 +5,7 @@ import Link from "./Link";
 export function Header() {
   return (
     <Center>
-      <Flex w="full" p={5} gap={5} mb={10}>
+      <Flex w="full" gap={5} mt={2} mb={10}>
         <Link to="/">
           <Button bg="transparent" p={5}>
             <Heading as="h1" size="lg">

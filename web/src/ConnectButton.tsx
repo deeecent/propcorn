@@ -7,7 +7,7 @@ function ConnectButton() {
       {({ isConnected, show, truncatedAddress, ensName }) => {
         return (
           <Button onClick={show}>
-            {isConnected ? (ensName ?? truncatedAddress) : "connect"}
+            {isConnected ? (ensName ?? truncatedAddress) : "Connect wallet"}
           </Button>
         );
       }}

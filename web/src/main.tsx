@@ -28,9 +28,9 @@ const WithHeader = () => (
   <>
     <Container maxW="container.xl">
       <Header />
-    </Container>
 
-    <Outlet />
+      <Outlet />
+    </Container>
 
     <Container mt={20}>
       <Footer />
@@ -54,7 +54,7 @@ const router = createBrowserRouter([
         element: <CreateProposalPage />,
       },
       {
-        path: "/proposals/:author/:index",
+        path: "/proposal/:author/:index",
         element: <App />,
       },
       {
