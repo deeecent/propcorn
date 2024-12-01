@@ -1,5 +1,4 @@
 import {
-  Box,
   Button,
   FormControl,
   FormHelperText,
@@ -12,8 +11,6 @@ import {
   NumberInput,
   NumberInputField,
   NumberInputStepper,
-  Spacer,
-  Text,
   useToast,
   VStack,
 } from "@chakra-ui/react";
@@ -24,7 +21,6 @@ import {
   useWatchContractEvent,
   useWriteContract,
 } from "wagmi";
-import { ConnectKitButton } from "connectkit";
 import { propcornAbi as abi, propcornAddress } from "./generated";
 import { type ChangeEvent, useEffect, useState } from "react";
 import { parseEther } from "viem";
