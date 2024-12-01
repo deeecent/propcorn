@@ -1,4 +1,5 @@
 # directories
+ignition/deployments/chain-31337
 .coverage_artifacts
 .coverage_cache
 .coverage_contracts

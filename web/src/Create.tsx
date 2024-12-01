@@ -1,6 +1,9 @@
 import {
   Box,
   Button,
+  FormControl,
+  FormHelperText,
+  FormLabel,
   Heading,
   HStack,
   Input,
@@ -129,111 +132,94 @@ function Create() {
   }, [isConfirmed]);
 
   return (
-    <VStack
-      className="form"
-      borderTopWidth="1px"
-      borderTopColor="white"
-      paddingTop="30px"
-      height="50vh"
-      width="60%"
-    >
-      <Heading as="h3" size="l">
+    <VStack>
+      <Heading as="h3" size="xl" mb={15}>
         Create a Proposal
       </Heading>
-      <HStack width="100%">
-        <Text width="20%">Github Issue:</Text>
-        <Input
-          value={link}
-          isInvalid={link === undefined}
-          onChange={handleLinkChange}
-          width="80%"
-          placeholder="Github Issue link"
-        />
-      </HStack>
-      <HStack width="100%">
-        <Text width="20%">Requested Amount:</Text>
-        <NumberInput
-          isInvalid={amount === undefined}
-          value={amount}
-          onChange={handleAmountChange}
+
+      <VStack gap={5}>
+        <FormControl isRequired>
+          <FormLabel>GitHub Issue Link</FormLabel>
+          <Input
+            onChange={handleLinkChange}
+            placeholder="https://github.com/user/repo/issues/123"
+          />
+          <FormHelperText>
+            Provide the link to the GitHub issue this proposal will address.
+          </FormHelperText>
+        </FormControl>
+
+        <FormControl isRequired>
+          <FormLabel>Requested Amount (in Ether)</FormLabel>
+          <NumberInput value={amount} onChange={handleAmountChange}>
+            <NumberInputField placeholder="Enter the amount in ETH" />
+          </NumberInput>
+          <FormHelperText>
+            Specify the amount of Ether required to complete this task.
+          </FormHelperText>
+        </FormControl>
+
+        <FormControl isRequired>
+          <FormLabel>Delivery Time</FormLabel>
+          <HStack width="100%">
+            <NumberInput
+              width="100px"
+              step={1}
+              min={0}
+              onChange={(event: string) => setHours(Number(event))}
+            >
+              <NumberInputField placeholder="Hours" />
+              <NumberInputStepper>
+                <NumberIncrementStepper />
+                <NumberDecrementStepper />
+              </NumberInputStepper>
+            </NumberInput>
+            <NumberInput
+              width="100px"
+              step={1}
+              min={0}
+              onChange={(event: string) => setDays(Number(event))}
+            >
+              <NumberInputField placeholder="Days" />
+              <NumberInputStepper>
+                <NumberIncrementStepper />
+                <NumberDecrementStepper />
+              </NumberInputStepper>
+            </NumberInput>
+          </HStack>
+          <FormHelperText>
+            Enter the estimated time needed to deliver the solution.
+          </FormHelperText>
+        </FormControl>
+
+        <FormControl>
+          <FormLabel>Protocol Fee</FormLabel>
+          <HStack>
+            <NumberInput
+              isInvalid={fee === undefined}
+              value={fee}
+              onChange={handleFeeChange}
+            >
+              <NumberInputField placeholder="Enter fee percentage" />
+            </NumberInput>
+            <Button onClick={() => setFee(10)}>10%</Button>
+            <Button onClick={() => setFee(5)}>5%</Button>
+            <Button onClick={() => setFee(15)}>15%</Button>
+          </HStack>
+          <FormHelperText>
+            The fee is optional, but it helps Propcorn running!
+          </FormHelperText>
+        </FormControl>
+
+        <Button
+          width="100%"
+          bg="yellow.200"
+          disabled={!account.isConnected || isConfirming}
+          onClick={submit}
         >
-          <NumberInputField placeholder="ETH" />
-        </NumberInput>
-      </HStack>
-      <HStack width="100%">
-        <Text width="20%">Required time:</Text>
-        <NumberInput
-          width="100px"
-          step={1}
-          min={0}
-          onChange={(event: string) => setHours(Number(event))}
-        >
-          <NumberInputField placeholder="hours" />
-          <NumberInputStepper>
-            <NumberIncrementStepper bg="white" />
-            <NumberDecrementStepper bg="white" />
-          </NumberInputStepper>
-        </NumberInput>
-        <NumberInput
-          width="100px"
-          color="white"
-          step={1}
-          min={0}
-          onChange={(event: string) => setDays(Number(event))}
-        >
-          <NumberInputField placeholder="days" />
-          <NumberInputStepper>
-            <NumberIncrementStepper bg="white" />
-            <NumberDecrementStepper bg="white" />
-          </NumberInputStepper>
-        </NumberInput>
-      </HStack>
-      <HStack width="100%">
-        <Text width="20%">Protocol fee:</Text>
-        <NumberInput
-          isInvalid={fee === undefined}
-          value={fee}
-          onChange={handleFeeChange}
-        >
-          <NumberInputField placeholder="Protocol fee" />
-        </NumberInput>
-        <Button variant="primary" onClick={() => setFee(10)}>
-          10%
+          {isConfirming ? "Confirming..." : "Submit Proposal"}
         </Button>
-        <Button variant="primary" onClick={() => setFee(5)}>
-          5%
-        </Button>
-        <Button variant="primary" onClick={() => setFee(15)}>
-          15%
-        </Button>
-      </HStack>
-      <HStack width="100%">
-        <Text width="20%">Creator:</Text>
-        <ConnectKitButton.Custom>
-          {({ isConnected, show, truncatedAddress, ensName }) => {
-            return (
-              <Box>
-                {isConnected && (ensName ?? truncatedAddress)}
-                {!isConnected && (
-                  <Button onClick={show} variant="primary">
-                    connect
-                  </Button>
-                )}
-              </Box>
-            );
-          }}
-        </ConnectKitButton.Custom>
-      </HStack>
-      <Spacer />
-      <Button
-        width="100%"
-        variant="primary"
-        disabled={!account.isConnected || isConfirming}
-        onClick={submit}
-      >
-        {isConfirming ? "Confirming..." : "Submit"}
-      </Button>
-      <Spacer />
+      </VStack>
     </VStack>
   );
 }
