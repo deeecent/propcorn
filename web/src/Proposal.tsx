@@ -1,5 +1,6 @@
 import {
   Button,
+  Heading,
   HStack,
   Link,
   NumberInput,
@@ -21,6 +22,7 @@ import { propcornAbi as abi, propcornAddress } from "./generated";
 import { useEffect, useState } from "react";
 import { formatEther, parseEther } from "viem";
 import useCountdown, { decompose } from "./Countdown";
+import { useGitHubIssueData } from "./hooks";
 
 interface ProposalParams {
   author: `0x${string}`;
@@ -36,6 +38,30 @@ interface ProposalData {
   fundingCompletedAt: bigint;
   closed: boolean;
 }
+
+type ProposalDataProps = { url: string };
+
+const ProposalData: React.FC<ProposalDataProps> = ({ url }) => {
+  const { data, isLoading, error } = useGitHubIssueData(url);
+
+  if (isLoading) {
+    return <p>Loading issue metadata...</p>;
+  }
+
+  if (error) {
+    return <p>Error: {error}</p>;
+  }
+
+  if (!data) {
+    return <p>No metadata available.</p>;
+  }
+
+  return (
+    <>
+      <Heading as="h1">Proposal for: {data.title}</Heading>
+    </>
+  );
+};
 
 function Proposal(props: ProposalParams) {
   const { author, index } = props;
@@ -141,12 +167,9 @@ function Proposal(props: ProposalParams) {
     });
   }
 
-  useEffect(() => {
-    if (error) {
-      console.log(error);
-    }
-  }, [error]);
-
+  if (error) {
+    console.log(error);
+  }
   useEffect(() => {
     if (isConfirmed) {
       result.refetch();
@@ -166,91 +189,96 @@ function Proposal(props: ProposalParams) {
   }, [result]);
 
   return (
-    <VStack className="form" height="70vh" width="50%">
-      <Text width="100%" fontSize="30px">
-        Proposal
-      </Text>
-      <HStack width="100%">
-        <Text width="30%">Github Issue:</Text>
-        <Link href={url} target="blank" textAlign="left">
-          {url}
-        </Link>
-      </HStack>
-      <HStack width="100%">
-        <Text width="30%">Requested Amount:</Text>
-        <Text>
-          {minAmountRequested
-            ? `${formatEther(minAmountRequested)} ETH`
-            : "..."}
+    <>
+      <>
+        <ProposalData url={url} />
+      </>
+      <VStack className="form" height="70vh" width="50%">
+        <Text width="100%" fontSize="30px">
+          Proposal
         </Text>
-      </HStack>
-      <HStack width="100%">
-        <Text width="30%">Current Funding:</Text>
-        <Text>
-          {balance !== undefined ? `${formatEther(balance)} ETH` : "..."}
-        </Text>
-      </HStack>
-      <HStack width="100%">
-        <Text width="30%">Estimated work time:</Text>
-        <Text>
-          {secondsToUnlock !== undefined
-            ? `${sDays}d ${sHours}h ${sMinutes}m ${sSeconds}s`
-            : "..."}
-        </Text>
-      </HStack>
-      {fundCompletedAt !== undefined && fundCompletedAt > 0 && (
         <HStack width="100%">
-          <Text width="30%">Completes in:</Text>
-          <Text width="20%" textAlign="left">
-            {days}d {hours}h {minutes}m {seconds}s
+          <Text width="30%">Github Issue:</Text>
+          <Link href={url} target="blank" textAlign="left">
+            {url}
+          </Link>
+        </HStack>
+        <HStack width="100%">
+          <Text width="30%">Requested Amount:</Text>
+          <Text>
+            {minAmountRequested
+              ? `${formatEther(minAmountRequested)} ETH`
+              : "..."}
           </Text>
         </HStack>
-      )}
-      <HStack width="100%">
-        <Text width="30%">Protocol fee:</Text>
-        <Text>
-          {feeBasisPoints !== undefined
-            ? `${Number(feeBasisPoints) / 100}%`
-            : "..."}
-        </Text>
-      </HStack>
-      <HStack width="100%">
-        <Text width="30%">Author:</Text>
-        <Text>{ensName && ensName.data ? ensName.data : author}</Text>
-      </HStack>
-      {accountIsAuthor && canWithdraw() && (
-        <HStack width="40%">
-          <Button
-            width="80%"
-            variant="primary"
-            disabled={!account.isConnected || isConfirming}
-            onClick={withdraw}
-          >
-            {isConfirming ? "Confirming..." : "Withdraw"}
-          </Button>
+        <HStack width="100%">
+          <Text width="30%">Current Funding:</Text>
+          <Text>
+            {balance !== undefined ? `${formatEther(balance)} ETH` : "..."}
+          </Text>
         </HStack>
-      )}
-      {(!accountIsAuthor || !canWithdraw()) && (
-        <HStack width="40%">
-          <NumberInput
-            isInvalid={fundAmount === undefined}
-            value={fundAmount}
-            onChange={handleFundAmountChange}
-          >
-            <NumberInputField fontSize="13px" placeholder="e.g. 0.5" />
-          </NumberInput>
-          <Button
-            width="80%"
-            variant="primary"
-            disabled={!account.isConnected || isConfirming}
-            onClick={submit}
-          >
-            {isConfirming ? "Confirming..." : "Fund (ETH)"}
-          </Button>
+        <HStack width="100%">
+          <Text width="30%">Estimated work time:</Text>
+          <Text>
+            {secondsToUnlock !== undefined
+              ? `${sDays}d ${sHours}h ${sMinutes}m ${sSeconds}s`
+              : "..."}
+          </Text>
         </HStack>
-      )}
-      <Spacer />
-    </VStack>
+        {fundCompletedAt !== undefined && fundCompletedAt > 0 && (
+          <HStack width="100%">
+            <Text width="30%">Completes in:</Text>
+            <Text width="20%" textAlign="left">
+              {days}d {hours}h {minutes}m {seconds}s
+            </Text>
+          </HStack>
+        )}
+        <HStack width="100%">
+          <Text width="30%">Protocol fee:</Text>
+          <Text>
+            {feeBasisPoints !== undefined
+              ? `${Number(feeBasisPoints) / 100}%`
+              : "..."}
+          </Text>
+        </HStack>
+        <HStack width="100%">
+          <Text width="30%">Author:</Text>
+          <Text>{ensName && ensName.data ? ensName.data : author}</Text>
+        </HStack>
+        {accountIsAuthor && canWithdraw() && (
+          <HStack width="40%">
+            <Button
+              width="80%"
+              variant="primary"
+              disabled={!account.isConnected || isConfirming}
+              onClick={withdraw}
+            >
+              {isConfirming ? "Confirming..." : "Withdraw"}
+            </Button>
+          </HStack>
+        )}
+        {(!accountIsAuthor || !canWithdraw()) && (
+          <HStack width="40%">
+            <NumberInput
+              isInvalid={fundAmount === undefined}
+              value={fundAmount}
+              onChange={handleFundAmountChange}
+            >
+              <NumberInputField fontSize="13px" placeholder="e.g. 0.5" />
+            </NumberInput>
+            <Button
+              width="80%"
+              variant="primary"
+              disabled={!account.isConnected || isConfirming}
+              onClick={submit}
+            >
+              {isConfirming ? "Confirming..." : "Fund (ETH)"}
+            </Button>
+          </HStack>
+        )}
+        <Spacer />
+      </VStack>
+    </>
   );
 }
 

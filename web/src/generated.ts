@@ -3,7 +3,7 @@ import {
   createUseReadContract,
   createUseWriteContract,
   createUseSimulateContract,
-} from 'wagmi/codegen'
+} from "wagmi/codegen";
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Address
@@ -11,33 +11,33 @@ import {
 
 export const addressAbi = [
   {
-    type: 'error',
-    inputs: [{ name: 'target', internalType: 'address', type: 'address' }],
-    name: 'AddressEmptyCode',
+    type: "error",
+    inputs: [{ name: "target", internalType: "address", type: "address" }],
+    name: "AddressEmptyCode",
   },
-] as const
+] as const;
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // ContextUpgradeable
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 export const contextUpgradeableAbi = [
-  { type: 'error', inputs: [], name: 'InvalidInitialization' },
-  { type: 'error', inputs: [], name: 'NotInitializing' },
+  { type: "error", inputs: [], name: "InvalidInitialization" },
+  { type: "error", inputs: [], name: "NotInitializing" },
   {
-    type: 'event',
+    type: "event",
     anonymous: false,
     inputs: [
       {
-        name: 'version',
-        internalType: 'uint64',
-        type: 'uint64',
+        name: "version",
+        internalType: "uint64",
+        type: "uint64",
         indexed: false,
       },
     ],
-    name: 'Initialized',
+    name: "Initialized",
   },
-] as const
+] as const;
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // ERC1967Proxy
@@ -45,42 +45,42 @@ export const contextUpgradeableAbi = [
 
 export const erc1967ProxyAbi = [
   {
-    type: 'constructor',
+    type: "constructor",
     inputs: [
-      { name: 'implementation', internalType: 'address', type: 'address' },
-      { name: '_data', internalType: 'bytes', type: 'bytes' },
+      { name: "implementation", internalType: "address", type: "address" },
+      { name: "_data", internalType: "bytes", type: "bytes" },
     ],
-    stateMutability: 'payable',
+    stateMutability: "payable",
   },
   {
-    type: 'error',
-    inputs: [{ name: 'target', internalType: 'address', type: 'address' }],
-    name: 'AddressEmptyCode',
+    type: "error",
+    inputs: [{ name: "target", internalType: "address", type: "address" }],
+    name: "AddressEmptyCode",
   },
   {
-    type: 'error',
+    type: "error",
     inputs: [
-      { name: 'implementation', internalType: 'address', type: 'address' },
+      { name: "implementation", internalType: "address", type: "address" },
     ],
-    name: 'ERC1967InvalidImplementation',
+    name: "ERC1967InvalidImplementation",
   },
-  { type: 'error', inputs: [], name: 'ERC1967NonPayable' },
-  { type: 'error', inputs: [], name: 'FailedCall' },
+  { type: "error", inputs: [], name: "ERC1967NonPayable" },
+  { type: "error", inputs: [], name: "FailedCall" },
   {
-    type: 'event',
+    type: "event",
     anonymous: false,
     inputs: [
       {
-        name: 'implementation',
-        internalType: 'address',
-        type: 'address',
+        name: "implementation",
+        internalType: "address",
+        type: "address",
         indexed: true,
       },
     ],
-    name: 'Upgraded',
+    name: "Upgraded",
   },
-  { type: 'fallback', stateMutability: 'payable' },
-] as const
+  { type: "fallback", stateMutability: "payable" },
+] as const;
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // ERC1967Utils
@@ -88,46 +88,46 @@ export const erc1967ProxyAbi = [
 
 export const erc1967UtilsAbi = [
   {
-    type: 'error',
-    inputs: [{ name: 'admin', internalType: 'address', type: 'address' }],
-    name: 'ERC1967InvalidAdmin',
+    type: "error",
+    inputs: [{ name: "admin", internalType: "address", type: "address" }],
+    name: "ERC1967InvalidAdmin",
   },
   {
-    type: 'error',
-    inputs: [{ name: 'beacon', internalType: 'address', type: 'address' }],
-    name: 'ERC1967InvalidBeacon',
+    type: "error",
+    inputs: [{ name: "beacon", internalType: "address", type: "address" }],
+    name: "ERC1967InvalidBeacon",
   },
   {
-    type: 'error',
+    type: "error",
     inputs: [
-      { name: 'implementation', internalType: 'address', type: 'address' },
+      { name: "implementation", internalType: "address", type: "address" },
     ],
-    name: 'ERC1967InvalidImplementation',
+    name: "ERC1967InvalidImplementation",
   },
-  { type: 'error', inputs: [], name: 'ERC1967NonPayable' },
-] as const
+  { type: "error", inputs: [], name: "ERC1967NonPayable" },
+] as const;
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Errors
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 export const errorsAbi = [
-  { type: 'error', inputs: [], name: 'FailedCall' },
-  { type: 'error', inputs: [], name: 'FailedDeployment' },
+  { type: "error", inputs: [], name: "FailedCall" },
+  { type: "error", inputs: [], name: "FailedDeployment" },
   {
-    type: 'error',
+    type: "error",
     inputs: [
-      { name: 'balance', internalType: 'uint256', type: 'uint256' },
-      { name: 'needed', internalType: 'uint256', type: 'uint256' },
+      { name: "balance", internalType: "uint256", type: "uint256" },
+      { name: "needed", internalType: "uint256", type: "uint256" },
     ],
-    name: 'InsufficientBalance',
+    name: "InsufficientBalance",
   },
   {
-    type: 'error',
-    inputs: [{ name: '', internalType: 'address', type: 'address' }],
-    name: 'MissingPrecompile',
+    type: "error",
+    inputs: [{ name: "", internalType: "address", type: "address" }],
+    name: "MissingPrecompile",
   },
-] as const
+] as const;
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // IBeacon
@@ -135,13 +135,13 @@ export const errorsAbi = [
 
 export const iBeaconAbi = [
   {
-    type: 'function',
+    type: "function",
     inputs: [],
-    name: 'implementation',
-    outputs: [{ name: '', internalType: 'address', type: 'address' }],
-    stateMutability: 'view',
+    name: "implementation",
+    outputs: [{ name: "", internalType: "address", type: "address" }],
+    stateMutability: "view",
   },
-] as const
+] as const;
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // IERC1822Proxiable
@@ -149,13 +149,13 @@ export const iBeaconAbi = [
 
 export const ierc1822ProxiableAbi = [
   {
-    type: 'function',
+    type: "function",
     inputs: [],
-    name: 'proxiableUUID',
-    outputs: [{ name: '', internalType: 'bytes32', type: 'bytes32' }],
-    stateMutability: 'view',
+    name: "proxiableUUID",
+    outputs: [{ name: "", internalType: "bytes32", type: "bytes32" }],
+    stateMutability: "view",
   },
-] as const
+] as const;
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // IERC1967
@@ -163,145 +163,145 @@ export const ierc1822ProxiableAbi = [
 
 export const ierc1967Abi = [
   {
-    type: 'event',
+    type: "event",
     anonymous: false,
     inputs: [
       {
-        name: 'previousAdmin',
-        internalType: 'address',
-        type: 'address',
+        name: "previousAdmin",
+        internalType: "address",
+        type: "address",
         indexed: false,
       },
       {
-        name: 'newAdmin',
-        internalType: 'address',
-        type: 'address',
+        name: "newAdmin",
+        internalType: "address",
+        type: "address",
         indexed: false,
       },
     ],
-    name: 'AdminChanged',
+    name: "AdminChanged",
   },
   {
-    type: 'event',
+    type: "event",
     anonymous: false,
     inputs: [
       {
-        name: 'beacon',
-        internalType: 'address',
-        type: 'address',
+        name: "beacon",
+        internalType: "address",
+        type: "address",
         indexed: true,
       },
     ],
-    name: 'BeaconUpgraded',
+    name: "BeaconUpgraded",
   },
   {
-    type: 'event',
+    type: "event",
     anonymous: false,
     inputs: [
       {
-        name: 'implementation',
-        internalType: 'address',
-        type: 'address',
+        name: "implementation",
+        internalType: "address",
+        type: "address",
         indexed: true,
       },
     ],
-    name: 'Upgraded',
+    name: "Upgraded",
   },
-] as const
+] as const;
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Initializable
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 export const initializableAbi = [
-  { type: 'error', inputs: [], name: 'InvalidInitialization' },
-  { type: 'error', inputs: [], name: 'NotInitializing' },
+  { type: "error", inputs: [], name: "InvalidInitialization" },
+  { type: "error", inputs: [], name: "NotInitializing" },
   {
-    type: 'event',
+    type: "event",
     anonymous: false,
     inputs: [
       {
-        name: 'version',
-        internalType: 'uint64',
-        type: 'uint64',
+        name: "version",
+        internalType: "uint64",
+        type: "uint64",
         indexed: false,
       },
     ],
-    name: 'Initialized',
+    name: "Initialized",
   },
-] as const
+] as const;
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // OwnableUpgradeable
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 export const ownableUpgradeableAbi = [
-  { type: 'error', inputs: [], name: 'InvalidInitialization' },
-  { type: 'error', inputs: [], name: 'NotInitializing' },
+  { type: "error", inputs: [], name: "InvalidInitialization" },
+  { type: "error", inputs: [], name: "NotInitializing" },
   {
-    type: 'error',
-    inputs: [{ name: 'owner', internalType: 'address', type: 'address' }],
-    name: 'OwnableInvalidOwner',
+    type: "error",
+    inputs: [{ name: "owner", internalType: "address", type: "address" }],
+    name: "OwnableInvalidOwner",
   },
   {
-    type: 'error',
-    inputs: [{ name: 'account', internalType: 'address', type: 'address' }],
-    name: 'OwnableUnauthorizedAccount',
+    type: "error",
+    inputs: [{ name: "account", internalType: "address", type: "address" }],
+    name: "OwnableUnauthorizedAccount",
   },
   {
-    type: 'event',
+    type: "event",
     anonymous: false,
     inputs: [
       {
-        name: 'version',
-        internalType: 'uint64',
-        type: 'uint64',
+        name: "version",
+        internalType: "uint64",
+        type: "uint64",
         indexed: false,
       },
     ],
-    name: 'Initialized',
+    name: "Initialized",
   },
   {
-    type: 'event',
+    type: "event",
     anonymous: false,
     inputs: [
       {
-        name: 'previousOwner',
-        internalType: 'address',
-        type: 'address',
+        name: "previousOwner",
+        internalType: "address",
+        type: "address",
         indexed: true,
       },
       {
-        name: 'newOwner',
-        internalType: 'address',
-        type: 'address',
+        name: "newOwner",
+        internalType: "address",
+        type: "address",
         indexed: true,
       },
     ],
-    name: 'OwnershipTransferred',
+    name: "OwnershipTransferred",
   },
   {
-    type: 'function',
+    type: "function",
     inputs: [],
-    name: 'owner',
-    outputs: [{ name: '', internalType: 'address', type: 'address' }],
-    stateMutability: 'view',
+    name: "owner",
+    outputs: [{ name: "", internalType: "address", type: "address" }],
+    stateMutability: "view",
   },
   {
-    type: 'function',
+    type: "function",
     inputs: [],
-    name: 'renounceOwnership',
+    name: "renounceOwnership",
     outputs: [],
-    stateMutability: 'nonpayable',
+    stateMutability: "nonpayable",
   },
   {
-    type: 'function',
-    inputs: [{ name: 'newOwner', internalType: 'address', type: 'address' }],
-    name: 'transferOwnership',
+    type: "function",
+    inputs: [{ name: "newOwner", internalType: "address", type: "address" }],
+    name: "transferOwnership",
     outputs: [],
-    stateMutability: 'nonpayable',
+    stateMutability: "nonpayable",
   },
-] as const
+] as const;
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Propcorn
@@ -311,346 +311,346 @@ export const ownableUpgradeableAbi = [
  * [__View Contract on Op Mainnet Optimism Explorer__](https://optimistic.etherscan.io/address/0xa1430c9c87D3c534EEfC429F4F29577282b8dE0F)
  */
 export const propcornAbi = [
-  { type: 'constructor', inputs: [], stateMutability: 'nonpayable' },
+  { type: "constructor", inputs: [], stateMutability: "nonpayable" },
   {
-    type: 'error',
-    inputs: [{ name: 'target', internalType: 'address', type: 'address' }],
-    name: 'AddressEmptyCode',
+    type: "error",
+    inputs: [{ name: "target", internalType: "address", type: "address" }],
+    name: "AddressEmptyCode",
   },
   {
-    type: 'error',
+    type: "error",
     inputs: [
-      { name: 'implementation', internalType: 'address', type: 'address' },
+      { name: "implementation", internalType: "address", type: "address" },
     ],
-    name: 'ERC1967InvalidImplementation',
+    name: "ERC1967InvalidImplementation",
   },
-  { type: 'error', inputs: [], name: 'ERC1967NonPayable' },
-  { type: 'error', inputs: [], name: 'FailedCall' },
-  { type: 'error', inputs: [], name: 'FundsLocked' },
-  { type: 'error', inputs: [], name: 'InvalidFee' },
-  { type: 'error', inputs: [], name: 'InvalidInitialization' },
-  { type: 'error', inputs: [], name: 'InvalidOwner' },
-  { type: 'error', inputs: [], name: 'NoFundsToReturn' },
-  { type: 'error', inputs: [], name: 'NonexistentProposal' },
-  { type: 'error', inputs: [], name: 'NotInitializing' },
+  { type: "error", inputs: [], name: "ERC1967NonPayable" },
+  { type: "error", inputs: [], name: "FailedCall" },
+  { type: "error", inputs: [], name: "FundsLocked" },
+  { type: "error", inputs: [], name: "InvalidFee" },
+  { type: "error", inputs: [], name: "InvalidInitialization" },
+  { type: "error", inputs: [], name: "InvalidOwner" },
+  { type: "error", inputs: [], name: "NoFundsToReturn" },
+  { type: "error", inputs: [], name: "NonexistentProposal" },
+  { type: "error", inputs: [], name: "NotInitializing" },
   {
-    type: 'error',
-    inputs: [{ name: 'owner', internalType: 'address', type: 'address' }],
-    name: 'OwnableInvalidOwner',
-  },
-  {
-    type: 'error',
-    inputs: [{ name: 'account', internalType: 'address', type: 'address' }],
-    name: 'OwnableUnauthorizedAccount',
-  },
-  { type: 'error', inputs: [], name: 'ProposalClosed' },
-  { type: 'error', inputs: [], name: 'ProposalInProgress' },
-  { type: 'error', inputs: [], name: 'UUPSUnauthorizedCallContext' },
-  {
-    type: 'error',
-    inputs: [{ name: 'slot', internalType: 'bytes32', type: 'bytes32' }],
-    name: 'UUPSUnsupportedProxiableUUID',
+    type: "error",
+    inputs: [{ name: "owner", internalType: "address", type: "address" }],
+    name: "OwnableInvalidOwner",
   },
   {
-    type: 'event',
+    type: "error",
+    inputs: [{ name: "account", internalType: "address", type: "address" }],
+    name: "OwnableUnauthorizedAccount",
+  },
+  { type: "error", inputs: [], name: "ProposalClosed" },
+  { type: "error", inputs: [], name: "ProposalInProgress" },
+  { type: "error", inputs: [], name: "UUPSUnauthorizedCallContext" },
+  {
+    type: "error",
+    inputs: [{ name: "slot", internalType: "bytes32", type: "bytes32" }],
+    name: "UUPSUnsupportedProxiableUUID",
+  },
+  {
+    type: "event",
     anonymous: false,
     inputs: [
-      { name: 'from', internalType: 'address', type: 'address', indexed: true },
+      { name: "from", internalType: "address", type: "address", indexed: true },
       {
-        name: 'index',
-        internalType: 'uint256',
-        type: 'uint256',
+        name: "index",
+        internalType: "uint256",
+        type: "uint256",
         indexed: false,
       },
       {
-        name: 'amount',
-        internalType: 'uint256',
-        type: 'uint256',
+        name: "amount",
+        internalType: "uint256",
+        type: "uint256",
         indexed: false,
       },
-      { name: 'to', internalType: 'address', type: 'address', indexed: false },
+      { name: "to", internalType: "address", type: "address", indexed: false },
     ],
-    name: 'FundsWithdrawn',
+    name: "FundsWithdrawn",
   },
   {
-    type: 'event',
+    type: "event",
     anonymous: false,
     inputs: [
       {
-        name: 'version',
-        internalType: 'uint64',
-        type: 'uint64',
+        name: "version",
+        internalType: "uint64",
+        type: "uint64",
         indexed: false,
       },
     ],
-    name: 'Initialized',
+    name: "Initialized",
   },
   {
-    type: 'event',
+    type: "event",
     anonymous: false,
     inputs: [
       {
-        name: 'previousOwner',
-        internalType: 'address',
-        type: 'address',
+        name: "previousOwner",
+        internalType: "address",
+        type: "address",
         indexed: true,
       },
       {
-        name: 'newOwner',
-        internalType: 'address',
-        type: 'address',
+        name: "newOwner",
+        internalType: "address",
+        type: "address",
         indexed: true,
       },
     ],
-    name: 'OwnershipTransferred',
+    name: "OwnershipTransferred",
   },
   {
-    type: 'event',
+    type: "event",
     anonymous: false,
     inputs: [
-      { name: 'from', internalType: 'address', type: 'address', indexed: true },
+      { name: "from", internalType: "address", type: "address", indexed: true },
       {
-        name: 'index',
-        internalType: 'uint256',
-        type: 'uint256',
+        name: "index",
+        internalType: "uint256",
+        type: "uint256",
         indexed: false,
       },
-      { name: 'url', internalType: 'string', type: 'string', indexed: false },
+      { name: "url", internalType: "string", type: "string", indexed: false },
       {
-        name: 'secondsToUnlock',
-        internalType: 'uint256',
-        type: 'uint256',
-        indexed: false,
-      },
-      {
-        name: 'minAmountRequested',
-        internalType: 'uint256',
-        type: 'uint256',
+        name: "secondsToUnlock",
+        internalType: "uint256",
+        type: "uint256",
         indexed: false,
       },
       {
-        name: 'feeBasisPoints',
-        internalType: 'uint256',
-        type: 'uint256',
+        name: "minAmountRequested",
+        internalType: "uint256",
+        type: "uint256",
+        indexed: false,
+      },
+      {
+        name: "feeBasisPoints",
+        internalType: "uint256",
+        type: "uint256",
         indexed: false,
       },
     ],
-    name: 'ProposalCreated',
+    name: "ProposalCreated",
   },
   {
-    type: 'event',
+    type: "event",
     anonymous: false,
     inputs: [
-      { name: 'from', internalType: 'address', type: 'address', indexed: true },
+      { name: "from", internalType: "address", type: "address", indexed: true },
       {
-        name: 'account',
-        internalType: 'address',
-        type: 'address',
+        name: "account",
+        internalType: "address",
+        type: "address",
         indexed: true,
       },
       {
-        name: 'index',
-        internalType: 'uint256',
-        type: 'uint256',
+        name: "index",
+        internalType: "uint256",
+        type: "uint256",
         indexed: false,
       },
       {
-        name: 'amount',
-        internalType: 'uint256',
-        type: 'uint256',
+        name: "amount",
+        internalType: "uint256",
+        type: "uint256",
         indexed: false,
       },
     ],
-    name: 'ProposalDefunded',
+    name: "ProposalDefunded",
   },
   {
-    type: 'event',
+    type: "event",
     anonymous: false,
     inputs: [
-      { name: 'from', internalType: 'address', type: 'address', indexed: true },
+      { name: "from", internalType: "address", type: "address", indexed: true },
       {
-        name: 'account',
-        internalType: 'address',
-        type: 'address',
+        name: "account",
+        internalType: "address",
+        type: "address",
         indexed: true,
       },
       {
-        name: 'index',
-        internalType: 'uint256',
-        type: 'uint256',
+        name: "index",
+        internalType: "uint256",
+        type: "uint256",
         indexed: false,
       },
       {
-        name: 'amount',
-        internalType: 'uint256',
-        type: 'uint256',
+        name: "amount",
+        internalType: "uint256",
+        type: "uint256",
         indexed: false,
       },
       {
-        name: 'fundingCompletedAt',
-        internalType: 'uint256',
-        type: 'uint256',
+        name: "fundingCompletedAt",
+        internalType: "uint256",
+        type: "uint256",
         indexed: false,
       },
     ],
-    name: 'ProposalFunded',
+    name: "ProposalFunded",
   },
   {
-    type: 'event',
+    type: "event",
     anonymous: false,
     inputs: [
       {
-        name: 'implementation',
-        internalType: 'address',
-        type: 'address',
+        name: "implementation",
+        internalType: "address",
+        type: "address",
         indexed: true,
       },
     ],
-    name: 'Upgraded',
+    name: "Upgraded",
   },
   {
-    type: 'function',
+    type: "function",
     inputs: [],
-    name: 'UPGRADE_INTERFACE_VERSION',
-    outputs: [{ name: '', internalType: 'string', type: 'string' }],
-    stateMutability: 'view',
+    name: "UPGRADE_INTERFACE_VERSION",
+    outputs: [{ name: "", internalType: "string", type: "string" }],
+    stateMutability: "view",
   },
   {
-    type: 'function',
+    type: "function",
     inputs: [
-      { name: 'url', internalType: 'string', type: 'string' },
-      { name: 'secondsToUnlock', internalType: 'uint256', type: 'uint256' },
-      { name: 'minAmountRequested', internalType: 'uint256', type: 'uint256' },
-      { name: 'feeBasisPoints', internalType: 'uint256', type: 'uint256' },
+      { name: "url", internalType: "string", type: "string" },
+      { name: "secondsToUnlock", internalType: "uint256", type: "uint256" },
+      { name: "minAmountRequested", internalType: "uint256", type: "uint256" },
+      { name: "feeBasisPoints", internalType: "uint256", type: "uint256" },
     ],
-    name: 'createProposal',
+    name: "createProposal",
     outputs: [],
-    stateMutability: 'nonpayable',
+    stateMutability: "nonpayable",
   },
   {
-    type: 'function',
+    type: "function",
     inputs: [
-      { name: 'account', internalType: 'address', type: 'address' },
-      { name: 'index', internalType: 'uint256', type: 'uint256' },
+      { name: "account", internalType: "address", type: "address" },
+      { name: "index", internalType: "uint256", type: "uint256" },
     ],
-    name: 'defundProposal',
+    name: "defundProposal",
     outputs: [],
-    stateMutability: 'nonpayable',
+    stateMutability: "nonpayable",
   },
   {
-    type: 'function',
+    type: "function",
     inputs: [
-      { name: 'account', internalType: 'address', type: 'address' },
-      { name: 'index', internalType: 'uint256', type: 'uint256' },
+      { name: "account", internalType: "address", type: "address" },
+      { name: "index", internalType: "uint256", type: "uint256" },
     ],
-    name: 'fundProposal',
+    name: "fundProposal",
     outputs: [],
-    stateMutability: 'payable',
+    stateMutability: "payable",
   },
   {
-    type: 'function',
+    type: "function",
     inputs: [
-      { name: 'account', internalType: 'address', type: 'address' },
-      { name: 'index', internalType: 'uint256', type: 'uint256' },
+      { name: "account", internalType: "address", type: "address" },
+      { name: "index", internalType: "uint256", type: "uint256" },
     ],
-    name: 'getProposalByAccount',
+    name: "getProposalByAccount",
     outputs: [
       {
-        name: '',
-        internalType: 'struct Propcorn.Proposal',
-        type: 'tuple',
+        name: "",
+        internalType: "struct Propcorn.Proposal",
+        type: "tuple",
         components: [
-          { name: 'url', internalType: 'string', type: 'string' },
-          { name: 'secondsToUnlock', internalType: 'uint256', type: 'uint256' },
+          { name: "url", internalType: "string", type: "string" },
+          { name: "secondsToUnlock", internalType: "uint256", type: "uint256" },
           {
-            name: 'minAmountRequested',
-            internalType: 'uint256',
-            type: 'uint256',
+            name: "minAmountRequested",
+            internalType: "uint256",
+            type: "uint256",
           },
-          { name: 'balance', internalType: 'uint256', type: 'uint256' },
+          { name: "balance", internalType: "uint256", type: "uint256" },
           {
-            name: 'fundingCompletedAt',
-            internalType: 'uint256',
-            type: 'uint256',
+            name: "fundingCompletedAt",
+            internalType: "uint256",
+            type: "uint256",
           },
-          { name: 'feeBasisPoints', internalType: 'uint256', type: 'uint256' },
-          { name: 'closed', internalType: 'bool', type: 'bool' },
+          { name: "feeBasisPoints", internalType: "uint256", type: "uint256" },
+          { name: "closed", internalType: "bool", type: "bool" },
         ],
       },
     ],
-    stateMutability: 'view',
+    stateMutability: "view",
   },
   {
-    type: 'function',
+    type: "function",
     inputs: [
       {
-        name: 'protocolFeeReceiver',
-        internalType: 'address payable',
-        type: 'address',
+        name: "protocolFeeReceiver",
+        internalType: "address payable",
+        type: "address",
       },
     ],
-    name: 'initialize',
+    name: "initialize",
     outputs: [],
-    stateMutability: 'nonpayable',
+    stateMutability: "nonpayable",
   },
   {
-    type: 'function',
+    type: "function",
     inputs: [],
-    name: 'owner',
-    outputs: [{ name: '', internalType: 'address', type: 'address' }],
-    stateMutability: 'view',
+    name: "owner",
+    outputs: [{ name: "", internalType: "address", type: "address" }],
+    stateMutability: "view",
   },
   {
-    type: 'function',
+    type: "function",
     inputs: [],
-    name: 'proxiableUUID',
-    outputs: [{ name: '', internalType: 'bytes32', type: 'bytes32' }],
-    stateMutability: 'view',
+    name: "proxiableUUID",
+    outputs: [{ name: "", internalType: "bytes32", type: "bytes32" }],
+    stateMutability: "view",
   },
   {
-    type: 'function',
+    type: "function",
     inputs: [],
-    name: 'renounceOwnership',
+    name: "renounceOwnership",
     outputs: [],
-    stateMutability: 'nonpayable',
+    stateMutability: "nonpayable",
   },
   {
-    type: 'function',
-    inputs: [{ name: 'newOwner', internalType: 'address', type: 'address' }],
-    name: 'transferOwnership',
+    type: "function",
+    inputs: [{ name: "newOwner", internalType: "address", type: "address" }],
+    name: "transferOwnership",
     outputs: [],
-    stateMutability: 'nonpayable',
+    stateMutability: "nonpayable",
   },
   {
-    type: 'function',
+    type: "function",
     inputs: [
-      { name: 'newImplementation', internalType: 'address', type: 'address' },
-      { name: 'data', internalType: 'bytes', type: 'bytes' },
+      { name: "newImplementation", internalType: "address", type: "address" },
+      { name: "data", internalType: "bytes", type: "bytes" },
     ],
-    name: 'upgradeToAndCall',
+    name: "upgradeToAndCall",
     outputs: [],
-    stateMutability: 'payable',
+    stateMutability: "payable",
   },
   {
-    type: 'function',
+    type: "function",
     inputs: [
-      { name: 'account', internalType: 'address', type: 'address' },
-      { name: 'index', internalType: 'uint256', type: 'uint256' },
-      { name: 'receiver', internalType: 'address', type: 'address' },
+      { name: "account", internalType: "address", type: "address" },
+      { name: "index", internalType: "uint256", type: "uint256" },
+      { name: "receiver", internalType: "address", type: "address" },
     ],
-    name: 'withdrawFunds',
+    name: "withdrawFunds",
     outputs: [],
-    stateMutability: 'nonpayable',
+    stateMutability: "nonpayable",
   },
-] as const
+] as const;
 
 /**
  * [__View Contract on Op Mainnet Optimism Explorer__](https://optimistic.etherscan.io/address/0xa1430c9c87D3c534EEfC429F4F29577282b8dE0F)
  */
 export const propcornAddress = {
-  10: '0xa1430c9c87D3c534EEfC429F4F29577282b8dE0F',
-  31337: '0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512'
-} as const
+  10: "0xa1430c9c87D3c534EEfC429F4F29577282b8dE0F",
+  1337: "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512",
+} as const;
 
 /**
  * [__View Contract on Op Mainnet Optimism Explorer__](https://optimistic.etherscan.io/address/0xa1430c9c87D3c534EEfC429F4F29577282b8dE0F)
@@ -658,15 +658,15 @@ export const propcornAddress = {
 export const propcornConfig = {
   address: propcornAddress,
   abi: propcornAbi,
-} as const
+} as const;
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Proxy
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 export const proxyAbi = [
-  { type: 'fallback', stateMutability: 'payable' },
-] as const
+  { type: "fallback", stateMutability: "payable" },
+] as const;
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // UUPSUpgradeable
@@ -674,78 +674,78 @@ export const proxyAbi = [
 
 export const uupsUpgradeableAbi = [
   {
-    type: 'error',
-    inputs: [{ name: 'target', internalType: 'address', type: 'address' }],
-    name: 'AddressEmptyCode',
+    type: "error",
+    inputs: [{ name: "target", internalType: "address", type: "address" }],
+    name: "AddressEmptyCode",
   },
   {
-    type: 'error',
+    type: "error",
     inputs: [
-      { name: 'implementation', internalType: 'address', type: 'address' },
+      { name: "implementation", internalType: "address", type: "address" },
     ],
-    name: 'ERC1967InvalidImplementation',
+    name: "ERC1967InvalidImplementation",
   },
-  { type: 'error', inputs: [], name: 'ERC1967NonPayable' },
-  { type: 'error', inputs: [], name: 'FailedCall' },
-  { type: 'error', inputs: [], name: 'InvalidInitialization' },
-  { type: 'error', inputs: [], name: 'NotInitializing' },
-  { type: 'error', inputs: [], name: 'UUPSUnauthorizedCallContext' },
+  { type: "error", inputs: [], name: "ERC1967NonPayable" },
+  { type: "error", inputs: [], name: "FailedCall" },
+  { type: "error", inputs: [], name: "InvalidInitialization" },
+  { type: "error", inputs: [], name: "NotInitializing" },
+  { type: "error", inputs: [], name: "UUPSUnauthorizedCallContext" },
   {
-    type: 'error',
-    inputs: [{ name: 'slot', internalType: 'bytes32', type: 'bytes32' }],
-    name: 'UUPSUnsupportedProxiableUUID',
+    type: "error",
+    inputs: [{ name: "slot", internalType: "bytes32", type: "bytes32" }],
+    name: "UUPSUnsupportedProxiableUUID",
   },
   {
-    type: 'event',
+    type: "event",
     anonymous: false,
     inputs: [
       {
-        name: 'version',
-        internalType: 'uint64',
-        type: 'uint64',
+        name: "version",
+        internalType: "uint64",
+        type: "uint64",
         indexed: false,
       },
     ],
-    name: 'Initialized',
+    name: "Initialized",
   },
   {
-    type: 'event',
+    type: "event",
     anonymous: false,
     inputs: [
       {
-        name: 'implementation',
-        internalType: 'address',
-        type: 'address',
+        name: "implementation",
+        internalType: "address",
+        type: "address",
         indexed: true,
       },
     ],
-    name: 'Upgraded',
+    name: "Upgraded",
   },
   {
-    type: 'function',
+    type: "function",
     inputs: [],
-    name: 'UPGRADE_INTERFACE_VERSION',
-    outputs: [{ name: '', internalType: 'string', type: 'string' }],
-    stateMutability: 'view',
+    name: "UPGRADE_INTERFACE_VERSION",
+    outputs: [{ name: "", internalType: "string", type: "string" }],
+    stateMutability: "view",
   },
   {
-    type: 'function',
+    type: "function",
     inputs: [],
-    name: 'proxiableUUID',
-    outputs: [{ name: '', internalType: 'bytes32', type: 'bytes32' }],
-    stateMutability: 'view',
+    name: "proxiableUUID",
+    outputs: [{ name: "", internalType: "bytes32", type: "bytes32" }],
+    stateMutability: "view",
   },
   {
-    type: 'function',
+    type: "function",
     inputs: [
-      { name: 'newImplementation', internalType: 'address', type: 'address' },
-      { name: 'data', internalType: 'bytes', type: 'bytes' },
+      { name: "newImplementation", internalType: "address", type: "address" },
+      { name: "data", internalType: "bytes", type: "bytes" },
     ],
-    name: 'upgradeToAndCall',
+    name: "upgradeToAndCall",
     outputs: [],
-    stateMutability: 'payable',
+    stateMutability: "payable",
   },
-] as const
+] as const;
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // React
@@ -755,7 +755,7 @@ export const uupsUpgradeableAbi = [
  * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link contextUpgradeableAbi}__
  */
 export const useWatchContextUpgradeableEvent =
-  /*#__PURE__*/ createUseWatchContractEvent({ abi: contextUpgradeableAbi })
+  /*#__PURE__*/ createUseWatchContractEvent({ abi: contextUpgradeableAbi });
 
 /**
  * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link contextUpgradeableAbi}__ and `eventName` set to `"Initialized"`
@@ -763,14 +763,14 @@ export const useWatchContextUpgradeableEvent =
 export const useWatchContextUpgradeableInitializedEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
     abi: contextUpgradeableAbi,
-    eventName: 'Initialized',
-  })
+    eventName: "Initialized",
+  });
 
 /**
  * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link erc1967ProxyAbi}__
  */
 export const useWatchErc1967ProxyEvent =
-  /*#__PURE__*/ createUseWatchContractEvent({ abi: erc1967ProxyAbi })
+  /*#__PURE__*/ createUseWatchContractEvent({ abi: erc1967ProxyAbi });
 
 /**
  * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link erc1967ProxyAbi}__ and `eventName` set to `"Upgraded"`
@@ -778,29 +778,29 @@ export const useWatchErc1967ProxyEvent =
 export const useWatchErc1967ProxyUpgradedEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
     abi: erc1967ProxyAbi,
-    eventName: 'Upgraded',
-  })
+    eventName: "Upgraded",
+  });
 
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link iBeaconAbi}__
  */
 export const useReadIBeacon = /*#__PURE__*/ createUseReadContract({
   abi: iBeaconAbi,
-})
+});
 
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link iBeaconAbi}__ and `functionName` set to `"implementation"`
  */
 export const useReadIBeaconImplementation = /*#__PURE__*/ createUseReadContract(
-  { abi: iBeaconAbi, functionName: 'implementation' },
-)
+  { abi: iBeaconAbi, functionName: "implementation" },
+);
 
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link ierc1822ProxiableAbi}__
  */
 export const useReadIerc1822Proxiable = /*#__PURE__*/ createUseReadContract({
   abi: ierc1822ProxiableAbi,
-})
+});
 
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link ierc1822ProxiableAbi}__ and `functionName` set to `"proxiableUUID"`
@@ -808,15 +808,15 @@ export const useReadIerc1822Proxiable = /*#__PURE__*/ createUseReadContract({
 export const useReadIerc1822ProxiableProxiableUuid =
   /*#__PURE__*/ createUseReadContract({
     abi: ierc1822ProxiableAbi,
-    functionName: 'proxiableUUID',
-  })
+    functionName: "proxiableUUID",
+  });
 
 /**
  * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link ierc1967Abi}__
  */
 export const useWatchIerc1967Event = /*#__PURE__*/ createUseWatchContractEvent({
   abi: ierc1967Abi,
-})
+});
 
 /**
  * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link ierc1967Abi}__ and `eventName` set to `"AdminChanged"`
@@ -824,8 +824,8 @@ export const useWatchIerc1967Event = /*#__PURE__*/ createUseWatchContractEvent({
 export const useWatchIerc1967AdminChangedEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
     abi: ierc1967Abi,
-    eventName: 'AdminChanged',
-  })
+    eventName: "AdminChanged",
+  });
 
 /**
  * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link ierc1967Abi}__ and `eventName` set to `"BeaconUpgraded"`
@@ -833,8 +833,8 @@ export const useWatchIerc1967AdminChangedEvent =
 export const useWatchIerc1967BeaconUpgradedEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
     abi: ierc1967Abi,
-    eventName: 'BeaconUpgraded',
-  })
+    eventName: "BeaconUpgraded",
+  });
 
 /**
  * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link ierc1967Abi}__ and `eventName` set to `"Upgraded"`
@@ -842,14 +842,14 @@ export const useWatchIerc1967BeaconUpgradedEvent =
 export const useWatchIerc1967UpgradedEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
     abi: ierc1967Abi,
-    eventName: 'Upgraded',
-  })
+    eventName: "Upgraded",
+  });
 
 /**
  * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link initializableAbi}__
  */
 export const useWatchInitializableEvent =
-  /*#__PURE__*/ createUseWatchContractEvent({ abi: initializableAbi })
+  /*#__PURE__*/ createUseWatchContractEvent({ abi: initializableAbi });
 
 /**
  * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link initializableAbi}__ and `eventName` set to `"Initialized"`
@@ -857,15 +857,15 @@ export const useWatchInitializableEvent =
 export const useWatchInitializableInitializedEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
     abi: initializableAbi,
-    eventName: 'Initialized',
-  })
+    eventName: "Initialized",
+  });
 
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link ownableUpgradeableAbi}__
  */
 export const useReadOwnableUpgradeable = /*#__PURE__*/ createUseReadContract({
   abi: ownableUpgradeableAbi,
-})
+});
 
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link ownableUpgradeableAbi}__ and `functionName` set to `"owner"`
@@ -873,15 +873,15 @@ export const useReadOwnableUpgradeable = /*#__PURE__*/ createUseReadContract({
 export const useReadOwnableUpgradeableOwner =
   /*#__PURE__*/ createUseReadContract({
     abi: ownableUpgradeableAbi,
-    functionName: 'owner',
-  })
+    functionName: "owner",
+  });
 
 /**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link ownableUpgradeableAbi}__
  */
 export const useWriteOwnableUpgradeable = /*#__PURE__*/ createUseWriteContract({
   abi: ownableUpgradeableAbi,
-})
+});
 
 /**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link ownableUpgradeableAbi}__ and `functionName` set to `"renounceOwnership"`
@@ -889,8 +889,8 @@ export const useWriteOwnableUpgradeable = /*#__PURE__*/ createUseWriteContract({
 export const useWriteOwnableUpgradeableRenounceOwnership =
   /*#__PURE__*/ createUseWriteContract({
     abi: ownableUpgradeableAbi,
-    functionName: 'renounceOwnership',
-  })
+    functionName: "renounceOwnership",
+  });
 
 /**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link ownableUpgradeableAbi}__ and `functionName` set to `"transferOwnership"`
@@ -898,14 +898,14 @@ export const useWriteOwnableUpgradeableRenounceOwnership =
 export const useWriteOwnableUpgradeableTransferOwnership =
   /*#__PURE__*/ createUseWriteContract({
     abi: ownableUpgradeableAbi,
-    functionName: 'transferOwnership',
-  })
+    functionName: "transferOwnership",
+  });
 
 /**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link ownableUpgradeableAbi}__
  */
 export const useSimulateOwnableUpgradeable =
-  /*#__PURE__*/ createUseSimulateContract({ abi: ownableUpgradeableAbi })
+  /*#__PURE__*/ createUseSimulateContract({ abi: ownableUpgradeableAbi });
 
 /**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link ownableUpgradeableAbi}__ and `functionName` set to `"renounceOwnership"`
@@ -913,8 +913,8 @@ export const useSimulateOwnableUpgradeable =
 export const useSimulateOwnableUpgradeableRenounceOwnership =
   /*#__PURE__*/ createUseSimulateContract({
     abi: ownableUpgradeableAbi,
-    functionName: 'renounceOwnership',
-  })
+    functionName: "renounceOwnership",
+  });
 
 /**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link ownableUpgradeableAbi}__ and `functionName` set to `"transferOwnership"`
@@ -922,14 +922,14 @@ export const useSimulateOwnableUpgradeableRenounceOwnership =
 export const useSimulateOwnableUpgradeableTransferOwnership =
   /*#__PURE__*/ createUseSimulateContract({
     abi: ownableUpgradeableAbi,
-    functionName: 'transferOwnership',
-  })
+    functionName: "transferOwnership",
+  });
 
 /**
  * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link ownableUpgradeableAbi}__
  */
 export const useWatchOwnableUpgradeableEvent =
-  /*#__PURE__*/ createUseWatchContractEvent({ abi: ownableUpgradeableAbi })
+  /*#__PURE__*/ createUseWatchContractEvent({ abi: ownableUpgradeableAbi });
 
 /**
  * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link ownableUpgradeableAbi}__ and `eventName` set to `"Initialized"`
@@ -937,8 +937,8 @@ export const useWatchOwnableUpgradeableEvent =
 export const useWatchOwnableUpgradeableInitializedEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
     abi: ownableUpgradeableAbi,
-    eventName: 'Initialized',
-  })
+    eventName: "Initialized",
+  });
 
 /**
  * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link ownableUpgradeableAbi}__ and `eventName` set to `"OwnershipTransferred"`
@@ -946,8 +946,8 @@ export const useWatchOwnableUpgradeableInitializedEvent =
 export const useWatchOwnableUpgradeableOwnershipTransferredEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
     abi: ownableUpgradeableAbi,
-    eventName: 'OwnershipTransferred',
-  })
+    eventName: "OwnershipTransferred",
+  });
 
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link propcornAbi}__
@@ -957,7 +957,7 @@ export const useWatchOwnableUpgradeableOwnershipTransferredEvent =
 export const useReadPropcorn = /*#__PURE__*/ createUseReadContract({
   abi: propcornAbi,
   address: propcornAddress,
-})
+});
 
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link propcornAbi}__ and `functionName` set to `"UPGRADE_INTERFACE_VERSION"`
@@ -968,8 +968,8 @@ export const useReadPropcornUpgradeInterfaceVersion =
   /*#__PURE__*/ createUseReadContract({
     abi: propcornAbi,
     address: propcornAddress,
-    functionName: 'UPGRADE_INTERFACE_VERSION',
-  })
+    functionName: "UPGRADE_INTERFACE_VERSION",
+  });
 
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link propcornAbi}__ and `functionName` set to `"getProposalByAccount"`
@@ -980,8 +980,8 @@ export const useReadPropcornGetProposalByAccount =
   /*#__PURE__*/ createUseReadContract({
     abi: propcornAbi,
     address: propcornAddress,
-    functionName: 'getProposalByAccount',
-  })
+    functionName: "getProposalByAccount",
+  });
 
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link propcornAbi}__ and `functionName` set to `"owner"`
@@ -991,8 +991,8 @@ export const useReadPropcornGetProposalByAccount =
 export const useReadPropcornOwner = /*#__PURE__*/ createUseReadContract({
   abi: propcornAbi,
   address: propcornAddress,
-  functionName: 'owner',
-})
+  functionName: "owner",
+});
 
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link propcornAbi}__ and `functionName` set to `"proxiableUUID"`
@@ -1000,8 +1000,8 @@ export const useReadPropcornOwner = /*#__PURE__*/ createUseReadContract({
  * [__View Contract on Op Mainnet Optimism Explorer__](https://optimistic.etherscan.io/address/0xa1430c9c87D3c534EEfC429F4F29577282b8dE0F)
  */
 export const useReadPropcornProxiableUuid = /*#__PURE__*/ createUseReadContract(
-  { abi: propcornAbi, address: propcornAddress, functionName: 'proxiableUUID' },
-)
+  { abi: propcornAbi, address: propcornAddress, functionName: "proxiableUUID" },
+);
 
 /**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link propcornAbi}__
@@ -1011,7 +1011,7 @@ export const useReadPropcornProxiableUuid = /*#__PURE__*/ createUseReadContract(
 export const useWritePropcorn = /*#__PURE__*/ createUseWriteContract({
   abi: propcornAbi,
   address: propcornAddress,
-})
+});
 
 /**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link propcornAbi}__ and `functionName` set to `"createProposal"`
@@ -1022,8 +1022,8 @@ export const useWritePropcornCreateProposal =
   /*#__PURE__*/ createUseWriteContract({
     abi: propcornAbi,
     address: propcornAddress,
-    functionName: 'createProposal',
-  })
+    functionName: "createProposal",
+  });
 
 /**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link propcornAbi}__ and `functionName` set to `"defundProposal"`
@@ -1034,8 +1034,8 @@ export const useWritePropcornDefundProposal =
   /*#__PURE__*/ createUseWriteContract({
     abi: propcornAbi,
     address: propcornAddress,
-    functionName: 'defundProposal',
-  })
+    functionName: "defundProposal",
+  });
 
 /**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link propcornAbi}__ and `functionName` set to `"fundProposal"`
@@ -1046,8 +1046,8 @@ export const useWritePropcornFundProposal =
   /*#__PURE__*/ createUseWriteContract({
     abi: propcornAbi,
     address: propcornAddress,
-    functionName: 'fundProposal',
-  })
+    functionName: "fundProposal",
+  });
 
 /**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link propcornAbi}__ and `functionName` set to `"initialize"`
@@ -1057,8 +1057,8 @@ export const useWritePropcornFundProposal =
 export const useWritePropcornInitialize = /*#__PURE__*/ createUseWriteContract({
   abi: propcornAbi,
   address: propcornAddress,
-  functionName: 'initialize',
-})
+  functionName: "initialize",
+});
 
 /**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link propcornAbi}__ and `functionName` set to `"renounceOwnership"`
@@ -1069,8 +1069,8 @@ export const useWritePropcornRenounceOwnership =
   /*#__PURE__*/ createUseWriteContract({
     abi: propcornAbi,
     address: propcornAddress,
-    functionName: 'renounceOwnership',
-  })
+    functionName: "renounceOwnership",
+  });
 
 /**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link propcornAbi}__ and `functionName` set to `"transferOwnership"`
@@ -1081,8 +1081,8 @@ export const useWritePropcornTransferOwnership =
   /*#__PURE__*/ createUseWriteContract({
     abi: propcornAbi,
     address: propcornAddress,
-    functionName: 'transferOwnership',
-  })
+    functionName: "transferOwnership",
+  });
 
 /**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link propcornAbi}__ and `functionName` set to `"upgradeToAndCall"`
@@ -1093,8 +1093,8 @@ export const useWritePropcornUpgradeToAndCall =
   /*#__PURE__*/ createUseWriteContract({
     abi: propcornAbi,
     address: propcornAddress,
-    functionName: 'upgradeToAndCall',
-  })
+    functionName: "upgradeToAndCall",
+  });
 
 /**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link propcornAbi}__ and `functionName` set to `"withdrawFunds"`
@@ -1105,8 +1105,8 @@ export const useWritePropcornWithdrawFunds =
   /*#__PURE__*/ createUseWriteContract({
     abi: propcornAbi,
     address: propcornAddress,
-    functionName: 'withdrawFunds',
-  })
+    functionName: "withdrawFunds",
+  });
 
 /**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link propcornAbi}__
@@ -1116,7 +1116,7 @@ export const useWritePropcornWithdrawFunds =
 export const useSimulatePropcorn = /*#__PURE__*/ createUseSimulateContract({
   abi: propcornAbi,
   address: propcornAddress,
-})
+});
 
 /**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link propcornAbi}__ and `functionName` set to `"createProposal"`
@@ -1127,8 +1127,8 @@ export const useSimulatePropcornCreateProposal =
   /*#__PURE__*/ createUseSimulateContract({
     abi: propcornAbi,
     address: propcornAddress,
-    functionName: 'createProposal',
-  })
+    functionName: "createProposal",
+  });
 
 /**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link propcornAbi}__ and `functionName` set to `"defundProposal"`
@@ -1139,8 +1139,8 @@ export const useSimulatePropcornDefundProposal =
   /*#__PURE__*/ createUseSimulateContract({
     abi: propcornAbi,
     address: propcornAddress,
-    functionName: 'defundProposal',
-  })
+    functionName: "defundProposal",
+  });
 
 /**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link propcornAbi}__ and `functionName` set to `"fundProposal"`
@@ -1151,8 +1151,8 @@ export const useSimulatePropcornFundProposal =
   /*#__PURE__*/ createUseSimulateContract({
     abi: propcornAbi,
     address: propcornAddress,
-    functionName: 'fundProposal',
-  })
+    functionName: "fundProposal",
+  });
 
 /**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link propcornAbi}__ and `functionName` set to `"initialize"`
@@ -1163,8 +1163,8 @@ export const useSimulatePropcornInitialize =
   /*#__PURE__*/ createUseSimulateContract({
     abi: propcornAbi,
     address: propcornAddress,
-    functionName: 'initialize',
-  })
+    functionName: "initialize",
+  });
 
 /**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link propcornAbi}__ and `functionName` set to `"renounceOwnership"`
@@ -1175,8 +1175,8 @@ export const useSimulatePropcornRenounceOwnership =
   /*#__PURE__*/ createUseSimulateContract({
     abi: propcornAbi,
     address: propcornAddress,
-    functionName: 'renounceOwnership',
-  })
+    functionName: "renounceOwnership",
+  });
 
 /**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link propcornAbi}__ and `functionName` set to `"transferOwnership"`
@@ -1187,8 +1187,8 @@ export const useSimulatePropcornTransferOwnership =
   /*#__PURE__*/ createUseSimulateContract({
     abi: propcornAbi,
     address: propcornAddress,
-    functionName: 'transferOwnership',
-  })
+    functionName: "transferOwnership",
+  });
 
 /**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link propcornAbi}__ and `functionName` set to `"upgradeToAndCall"`
@@ -1199,8 +1199,8 @@ export const useSimulatePropcornUpgradeToAndCall =
   /*#__PURE__*/ createUseSimulateContract({
     abi: propcornAbi,
     address: propcornAddress,
-    functionName: 'upgradeToAndCall',
-  })
+    functionName: "upgradeToAndCall",
+  });
 
 /**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link propcornAbi}__ and `functionName` set to `"withdrawFunds"`
@@ -1211,8 +1211,8 @@ export const useSimulatePropcornWithdrawFunds =
   /*#__PURE__*/ createUseSimulateContract({
     abi: propcornAbi,
     address: propcornAddress,
-    functionName: 'withdrawFunds',
-  })
+    functionName: "withdrawFunds",
+  });
 
 /**
  * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link propcornAbi}__
@@ -1222,7 +1222,7 @@ export const useSimulatePropcornWithdrawFunds =
 export const useWatchPropcornEvent = /*#__PURE__*/ createUseWatchContractEvent({
   abi: propcornAbi,
   address: propcornAddress,
-})
+});
 
 /**
  * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link propcornAbi}__ and `eventName` set to `"FundsWithdrawn"`
@@ -1233,8 +1233,8 @@ export const useWatchPropcornFundsWithdrawnEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
     abi: propcornAbi,
     address: propcornAddress,
-    eventName: 'FundsWithdrawn',
-  })
+    eventName: "FundsWithdrawn",
+  });
 
 /**
  * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link propcornAbi}__ and `eventName` set to `"Initialized"`
@@ -1245,8 +1245,8 @@ export const useWatchPropcornInitializedEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
     abi: propcornAbi,
     address: propcornAddress,
-    eventName: 'Initialized',
-  })
+    eventName: "Initialized",
+  });
 
 /**
  * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link propcornAbi}__ and `eventName` set to `"OwnershipTransferred"`
@@ -1257,8 +1257,8 @@ export const useWatchPropcornOwnershipTransferredEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
     abi: propcornAbi,
     address: propcornAddress,
-    eventName: 'OwnershipTransferred',
-  })
+    eventName: "OwnershipTransferred",
+  });
 
 /**
  * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link propcornAbi}__ and `eventName` set to `"ProposalCreated"`
@@ -1269,8 +1269,8 @@ export const useWatchPropcornProposalCreatedEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
     abi: propcornAbi,
     address: propcornAddress,
-    eventName: 'ProposalCreated',
-  })
+    eventName: "ProposalCreated",
+  });
 
 /**
  * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link propcornAbi}__ and `eventName` set to `"ProposalDefunded"`
@@ -1281,8 +1281,8 @@ export const useWatchPropcornProposalDefundedEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
     abi: propcornAbi,
     address: propcornAddress,
-    eventName: 'ProposalDefunded',
-  })
+    eventName: "ProposalDefunded",
+  });
 
 /**
  * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link propcornAbi}__ and `eventName` set to `"ProposalFunded"`
@@ -1293,8 +1293,8 @@ export const useWatchPropcornProposalFundedEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
     abi: propcornAbi,
     address: propcornAddress,
-    eventName: 'ProposalFunded',
-  })
+    eventName: "ProposalFunded",
+  });
 
 /**
  * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link propcornAbi}__ and `eventName` set to `"Upgraded"`
@@ -1305,15 +1305,15 @@ export const useWatchPropcornUpgradedEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
     abi: propcornAbi,
     address: propcornAddress,
-    eventName: 'Upgraded',
-  })
+    eventName: "Upgraded",
+  });
 
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link uupsUpgradeableAbi}__
  */
 export const useReadUupsUpgradeable = /*#__PURE__*/ createUseReadContract({
   abi: uupsUpgradeableAbi,
-})
+});
 
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link uupsUpgradeableAbi}__ and `functionName` set to `"UPGRADE_INTERFACE_VERSION"`
@@ -1321,8 +1321,8 @@ export const useReadUupsUpgradeable = /*#__PURE__*/ createUseReadContract({
 export const useReadUupsUpgradeableUpgradeInterfaceVersion =
   /*#__PURE__*/ createUseReadContract({
     abi: uupsUpgradeableAbi,
-    functionName: 'UPGRADE_INTERFACE_VERSION',
-  })
+    functionName: "UPGRADE_INTERFACE_VERSION",
+  });
 
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link uupsUpgradeableAbi}__ and `functionName` set to `"proxiableUUID"`
@@ -1330,15 +1330,15 @@ export const useReadUupsUpgradeableUpgradeInterfaceVersion =
 export const useReadUupsUpgradeableProxiableUuid =
   /*#__PURE__*/ createUseReadContract({
     abi: uupsUpgradeableAbi,
-    functionName: 'proxiableUUID',
-  })
+    functionName: "proxiableUUID",
+  });
 
 /**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link uupsUpgradeableAbi}__
  */
 export const useWriteUupsUpgradeable = /*#__PURE__*/ createUseWriteContract({
   abi: uupsUpgradeableAbi,
-})
+});
 
 /**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link uupsUpgradeableAbi}__ and `functionName` set to `"upgradeToAndCall"`
@@ -1346,14 +1346,14 @@ export const useWriteUupsUpgradeable = /*#__PURE__*/ createUseWriteContract({
 export const useWriteUupsUpgradeableUpgradeToAndCall =
   /*#__PURE__*/ createUseWriteContract({
     abi: uupsUpgradeableAbi,
-    functionName: 'upgradeToAndCall',
-  })
+    functionName: "upgradeToAndCall",
+  });
 
 /**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link uupsUpgradeableAbi}__
  */
 export const useSimulateUupsUpgradeable =
-  /*#__PURE__*/ createUseSimulateContract({ abi: uupsUpgradeableAbi })
+  /*#__PURE__*/ createUseSimulateContract({ abi: uupsUpgradeableAbi });
 
 /**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link uupsUpgradeableAbi}__ and `functionName` set to `"upgradeToAndCall"`
@@ -1361,14 +1361,14 @@ export const useSimulateUupsUpgradeable =
 export const useSimulateUupsUpgradeableUpgradeToAndCall =
   /*#__PURE__*/ createUseSimulateContract({
     abi: uupsUpgradeableAbi,
-    functionName: 'upgradeToAndCall',
-  })
+    functionName: "upgradeToAndCall",
+  });
 
 /**
  * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link uupsUpgradeableAbi}__
  */
 export const useWatchUupsUpgradeableEvent =
-  /*#__PURE__*/ createUseWatchContractEvent({ abi: uupsUpgradeableAbi })
+  /*#__PURE__*/ createUseWatchContractEvent({ abi: uupsUpgradeableAbi });
 
 /**
  * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link uupsUpgradeableAbi}__ and `eventName` set to `"Initialized"`
@@ -1376,8 +1376,8 @@ export const useWatchUupsUpgradeableEvent =
 export const useWatchUupsUpgradeableInitializedEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
     abi: uupsUpgradeableAbi,
-    eventName: 'Initialized',
-  })
+    eventName: "Initialized",
+  });
 
 /**
  * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link uupsUpgradeableAbi}__ and `eventName` set to `"Upgraded"`
@@ -1385,5 +1385,5 @@ export const useWatchUupsUpgradeableInitializedEvent =
 export const useWatchUupsUpgradeableUpgradedEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
     abi: uupsUpgradeableAbi,
-    eventName: 'Upgraded',
-  })
+    eventName: "Upgraded",
+  });
