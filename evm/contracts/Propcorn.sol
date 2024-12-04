@@ -4,14 +4,15 @@ pragma solidity 0.8.23;
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import "hardhat/console.sol";
 
 contract Propcorn is Initializable, UUPSUpgradeable, OwnableUpgradeable {
     // Errors
     error NonexistentProposal();
-    error ProposalInProgress();
+    error ProposalFunding();
+    error ProposalPaid();
     error FundsLocked();
     error NoFundsToReturn();
-    error ProposalClosed();
     error InvalidOwner();
     error InvalidFee();
 
@@ -29,8 +30,7 @@ contract Propcorn is Initializable, UUPSUpgradeable, OwnableUpgradeable {
         address indexed from,
         address indexed account,
         uint256 index,
-        uint256 amount,
-        uint256 fundingCompletedAt
+        uint256 amount
     );
 
     event ProposalDefunded(
@@ -40,6 +40,8 @@ contract Propcorn is Initializable, UUPSUpgradeable, OwnableUpgradeable {
         uint256 amount
     );
 
+    event ProposalCanceled(address indexed from, uint256 index);
+
     event FundsWithdrawn(
         address indexed from,
         uint256 index,
@@ -47,15 +49,23 @@ contract Propcorn is Initializable, UUPSUpgradeable, OwnableUpgradeable {
         address to
     );
 
+    enum ProposalStatus {
+        INVALID,
+        FUNDING,
+        STARTED,
+        PAID,
+        CANCELED
+    }
+
     // Structs and data
     struct Proposal {
         string url;
         uint256 secondsToUnlock;
+        uint256 fundingCompletedAt;
         uint256 minAmountRequested;
         uint256 balance;
-        uint256 fundingCompletedAt;
         uint256 feeBasisPoints;
-        bool closed;
+        ProposalStatus status;
     }
 
     // keccak256(address, proposal creator address, proposal index) is the key to the balance;
@@ -83,6 +93,26 @@ contract Propcorn is Initializable, UUPSUpgradeable, OwnableUpgradeable {
         _;
     }
 
+    // Read
+
+    function fundsUnlockedAt(
+        Proposal memory proposal
+    ) public pure returns (uint256) {
+        return
+            proposal.fundingCompletedAt > 0
+                ? proposal.fundingCompletedAt + proposal.secondsToUnlock
+                : type(uint256).max;
+    }
+
+    function getProposalByAccount(
+        address account,
+        uint256 index
+    ) public view proposalExists(account, index) returns (Proposal memory) {
+        return _proposals[account][index];
+    }
+
+    // Write
+
     function createProposal(
         string calldata url,
         uint256 secondsToUnlock,
@@ -96,11 +126,11 @@ contract Propcorn is Initializable, UUPSUpgradeable, OwnableUpgradeable {
             Proposal(
                 url,
                 secondsToUnlock,
+                0,
                 minAmountRequested,
                 0,
-                0,
                 feeBasisPoints,
-                false
+                ProposalStatus.FUNDING
             )
         );
 
@@ -119,30 +149,20 @@ contract Propcorn is Initializable, UUPSUpgradeable, OwnableUpgradeable {
         uint256 index
     ) public payable proposalExists(account, index) {
         Proposal storage proposal = _proposals[account][index];
-        if (proposal.closed) {
-            revert ProposalClosed();
-        }
+
+        _checkFundability(proposal);
 
         _addressAndProposalToBalance[
             uint256(keccak256(abi.encodePacked(msg.sender, account, index)))
         ] += msg.value;
-
         proposal.balance += msg.value;
 
-        if (
-            proposal.fundingCompletedAt == 0 &&
-            proposal.balance >= proposal.minAmountRequested
-        ) {
+        if (proposal.balance >= proposal.minAmountRequested) {
+            proposal.status = ProposalStatus.STARTED;
             proposal.fundingCompletedAt = block.timestamp;
         }
 
-        emit ProposalFunded(
-            msg.sender,
-            account,
-            index,
-            msg.value,
-            proposal.fundingCompletedAt
-        );
+        emit ProposalFunded(msg.sender, account, index, msg.value);
     }
 
     function defundProposal(
@@ -151,13 +171,7 @@ contract Propcorn is Initializable, UUPSUpgradeable, OwnableUpgradeable {
     ) public proposalExists(account, index) {
         Proposal storage proposal = _proposals[account][index];
 
-        if (proposal.closed) {
-            revert ProposalClosed();
-        }
-
-        if (proposal.fundingCompletedAt > 0) {
-            revert FundsLocked();
-        }
+        _checkFundability(proposal);
 
         uint256 key = uint256(
             keccak256(abi.encodePacked(msg.sender, account, index))
@@ -176,6 +190,25 @@ contract Propcorn is Initializable, UUPSUpgradeable, OwnableUpgradeable {
         emit ProposalDefunded(msg.sender, account, index, toReturn);
     }
 
+    function cancelProposal(
+        address account,
+        uint256 index
+    ) public proposalExists(account, index) {
+        Proposal storage proposal = _proposals[account][index];
+
+        if (account != msg.sender) {
+            revert InvalidOwner();
+        }
+
+        if (proposal.status == ProposalStatus.PAID) {
+            revert ProposalPaid();
+        }
+
+        proposal.status = ProposalStatus.CANCELED;
+
+        emit ProposalCanceled(msg.sender, index);
+    }
+
     function withdrawFunds(
         address account,
         uint256 index,
@@ -187,19 +220,19 @@ contract Propcorn is Initializable, UUPSUpgradeable, OwnableUpgradeable {
             revert InvalidOwner();
         }
 
-        if (proposal.closed) {
-            revert ProposalClosed();
+        if (proposal.status == ProposalStatus.FUNDING) {
+            revert ProposalFunding();
         }
 
-        if (
-            proposal.fundingCompletedAt == 0 ||
-            block.timestamp - proposal.fundingCompletedAt <
-            proposal.secondsToUnlock
-        ) {
-            revert ProposalInProgress();
+        if (proposal.status == ProposalStatus.PAID) {
+            revert ProposalPaid();
         }
 
-        proposal.closed = true;
+        if (block.timestamp < fundsUnlockedAt(proposal)) {
+            revert FundsLocked();
+        }
+
+        proposal.status = ProposalStatus.PAID;
 
         uint256 protocolFee = (proposal.balance * proposal.feeBasisPoints) /
             10_000;
@@ -215,10 +248,15 @@ contract Propcorn is Initializable, UUPSUpgradeable, OwnableUpgradeable {
         );
     }
 
-    function getProposalByAccount(
-        address account,
-        uint256 index
-    ) public view proposalExists(account, index) returns (Proposal memory) {
-        return _proposals[account][index];
+    // Internal
+
+    function _checkFundability(Proposal memory proposal) internal pure {
+        if (proposal.status == ProposalStatus.PAID) {
+            revert ProposalPaid();
+        }
+
+        if (proposal.status == ProposalStatus.STARTED) {
+            revert FundsLocked();
+        }
     }
 }

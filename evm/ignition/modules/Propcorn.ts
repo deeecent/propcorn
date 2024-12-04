@@ -4,7 +4,7 @@ const PropcornModule = buildModule("PropcornModule", (m) => {
   const deployer = m.getAccount(0);
 
   // Deploy the implementation contract
-  const implementation = m.contract("Propcorn");
+  const implementation = m.contract("Propcorn", [], { id: "PropcornV1" });
 
   // Encode the initialize function call
   const initializeData = m.encodeFunctionCall(
@@ -18,7 +18,7 @@ const PropcornModule = buildModule("PropcornModule", (m) => {
     id: "Proxy",
   });
 
-  return { proxy };
+  return { proxy, implementation };
 }) as ReturnType<typeof buildModule>; // Explicitly cast the return type here
 
 export default PropcornModule;
