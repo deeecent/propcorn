@@ -7,10 +7,17 @@ import { ethers, upgrades } from "hardhat";
 import {
   Propcorn,
   PropcornNoMoreUpgrades__factory,
-  PropcornUpgraded,
   PropcornUpgraded__factory,
 } from "../../types";
 import { deployPropcornFixture } from "./Propcorn.fixture";
+
+enum ProposalStatus {
+  INVALID,
+  FUNDING,
+  STARTED,
+  PAID,
+  CANCELED,
+}
 
 describe("Propcorn", function () {
   let propcorn: Propcorn;
@@ -168,7 +175,7 @@ describe("Propcorn", function () {
       ).revertedWithCustomError(propcorn, "NonexistentProposal");
     });
 
-    it("should fail if the proposal is closed", async () => {
+    it("should fail if the proposal is paid", async () => {
       // Fund the full proposal
       await propcorn
         .connect(carol)
@@ -184,7 +191,7 @@ describe("Propcorn", function () {
 
       await expect(
         propcorn.connect(carol).fundProposal(bob.address, 0),
-      ).revertedWithCustomError(propcorn, "ProposalClosed");
+      ).revertedWithCustomError(propcorn, "ProposalPaid");
     });
 
     it("should emit an event on funding", async () => {
@@ -194,7 +201,7 @@ describe("Propcorn", function () {
           .fundProposal(bob.address, index, { value: parseEther("0.4") }),
       )
         .to.emit(propcorn, "ProposalFunded")
-        .withArgs(carol.address, bob.address, index, parseEther("0.4"), 0);
+        .withArgs(carol.address, bob.address, index, parseEther("0.4"));
     });
 
     it("should emit an event with `fundingCompletedAt` set on funding when reaches the threshold", async () => {
@@ -206,13 +213,7 @@ describe("Propcorn", function () {
           .fundProposal(bob.address, 0, { value: parseEther("1") }),
       )
         .to.emit(propcorn, "ProposalFunded")
-        .withArgs(
-          carol.address,
-          bob.address,
-          0,
-          parseEther("1"),
-          nextTimestamp,
-        );
+        .withArgs(carol.address, bob.address, 0, parseEther("1"));
     });
   });
 
@@ -269,7 +270,7 @@ describe("Propcorn", function () {
 
       await expect(
         propcorn.connect(carol).defundProposal(bob.address, 0),
-      ).revertedWithCustomError(propcorn, "ProposalClosed");
+      ).revertedWithCustomError(propcorn, "ProposalPaid");
     });
 
     it("should emit an event on defunding", async () => {
@@ -347,7 +348,7 @@ describe("Propcorn", function () {
     it("should fail if the proposal is not funded yet", async () => {
       await expect(
         propcorn.connect(bob).withdrawFunds(bob.address, index, bob.address),
-      ).revertedWithCustomError(propcorn, "ProposalInProgress");
+      ).revertedWithCustomError(propcorn, "ProposalFunding");
     });
 
     it("should fail if the proposal reaches the amount threshold but not the temporal one", async () => {
@@ -356,7 +357,7 @@ describe("Propcorn", function () {
         .fundProposal(bob.address, index, { value: minAmountRequested });
       await expect(
         propcorn.connect(bob).withdrawFunds(bob.address, index, bob.address),
-      ).revertedWithCustomError(propcorn, "ProposalInProgress");
+      ).revertedWithCustomError(propcorn, "FundsLocked");
     });
 
     it("should fail if the funds has already been withdrawn", async () => {
@@ -372,7 +373,7 @@ describe("Propcorn", function () {
 
       await expect(
         propcorn.connect(bob).withdrawFunds(bob.address, index, dan.address),
-      ).revertedWithCustomError(propcorn, "ProposalClosed");
+      ).revertedWithCustomError(propcorn, "ProposalPaid");
     });
 
     it("should transfer funds if the proposal reaches the min amount and enough time has passed", async () => {
@@ -411,6 +412,85 @@ describe("Propcorn", function () {
             (minAmountRequested * BigInt(feeBasisPoints)) / 10000n,
           dan.address,
         );
+    });
+  });
+
+  describe("cancelProposal", function () {
+    const url = "https://github.com/deeecent/propcorn/issues/1";
+    const secondsToUnlock = 666;
+    const minAmountRequested = parseEther("1");
+    // 2%
+    const feeBasisPoints = 2 * 100;
+    const index = 0;
+
+    beforeEach(async () => {
+      ({ propcorn } = await loadFixture(deployPropcornFixture));
+      await propcorn
+        .connect(bob)
+        .createProposal(
+          url,
+          secondsToUnlock,
+          minAmountRequested,
+          feeBasisPoints,
+        );
+    });
+
+    it("should fail if the proposal doesn't exist", async () => {
+      await expect(
+        propcorn.connect(bob).cancelProposal(bob.address, 9999),
+      ).revertedWithCustomError(propcorn, "NonexistentProposal");
+    });
+
+    it("should fail if the sender is not the owner of the proposal", async () => {
+      await expect(
+        propcorn.connect(carol).cancelProposal(bob.address, index),
+      ).revertedWithCustomError(propcorn, "InvalidOwner");
+    });
+
+    it("should fail if the proposal is already paid", async () => {
+      await propcorn
+        .connect(carol)
+        .fundProposal(bob.address, index, { value: minAmountRequested });
+
+      await time.increase(secondsToUnlock);
+
+      await propcorn
+        .connect(bob)
+        .withdrawFunds(bob.address, index, dan.address);
+
+      await expect(
+        propcorn.connect(bob).cancelProposal(bob.address, index),
+      ).revertedWithCustomError(propcorn, "ProposalPaid");
+    });
+
+    it("should cancel the proposal during funding", async () => {
+      await propcorn.connect(carol).fundProposal(bob.address, index, {
+        value: minAmountRequested - BigInt(1),
+      });
+
+      await propcorn.connect(bob).cancelProposal(bob.address, index);
+
+      const result = await propcorn.getProposalByAccount(bob.address, index);
+
+      expect(result.status).equal(ProposalStatus.CANCELED);
+    });
+
+    it("should cancel the proposal once funded", async () => {
+      await propcorn.connect(carol).fundProposal(bob.address, index, {
+        value: minAmountRequested,
+      });
+
+      await propcorn.connect(bob).cancelProposal(bob.address, index);
+
+      const result = await propcorn.getProposalByAccount(bob.address, index);
+
+      expect(result.status).equal(ProposalStatus.CANCELED);
+    });
+
+    it("should emit an event", async () => {
+      await expect(propcorn.connect(bob).cancelProposal(bob.address, index))
+        .to.emit(propcorn, "ProposalCanceled")
+        .withArgs(bob.address, index);
     });
   });
 });
