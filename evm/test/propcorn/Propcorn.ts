@@ -26,6 +26,40 @@ describe("Propcorn", function () {
   let carol: SignerWithAddress;
   let dan: SignerWithAddress;
 
+  function randomInt(max: number) {
+    return Math.floor(Math.random() * max);
+  }
+
+  async function createProposals(n: number) {
+    const urls = [...Array(n)].map(() => randomInt(10000000).toString());
+    const secondsToUnlocks = [...Array(n)].map(() => randomInt(10000000));
+    const minAmountRequesteds = [...Array(n)].map(() => randomInt(10000000));
+    const feeBasisPoints = [...Array(n)].map(() => randomInt(100));
+    const signers = await ethers.getSigners();
+    const authors = [...Array(n)].map((_, x) => {
+      return signers[x % (signers.length - 1)];
+    });
+    //console.log(authors);
+    for (let i = 0; i < n; i++) {
+      await propcorn
+        .connect(authors[i])
+        .createProposal(
+          urls[i],
+          secondsToUnlocks[i],
+          minAmountRequesteds[i],
+          feeBasisPoints[i],
+        );
+    }
+
+    return [
+      urls,
+      secondsToUnlocks,
+      minAmountRequesteds,
+      feeBasisPoints,
+      authors,
+    ];
+  }
+
   before(async () => {
     [alice, bob, carol, dan] = await ethers.getSigners();
   });
@@ -171,7 +205,7 @@ describe("Propcorn", function () {
 
     it("should fail if the proposal doesn't exist", async () => {
       await expect(
-        propcorn.connect(carol).fundProposal(bob.address, 9999),
+        propcorn.connect(carol).fundProposal(9999),
       ).revertedWithCustomError(propcorn, "NonexistentProposal");
     });
 
@@ -179,18 +213,16 @@ describe("Propcorn", function () {
       // Fund the full proposal
       await propcorn
         .connect(carol)
-        .fundProposal(bob.address, index, { value: minAmountRequested });
+        .fundProposal(index, { value: minAmountRequested });
 
       // Let time passes
       await time.increase(secondsToUnlock);
 
       // Withdraw the full amount
-      await propcorn
-        .connect(bob)
-        .withdrawFunds(bob.address, index, dan.address);
+      await propcorn.connect(bob).withdrawFunds(index, dan.address);
 
       await expect(
-        propcorn.connect(carol).fundProposal(bob.address, 0),
+        propcorn.connect(carol).fundProposal(0),
       ).revertedWithCustomError(propcorn, "ProposalPaid");
     });
 
@@ -198,7 +230,7 @@ describe("Propcorn", function () {
       await expect(
         propcorn
           .connect(carol)
-          .fundProposal(bob.address, index, { value: parseEther("0.4") }),
+          .fundProposal(index, { value: parseEther("0.4") }),
       )
         .to.emit(propcorn, "ProposalFunded")
         .withArgs(carol.address, bob.address, index, parseEther("0.4"));
@@ -208,9 +240,7 @@ describe("Propcorn", function () {
       const nextTimestamp = 2000000000;
       await time.setNextBlockTimestamp(nextTimestamp);
       await expect(
-        propcorn
-          .connect(carol)
-          .fundProposal(bob.address, 0, { value: parseEther("1") }),
+        propcorn.connect(carol).fundProposal(0, { value: parseEther("1") }),
       )
         .to.emit(propcorn, "ProposalFunded")
         .withArgs(carol.address, bob.address, 0, parseEther("1"));
@@ -239,7 +269,7 @@ describe("Propcorn", function () {
 
     it("should fail if the proposal doesn't exist", async () => {
       await expect(
-        propcorn.connect(carol).defundProposal(bob.address, 9999),
+        propcorn.connect(carol).defundProposal(9999),
       ).revertedWithCustomError(propcorn, "NonexistentProposal");
     });
 
@@ -247,10 +277,10 @@ describe("Propcorn", function () {
       // Fund the full proposal
       await propcorn
         .connect(carol)
-        .fundProposal(bob.address, index, { value: minAmountRequested });
+        .fundProposal(index, { value: minAmountRequested });
 
       await expect(
-        propcorn.connect(carol).defundProposal(bob.address, 0),
+        propcorn.connect(carol).defundProposal(0),
       ).revertedWithCustomError(propcorn, "FundsLocked");
     });
 
@@ -258,26 +288,24 @@ describe("Propcorn", function () {
       // Fund the full proposal
       await propcorn
         .connect(carol)
-        .fundProposal(bob.address, index, { value: minAmountRequested });
+        .fundProposal(index, { value: minAmountRequested });
 
       // Let time passes
       await time.increase(secondsToUnlock);
 
       // Withdraw the full amount
-      await propcorn
-        .connect(bob)
-        .withdrawFunds(bob.address, index, dan.address);
+      await propcorn.connect(bob).withdrawFunds(index, dan.address);
 
       await expect(
-        propcorn.connect(carol).defundProposal(bob.address, 0),
+        propcorn.connect(carol).defundProposal(0),
       ).revertedWithCustomError(propcorn, "ProposalPaid");
     });
 
     it("should emit an event on defunding", async () => {
       await propcorn
         .connect(carol)
-        .fundProposal(bob.address, index, { value: parseEther("0.4") });
-      await expect(propcorn.connect(carol).defundProposal(bob.address, index))
+        .fundProposal(index, { value: parseEther("0.4") });
+      await expect(propcorn.connect(carol).defundProposal(index))
         .to.emit(propcorn, "ProposalDefunded")
         .withArgs(carol.address, bob.address, index, parseEther("0.4"));
     });
@@ -285,10 +313,10 @@ describe("Propcorn", function () {
     it("should transfer the funds to the user", async () => {
       await propcorn
         .connect(carol)
-        .fundProposal(bob.address, index, { value: parseEther("0.4") });
+        .fundProposal(index, { value: parseEther("0.4") });
 
       await expect(
-        propcorn.connect(carol).defundProposal(bob.address, index),
+        propcorn.connect(carol).defundProposal(index),
       ).to.changeEtherBalances(
         [await propcorn.getAddress(), carol.address],
         [-parseEther("0.4"), parseEther("0.4")],
@@ -297,18 +325,18 @@ describe("Propcorn", function () {
 
     it("should not transfer the funds to a user that didn't fund the proposal", async () => {
       await expect(
-        propcorn.connect(carol).defundProposal(bob.address, index),
+        propcorn.connect(carol).defundProposal(index),
       ).revertedWithCustomError(propcorn, "NoFundsToReturn");
     });
 
     it("should not transfer the funds twice to the user", async () => {
       await propcorn
         .connect(carol)
-        .fundProposal(bob.address, index, { value: parseEther("0.4") });
+        .fundProposal(index, { value: parseEther("0.4") });
 
-      await propcorn.connect(carol).defundProposal(bob.address, index);
+      await propcorn.connect(carol).defundProposal(index);
       await expect(
-        propcorn.connect(carol).defundProposal(bob.address, index),
+        propcorn.connect(carol).defundProposal(index),
       ).revertedWithCustomError(propcorn, "NoFundsToReturn");
     });
   });
@@ -335,55 +363,53 @@ describe("Propcorn", function () {
 
     it("should fail if the proposal doesn't exist", async () => {
       await expect(
-        propcorn.connect(bob).withdrawFunds(bob.address, 9999, bob.address),
+        propcorn.connect(bob).withdrawFunds(9999, bob.address),
       ).revertedWithCustomError(propcorn, "NonexistentProposal");
     });
 
     it("should fail if the sender is not the owner of the proposal", async () => {
       await expect(
-        propcorn.connect(carol).withdrawFunds(bob.address, index, bob.address),
+        propcorn.connect(carol).withdrawFunds(index, bob.address),
       ).revertedWithCustomError(propcorn, "InvalidOwner");
     });
 
     it("should fail if the proposal is not funded yet", async () => {
       await expect(
-        propcorn.connect(bob).withdrawFunds(bob.address, index, bob.address),
+        propcorn.connect(bob).withdrawFunds(index, bob.address),
       ).revertedWithCustomError(propcorn, "ProposalFunding");
     });
 
     it("should fail if the proposal reaches the amount threshold but not the temporal one", async () => {
       await propcorn
         .connect(carol)
-        .fundProposal(bob.address, index, { value: minAmountRequested });
+        .fundProposal(index, { value: minAmountRequested });
       await expect(
-        propcorn.connect(bob).withdrawFunds(bob.address, index, bob.address),
+        propcorn.connect(bob).withdrawFunds(index, bob.address),
       ).revertedWithCustomError(propcorn, "FundsLocked");
     });
 
     it("should fail if the funds has already been withdrawn", async () => {
       await propcorn
         .connect(carol)
-        .fundProposal(bob.address, index, { value: minAmountRequested });
+        .fundProposal(index, { value: minAmountRequested });
 
       await time.increase(secondsToUnlock);
 
-      await propcorn
-        .connect(bob)
-        .withdrawFunds(bob.address, index, dan.address);
+      await propcorn.connect(bob).withdrawFunds(index, dan.address);
 
       await expect(
-        propcorn.connect(bob).withdrawFunds(bob.address, index, dan.address),
+        propcorn.connect(bob).withdrawFunds(index, dan.address),
       ).revertedWithCustomError(propcorn, "ProposalPaid");
     });
 
     it("should transfer funds if the proposal reaches the min amount and enough time has passed", async () => {
       await propcorn
         .connect(carol)
-        .fundProposal(bob.address, index, { value: minAmountRequested });
+        .fundProposal(index, { value: minAmountRequested });
       await time.increase(secondsToUnlock);
 
       await expect(
-        propcorn.connect(bob).withdrawFunds(bob.address, index, dan.address),
+        propcorn.connect(bob).withdrawFunds(index, dan.address),
       ).to.changeEtherBalances(
         [await propcorn.getAddress(), dan.address, alice.address],
         [
@@ -398,12 +424,10 @@ describe("Propcorn", function () {
     it("should emit an event if the proposal reaches the min amount and enough time has passed", async () => {
       await propcorn
         .connect(carol)
-        .fundProposal(bob.address, index, { value: minAmountRequested });
+        .fundProposal(index, { value: minAmountRequested });
       await time.increase(secondsToUnlock);
 
-      await expect(
-        propcorn.connect(bob).withdrawFunds(bob.address, index, dan.address),
-      )
+      await expect(propcorn.connect(bob).withdrawFunds(index, dan.address))
         .to.emit(propcorn, "FundsWithdrawn")
         .withArgs(
           bob.address,
@@ -437,60 +461,212 @@ describe("Propcorn", function () {
 
     it("should fail if the proposal doesn't exist", async () => {
       await expect(
-        propcorn.connect(bob).cancelProposal(bob.address, 9999),
+        propcorn.connect(bob).cancelProposal(9999),
       ).revertedWithCustomError(propcorn, "NonexistentProposal");
     });
 
     it("should fail if the sender is not the owner of the proposal", async () => {
       await expect(
-        propcorn.connect(carol).cancelProposal(bob.address, index),
+        propcorn.connect(carol).cancelProposal(index),
       ).revertedWithCustomError(propcorn, "InvalidOwner");
     });
 
     it("should fail if the proposal is already paid", async () => {
       await propcorn
         .connect(carol)
-        .fundProposal(bob.address, index, { value: minAmountRequested });
+        .fundProposal(index, { value: minAmountRequested });
 
       await time.increase(secondsToUnlock);
 
-      await propcorn
-        .connect(bob)
-        .withdrawFunds(bob.address, index, dan.address);
+      await propcorn.connect(bob).withdrawFunds(index, dan.address);
 
       await expect(
-        propcorn.connect(bob).cancelProposal(bob.address, index),
+        propcorn.connect(bob).cancelProposal(index),
       ).revertedWithCustomError(propcorn, "ProposalPaid");
     });
 
     it("should cancel the proposal during funding", async () => {
-      await propcorn.connect(carol).fundProposal(bob.address, index, {
+      await propcorn.connect(carol).fundProposal(index, {
         value: minAmountRequested - BigInt(1),
       });
 
-      await propcorn.connect(bob).cancelProposal(bob.address, index);
+      await propcorn.connect(bob).cancelProposal(index);
 
-      const result = await propcorn.getProposalByAccount(bob.address, index);
+      const result = await propcorn.proposals(index);
 
       expect(result.status).equal(ProposalStatus.CANCELED);
     });
 
     it("should cancel the proposal once funded", async () => {
-      await propcorn.connect(carol).fundProposal(bob.address, index, {
+      await propcorn.connect(carol).fundProposal(index, {
         value: minAmountRequested,
       });
 
-      await propcorn.connect(bob).cancelProposal(bob.address, index);
+      await propcorn.connect(bob).cancelProposal(index);
 
-      const result = await propcorn.getProposalByAccount(bob.address, index);
+      const result = await propcorn.proposals(index);
 
       expect(result.status).equal(ProposalStatus.CANCELED);
     });
 
     it("should emit an event", async () => {
-      await expect(propcorn.connect(bob).cancelProposal(bob.address, index))
+      await expect(propcorn.connect(bob).cancelProposal(index))
         .to.emit(propcorn, "ProposalCanceled")
         .withArgs(bob.address, index);
+    });
+  });
+
+  describe("getProposals", function () {
+    beforeEach(async () => {
+      ({ propcorn } = await loadFixture(deployPropcornFixture));
+    });
+
+    it("returns 0 proposals if none are there", async () => {
+      const result = await propcorn["getProposals()"]();
+
+      expect(result.length).equal(0);
+    });
+
+    it("returns all proposals sorted from earliest to latest", async () => {
+      const n = 3;
+      const [
+        urls,
+        secondsToUnlocks,
+        minAmountRequesteds,
+        feeBasisPoints,
+        authors,
+      ] = await createProposals(n);
+
+      const result = await propcorn["getProposals()"]();
+
+      expect(result.length).equal(urls.length);
+
+      for (let i = 0; i < n; i++) {
+        expect(result[i].author).equal(authors[i]);
+        expect(result[i].url).equal(urls[i]);
+        expect(result[i].secondsToUnlock).equal(secondsToUnlocks[i]);
+        expect(result[i].minAmountRequested).equal(minAmountRequesteds[i]);
+        expect(result[i].feeBasisPoints).equal(feeBasisPoints[i]);
+        expect(result[i].balance).equal(0);
+        expect(result[i].status).equal(ProposalStatus.FUNDING);
+      }
+    });
+  });
+
+  describe.only("getProposals(uint256)", function () {
+    beforeEach(async () => {
+      ({ propcorn } = await loadFixture(deployPropcornFixture));
+    });
+
+    it("returns 0 proposals if none are there", async () => {
+      const result = await propcorn["getProposals(uint256)"](0);
+
+      expect(result.length).equal(1000);
+      expect(result[0].status).equal(ProposalStatus.INVALID);
+    });
+
+    it("returns 0 proposals for page 1 if none are there", async () => {
+      const result = await propcorn["getProposals(uint256)"](1);
+
+      expect(result.length).equal(1000);
+      expect(result[0].status).equal(ProposalStatus.INVALID);
+    });
+
+    it("when less than 1000, returns all proposals for page 0 sorted from latest to earliest", async () => {
+      const n = 3;
+      const [
+        urls,
+        secondsToUnlocks,
+        minAmountRequesteds,
+        feeBasisPoints,
+        authors,
+      ] = await createProposals(n);
+      const result = await propcorn["getProposals(uint256)"](0);
+
+      expect(result.length).equal(1000);
+
+      for (let i = 2; i >= n; i--) {
+        expect(result[i].author).equal(authors[i]);
+        expect(result[i].url).equal(urls[i]);
+        expect(result[i].secondsToUnlock).equal(secondsToUnlocks[i]);
+        expect(result[i].minAmountRequested).equal(minAmountRequesteds[i]);
+        expect(result[i].feeBasisPoints).equal(feeBasisPoints[i]);
+        expect(result[i].balance).equal(0);
+        expect(result[i].status).equal(ProposalStatus.FUNDING);
+      }
+    });
+
+    it("returns max 1000 proposals for page 0, sorted from latest to earliest", async () => {
+      const n = 1001;
+      const [
+        urls,
+        secondsToUnlocks,
+        minAmountRequesteds,
+        feeBasisPoints,
+        authors,
+      ] = await createProposals(n);
+      const result = await propcorn["getProposals(uint256)"](0);
+
+      expect(result.length).equal(1000);
+
+      for (let i = 1000; i > 0; i--) {
+        expect(result[1000 - i].author).equal(authors[i]);
+        expect(result[1000 - i].url).equal(urls[i]);
+        expect(result[1000 - i].secondsToUnlock).equal(secondsToUnlocks[i]);
+        expect(result[1000 - i].minAmountRequested).equal(
+          minAmountRequesteds[i],
+        );
+        expect(result[1000 - i].feeBasisPoints).equal(feeBasisPoints[i]);
+        expect(result[1000 - i].balance).equal(0);
+        expect(result[1000 - i].status).equal(ProposalStatus.FUNDING);
+      }
+    });
+
+    it("returns proposals for page 1, sorted from latest to earliest", async () => {
+      const n = 1003;
+      const [
+        urls,
+        secondsToUnlocks,
+        minAmountRequesteds,
+        feeBasisPoints,
+        authors,
+      ] = await createProposals(n);
+      const result = await propcorn["getProposals(uint256)"](1);
+
+      expect(result.length).equal(1000);
+
+      for (let i = 2; i >= 0; i--) {
+        expect(result[2 - i].author).equal(authors[i]);
+        expect(result[2 - i].url).equal(urls[i]);
+        expect(result[2 - i].secondsToUnlock).equal(secondsToUnlocks[i]);
+        expect(result[2 - i].minAmountRequested).equal(minAmountRequesteds[i]);
+        expect(result[2 - i].feeBasisPoints).equal(feeBasisPoints[i]);
+        expect(result[2 - i].balance).equal(0);
+        expect(result[2 - i].status).equal(ProposalStatus.FUNDING);
+      }
+    });
+
+    it("returns earliest proposal on last page when 1001 proposals in total", async () => {
+      const n = 1001;
+      const [
+        urls,
+        secondsToUnlocks,
+        minAmountRequesteds,
+        feeBasisPoints,
+        authors,
+      ] = await createProposals(n);
+      const result = await propcorn["getProposals(uint256)"](1);
+
+      expect(result.length).equal(1000);
+
+      expect(result[0].author).equal(authors[0]);
+      expect(result[0].url).equal(urls[0]);
+      expect(result[0].secondsToUnlock).equal(secondsToUnlocks[0]);
+      expect(result[0].minAmountRequested).equal(minAmountRequesteds[0]);
+      expect(result[0].feeBasisPoints).equal(feeBasisPoints[0]);
+      expect(result[0].balance).equal(0);
+      expect(result[0].status).equal(ProposalStatus.FUNDING);
+      expect(result[1].status).equal(ProposalStatus.INVALID);
     });
   });
 });

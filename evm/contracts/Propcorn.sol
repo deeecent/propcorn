@@ -64,13 +64,16 @@ contract Propcorn is Initializable, UUPSUpgradeable, OwnableUpgradeable {
         uint256 minAmountRequested;
         uint256 balance;
         uint256 feeBasisPoints;
+        address author;
         ProposalStatus status;
     }
 
-    // keccak256(address, proposal creator address, proposal index) is the key to the balance;
-    mapping(uint256 => uint256) internal _addressAndProposalToBalance;
-    mapping(address => Proposal[]) internal _proposals;
+    mapping(address => mapping(uint256 => uint256)) funderToProposalBalance;
     address payable internal _protocolFeeReceiver;
+
+    Proposal[] public proposals;
+
+    uint256 constant PAGE_SIZE = 1000;
 
     function initialize(
         address payable protocolFeeReceiver
@@ -85,8 +88,8 @@ contract Propcorn is Initializable, UUPSUpgradeable, OwnableUpgradeable {
 
     function _authorizeUpgrade(address) internal virtual override onlyOwner {}
 
-    modifier proposalExists(address account, uint256 index) {
-        if (_proposals[account].length <= index) {
+    modifier proposalExists(uint256 index) {
+        if (index >= proposals.length) {
             revert NonexistentProposal();
         }
         _;
@@ -103,11 +106,40 @@ contract Propcorn is Initializable, UUPSUpgradeable, OwnableUpgradeable {
                 : type(uint256).max;
     }
 
-    function getProposalByAccount(
-        address account,
-        uint256 index
-    ) public view proposalExists(account, index) returns (Proposal memory) {
-        return _proposals[account][index];
+    /**
+     * Returns all proposals, sorted in ascending chronological order
+     * (first one created first).
+     */
+    function getProposals() public view returns (Proposal[] memory) {
+        return proposals;
+    }
+
+    /**
+     * Returns proposals sorted in descending chornological order
+     * (last one created is first).
+     * Page 0 will contains the latest 1000 proposals.
+     * Last page will contain the earliest proposals.
+     * Check for proposal.status == ProposalStatus.INVALID to know
+     * when the end of the list is reached.
+     */
+    function getProposals(
+        uint256 page
+    ) public view returns (Proposal[PAGE_SIZE] memory proposalPage) {
+        if (proposals.length > 0) {
+            uint256 startingIndex = (
+                proposals.length > (page * PAGE_SIZE)
+                    ? proposals.length - (page * PAGE_SIZE)
+                    : proposals.length
+            ) - 1;
+
+            uint256 minIndex = (
+                startingIndex < PAGE_SIZE ? 0 : startingIndex - PAGE_SIZE + 1
+            );
+
+            for (uint256 i = startingIndex + 1; i > minIndex; i--) {
+                proposalPage[startingIndex - (i - 1)] = proposals[i - 1];
+            }
+        }
     }
 
     // Write
@@ -121,7 +153,8 @@ contract Propcorn is Initializable, UUPSUpgradeable, OwnableUpgradeable {
         if (feeBasisPoints > 10000) {
             revert InvalidFee();
         }
-        _proposals[msg.sender].push(
+
+        proposals.push(
             Proposal(
                 url,
                 secondsToUnlock,
@@ -129,13 +162,14 @@ contract Propcorn is Initializable, UUPSUpgradeable, OwnableUpgradeable {
                 minAmountRequested,
                 0,
                 feeBasisPoints,
+                msg.sender,
                 ProposalStatus.FUNDING
             )
         );
 
         emit ProposalCreated(
             msg.sender,
-            _proposals[msg.sender].length - 1,
+            proposals.length - 1,
             url,
             secondsToUnlock,
             minAmountRequested,
@@ -143,17 +177,12 @@ contract Propcorn is Initializable, UUPSUpgradeable, OwnableUpgradeable {
         );
     }
 
-    function fundProposal(
-        address account,
-        uint256 index
-    ) public payable proposalExists(account, index) {
-        Proposal storage proposal = _proposals[account][index];
+    function fundProposal(uint256 index) public payable proposalExists(index) {
+        Proposal storage proposal = proposals[index];
 
         _checkFundability(proposal);
 
-        _addressAndProposalToBalance[
-            uint256(keccak256(abi.encodePacked(msg.sender, account, index)))
-        ] += msg.value;
+        funderToProposalBalance[msg.sender][index] += msg.value;
         proposal.balance += msg.value;
 
         if (proposal.balance >= proposal.minAmountRequested) {
@@ -161,41 +190,31 @@ contract Propcorn is Initializable, UUPSUpgradeable, OwnableUpgradeable {
             proposal.fundingCompletedAt = block.timestamp;
         }
 
-        emit ProposalFunded(msg.sender, account, index, msg.value);
+        emit ProposalFunded(msg.sender, proposal.author, index, msg.value);
     }
 
-    function defundProposal(
-        address account,
-        uint256 index
-    ) public proposalExists(account, index) {
-        Proposal storage proposal = _proposals[account][index];
+    function defundProposal(uint256 index) public proposalExists(index) {
+        Proposal storage proposal = proposals[index];
 
         _checkFundability(proposal);
 
-        uint256 key = uint256(
-            keccak256(abi.encodePacked(msg.sender, account, index))
-        );
-
-        uint256 toReturn = _addressAndProposalToBalance[key];
+        uint256 toReturn = funderToProposalBalance[msg.sender][index];
 
         if (toReturn == 0) {
             revert NoFundsToReturn();
         }
-        _addressAndProposalToBalance[key] = 0;
+        funderToProposalBalance[msg.sender][index] = 0;
 
         proposal.balance -= toReturn;
         payable(msg.sender).transfer(toReturn);
 
-        emit ProposalDefunded(msg.sender, account, index, toReturn);
+        emit ProposalDefunded(msg.sender, proposal.author, index, toReturn);
     }
 
-    function cancelProposal(
-        address account,
-        uint256 index
-    ) public proposalExists(account, index) {
-        Proposal storage proposal = _proposals[account][index];
+    function cancelProposal(uint256 index) public proposalExists(index) {
+        Proposal storage proposal = proposals[index];
 
-        if (account != msg.sender) {
+        if (proposal.author != msg.sender) {
             revert InvalidOwner();
         }
 
@@ -209,13 +228,12 @@ contract Propcorn is Initializable, UUPSUpgradeable, OwnableUpgradeable {
     }
 
     function withdrawFunds(
-        address account,
         uint256 index,
         address receiver
-    ) public proposalExists(account, index) {
-        Proposal storage proposal = _proposals[account][index];
+    ) public proposalExists(index) {
+        Proposal storage proposal = proposals[index];
 
-        if (account != msg.sender) {
+        if (proposal.author != msg.sender) {
             revert InvalidOwner();
         }
 
