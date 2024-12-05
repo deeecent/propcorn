@@ -8,26 +8,25 @@ import {
   Container,
   Button,
 } from "@chakra-ui/react";
-//import ProposalCard from "./ProposalCard";
+import ProposalCard from "./ProposalCard";
 import Link from "./Link";
+import { useReadPropcornGetProposals } from "./generated";
 
 const Hero = () => (
-  <Center>
-    <Container maxW="container.sm">
-      <Heading as="h1" size="2xl" mb={6}>
-        Micro-funding made easy
-      </Heading>
-      <Text fontSize="2xl">
-        <Highlight
-          query="public good"
-          styles={{ px: "2", py: "1", rounded: "full", bg: "yellow.200" }}
-        >
-          Propcorn is a public good that enables developers gather funding for
-          small open-source features.
-        </Highlight>
-      </Text>
-    </Container>
-  </Center>
+  <>
+    <Heading as="h1" size="2xl" mb={6}>
+      Micro-funding made easy
+    </Heading>
+    <Text fontSize="2xl">
+      <Highlight
+        query="public good"
+        styles={{ px: "2", py: "1", rounded: "full", bg: "yellow.200" }}
+      >
+        Propcorn is a public good that enables developers gather funding for
+        small open-source features.
+      </Highlight>
+    </Text>
+  </>
 );
 
 interface StepProps {
@@ -80,24 +79,30 @@ const OneTwoThree = () => (
   </VStack>
 );
 
-/*
-const LastProposals = () => (
-  <Container>
-    <Heading as="h2">Last Proposals</Heading>
-    <VStack>
-      <ProposalCard
-        url="https://github.com/deeecent/propcorn/issues/1"
-        author="0x123456789abcdef"
-        minAmountRequested={BigInt("1000000000000000000")} // 1 ETH
-        balance={BigInt("500000000000000000")} // 0.5 ETH
-        feeBasisPoints={BigInt(250)} // 2.5%
-        secondsToUnlock={BigInt(86400 * 7)} // 7 days
-        fundCompletedAt={BigInt(Math.round(Date.now() / 1000))} // Example timestamp
-      />
-    </VStack>
-  </Container>
-);
-*/
+const LastProposals = () => {
+  const { data: proposals, isLoading, isError } = useReadPropcornGetProposals();
+
+  return (
+    <>
+      <Heading as="h2">Last Proposals</Heading>
+      <VStack w="full" gap={8}>
+        {proposals?.map((p, i) => (
+          <ProposalCard
+            key={i}
+            index={i}
+            url={p.url}
+            author={p.author}
+            minAmountRequested={p.minAmountRequested}
+            balance={p.balance}
+            feeBasisPoints={p.feeBasisPoints}
+            secondsToUnlock={p.secondsToUnlock}
+            fundCompletedAt={p.fundingCompletedAt}
+          />
+        ))}
+      </VStack>
+    </>
+  );
+};
 
 const CreateProposal = () => (
   <Link to="/new">
@@ -111,12 +116,14 @@ const CreateProposal = () => (
 );
 
 const HomePage = () => (
-  <VStack gap={40}>
-    <Hero />
-    <OneTwoThree />
-    {/* <LastProposals /> */}
-    <CreateProposal />
-  </VStack>
+  <Container maxW="container.sm">
+    <VStack gap={40}>
+      <Hero />
+      <OneTwoThree />
+      <LastProposals />
+      <CreateProposal />
+    </VStack>
+  </Container>
 );
 
 export default HomePage;
