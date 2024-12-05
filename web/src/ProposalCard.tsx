@@ -5,11 +5,30 @@ import {
   CardHeader,
   CardBody,
   CardFooter,
+  Tag,
+  TagLeftIcon,
+  TagLabel,
+  Button,
+  HStack,
+  Box,
+  Spacer,
+  SimpleGrid,
 } from "@chakra-ui/react";
 import Markdown from "react-markdown";
-import { useGitHubIssueData } from "./hooks";
+import { formatEther, formatUnits } from "viem";
 
+import { useGitHubIssueData } from "./hooks";
+import Link from "./Link";
+
+function convertSecondsToDaysAndHours(seconds: number) {
+  const days = Math.floor(seconds / (24 * 3600));
+  const remainingSeconds = seconds % (24 * 3600);
+  const hours = Math.floor(remainingSeconds / 3600);
+
+  return { days, hours };
+}
 type ProposalCardProps = {
+  index: number;
   url: string;
   author: string;
   minAmountRequested: bigint;
@@ -20,6 +39,7 @@ type ProposalCardProps = {
 };
 
 const ProposalCard: React.FC<ProposalCardProps> = ({
+  index,
   url,
   author,
   minAmountRequested,
@@ -30,7 +50,6 @@ const ProposalCard: React.FC<ProposalCardProps> = ({
 }) => {
   const { data, isLoading, error } = useGitHubIssueData(url);
 
-  console.log(author, feeBasisPoints, secondsToUnlock, fundCompletedAt);
   if (isLoading) {
     return <p>Loading issue metadata...</p>;
   }
@@ -44,25 +63,46 @@ const ProposalCard: React.FC<ProposalCardProps> = ({
   }
 
   const progress = minAmountRequested
-    ? (Number(balance) / Number(minAmountRequested)) * 100
+    ? Number((balance * 100n) / minAmountRequested)
     : 0;
 
+  const { days, hours } = convertSecondsToDaysAndHours(Number(secondsToUnlock));
+
   return (
-    <Card>
+    <Card w="full">
       <CardHeader>
-        <Text fontSize="sm" color="gray.500">
-          {data.org}/{data.repo}
+        <Text fontSize="sm" color="gray.500" mb={2}>
+          Created by {author}
         </Text>
         <Heading as="h4" fontSize="large">
+          <Text as="span" mr={1} color="gray.500">
+            Proposal #{index}
+          </Text>
           {data.title}
         </Heading>
       </CardHeader>
       <CardBody>
-        <Text>
-          <Markdown>{data.body}</Markdown>
-        </Text>
+        <HStack>
+          <SimpleGrid columns={2} spacing={2} alignItems="center">
+            <Text color="gray.500">⏱️ Duration:</Text>
+            <Text>
+              {days} day{days !== 1 && "s"} {hours} hour{hours !== 1 && "s"}
+            </Text>
+
+            <Text color="gray.500">💰 Amount:</Text>
+            <Text>{formatEther(minAmountRequested)} Ether</Text>
+
+            <Text color="gray.500">💞 Network fee:</Text>
+            <Text>{formatUnits(feeBasisPoints, 2)}%</Text>
+          </SimpleGrid>
+
+          <Spacer />
+
+          <Link to={`/proposal/${index}`}>
+            <Button colorScheme="yellow">Details</Button>
+          </Link>
+        </HStack>
       </CardBody>
-      <CardFooter>{progress}</CardFooter>
     </Card>
   );
 };

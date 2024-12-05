@@ -54,7 +54,7 @@ const router = createBrowserRouter([
         element: <CreateProposalPage />,
       },
       {
-        path: "/proposal/:author/:index",
+        path: "/proposal/:index",
         element: <App />,
       },
       {
