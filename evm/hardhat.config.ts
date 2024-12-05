@@ -10,8 +10,8 @@ import "./tasks/accounts";
 // Run 'npx hardhat vars setup' to see the list of variables that need to be set
 const NETWORK: string = vars.get("NETWORK");
 const RPC_URL: string = vars.get("RPC_URL");
-const PRIVATE_KEY: string = vars.get("PRIVATE_KEY", undefined);
-const ETHERSCAN_API_KEY: string = vars.get("ETHERSCAN_API_KEY", undefined);
+const PRIVATE_KEY: string = vars.get("PRIVATE_KEY", "");
+const ETHERSCAN_API_KEY: string = vars.get("ETHERSCAN_API_KEY", "");
 
 const config: HardhatUserConfig = {
   defaultNetwork: "hardhat",
@@ -31,6 +31,10 @@ const config: HardhatUserConfig = {
     hardhat: {},
     [NETWORK]: {
       url: RPC_URL,
+      accounts: [PRIVATE_KEY],
+    },
+    localhost: {
+      url: "http://localhost:8545",
     },
   },
   paths: {
