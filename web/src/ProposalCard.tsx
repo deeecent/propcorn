@@ -9,6 +9,8 @@ import {
   Spacer,
   SimpleGrid,
   VStack,
+  Box,
+  Progress,
 } from "@chakra-ui/react";
 import { formatEther, formatUnits } from "viem";
 
@@ -63,13 +65,17 @@ const ProposalCard: React.FC<ProposalCardProps> = ({
         <Text fontSize="sm" color="gray.500" mb={2}>
           Created by {author}
         </Text>
-        <Heading as="h4" fontSize="large">
+        <Heading as="h4" fontSize="large" mb={3}>
           <Text as="span" mr={1} color="gray.500">
             Proposal #{index}
           </Text>
           {data.title}
         </Heading>
+        <Box>
+          <Progress colorScheme="green" size="xs" value={progress} />
+        </Box>
       </CardHeader>
+
       <CardBody>
         <HStack>
           <SimpleGrid columns={2} spacing={2} alignItems="center">
@@ -79,7 +85,12 @@ const ProposalCard: React.FC<ProposalCardProps> = ({
             </Text>
 
             <Text color="gray.500">💰 Amount:</Text>
-            <Text>{formatEther(minAmountRequested)} Ether</Text>
+            <Text>{formatEther(minAmountRequested)} ETH</Text>
+
+            <Text color="gray.500">🏦 Funding:</Text>
+            <Text>
+              {progress}% ({formatEther(balance)} ETH)
+            </Text>
 
             <Text color="gray.500">💞 Network fee:</Text>
             <Text>{formatUnits(feeBasisPoints, 2)}%</Text>
