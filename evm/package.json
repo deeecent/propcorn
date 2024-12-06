@@ -65,6 +65,7 @@
     "clean": "rimraf ./artifacts ./cache ./coverage ./types ./coverage.json && bun run typechain",
     "compile": "cross-env TS_NODE_TRANSPILE_ONLY=true hardhat compile",
     "coverage": "hardhat coverage --solcoverjs ./.solcover.js --temp artifacts --testfiles \"test/**/*.ts\" && bun run typechain",
+    "deploy:local": "source .env.local && bun run deploy",
     "deploy:optimism": "source .env.optimism && bun run deploy",
     "deploy:sepolia": "source .env.sepolia && bun run deploy",
     "deploy": "npx hardhat ignition deploy ignition/modules/Propcorn.ts --network $HARDHAT_VAR_NETWORK --verify",

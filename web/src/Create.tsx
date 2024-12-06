@@ -1,7 +1,11 @@
 import {
-  Box,
+  Alert,
+  AlertIcon,
   Button,
-  Heading,
+  Card,
+  FormControl,
+  FormHelperText,
+  FormLabel,
   HStack,
   Input,
   NumberDecrementStepper,
@@ -9,228 +13,155 @@ import {
   NumberInput,
   NumberInputField,
   NumberInputStepper,
-  Spacer,
-  Text,
-  useToast,
   VStack,
 } from "@chakra-ui/react";
-import "./Create.css";
+import { useAccount, useWaitForTransactionReceipt } from "wagmi";
 import {
-  useAccount,
-  useChainId,
-  useWaitForTransactionReceipt,
-  useWatchContractEvent,
-  useWriteContract,
-} from "wagmi";
-import { ConnectKitButton } from "connectkit";
-import { propcornAbi as abi, propcornAddress } from "./generated";
-import { useEffect, useState } from "react";
+  useWatchPropcornProposalCreatedEvent,
+  useWritePropcornCreateProposal,
+} from "./generated";
+import { type ChangeEvent, useState } from "react";
 import { parseEther } from "viem";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import ConnectButton from "./ConnectButton";
 
-function Create() {
-  const [searchParams] = useSearchParams();
+type CreateProps = {
+  onSuccess: (proposalIndex: number) => void;
+};
 
-  const toast = useToast();
-
+function Create({ onSuccess }: CreateProps) {
   const account = useAccount();
-  const { data: hash, writeContract } = useWriteContract();
-  const navigate = useNavigate();
-
-  const { isLoading: isConfirming, isSuccess: isConfirmed } =
-    useWaitForTransactionReceipt({
-      hash,
-    });
-
-  const chainId = useChainId();
+  const { data: hash, writeContract } = useWritePropcornCreateProposal();
+  const { isLoading: isConfirming } = useWaitForTransactionReceipt({
+    hash,
+  });
 
   const [link, setLink] = useState<string>();
-  const handleLinkChange = (event: any) => setLink(event.target.value);
+  const handleLinkChange = (event: ChangeEvent<HTMLInputElement>) =>
+    setLink(event.target.value);
 
   const [amount, setAmount] = useState<string>();
-  const handleAmountChange = (event: any) => setAmount(event);
+  const handleAmountChange = (valueAsString: string) =>
+    setAmount(valueAsString);
 
   const [days, setDays] = useState<number>();
   const [hours, setHours] = useState<number>();
 
   const [fee, setFee] = useState<number>(5);
-  const handleFeeChange = (event: any) => setFee(event);
+  const handleFeeChange = (_: unknown, valueAsNumber: number | undefined) =>
+    setFee(valueAsNumber ?? 0);
 
-  const unwatch = useWatchContractEvent({
-    address: propcornAddress[chainId],
-    abi: abi,
-    eventName: "ProposalCreated",
+  useWatchPropcornProposalCreatedEvent({
     args: { from: account.address },
-    onLogs: (logs) => {
-      navigate(`/proposals/${account.address}/${logs[0].args.index}`);
-    },
+    onLogs: (logs) => onSuccess(Number(logs[0].args.index)),
   });
-  console.log(unwatch);
-
-  useEffect(() => {
-    if (searchParams) {
-      const link = searchParams.get("link");
-      const fund = searchParams.get("fund");
-      if (link !== null && fund !== null && Number(fund) > 0) {
-        setLink(link);
-        setAmount(fund);
-
-        toast({
-          title: "ATTENTION",
-          description: `Once you create the proposal, remember to post the link as comment to the original issue, so that the bounty creator can know about it.`,
-          status: "info",
-          duration: 100000,
-          isClosable: true,
-        });
-      }
-    }
-  }, [searchParams]);
 
   async function submit() {
-    const totalTime =
-      (hours !== undefined ? Number(hours) * 3600 : 0) +
-      (days !== undefined ? Number(days) * 86400 : 0);
-    if (link === undefined || amount === undefined || totalTime === 0) {
-      const missing = [
-        { value: link, title: "github link" },
-        { value: amount, title: "fund amount" },
-        { value: totalTime, title: "working time" },
-      ]
-        .filter((x) => x.value === undefined || x.value === 0)
-        .map((x) => x.title)
-        .join(", ");
-      toast({
-        title: "Missing fields",
-        description: `${missing} are missing`,
-        status: "error",
-        duration: 9000,
-        isClosable: true,
-      });
-      return;
+    if (!link) {
+      throw new Error("Link has no value");
     }
-
-    console.log(totalTime);
-
+    if (!amount) {
+      throw new Error("Amount has no value");
+    }
+    const totalTime = Number(hours ?? 0) * 3600 + Number(days ?? 0) * 86400;
     writeContract({
-      abi,
-      address: propcornAddress[chainId],
-      functionName: "createProposal",
       args: [link, BigInt(totalTime), parseEther(amount), BigInt(fee * 100)],
     });
   }
 
-  useEffect(() => {
-    if (isConfirmed) {
-      console.log("succes");
-    }
-  }, [isConfirmed]);
-
   return (
-    <VStack
-      className="form"
-      borderTopWidth="1px"
-      borderTopColor="white"
-      paddingTop="30px"
-      height="50vh"
-      width="60%"
-    >
-      <Heading as="h3" size="l">
-        Create a Proposal
-      </Heading>
-      <HStack width="100%">
-        <Text width="20%">Github Issue:</Text>
+    <VStack gap={5}>
+      <FormControl isRequired>
+        <FormLabel>GitHub Issue Link</FormLabel>
         <Input
-          value={link}
-          isInvalid={link === undefined}
           onChange={handleLinkChange}
-          width="80%"
-          placeholder="Github Issue link"
-        ></Input>
-      </HStack>
-      <HStack width="100%">
-        <Text width="20%">Requested Amount:</Text>
-        <NumberInput
-          isInvalid={amount === undefined}
-          value={amount}
-          onChange={handleAmountChange}
-        >
-          <NumberInputField placeholder="ETH" />
+          placeholder="https://github.com/user/repo/issues/123"
+        />
+        <FormHelperText>
+          Provide the link to the GitHub issue this proposal will address.
+        </FormHelperText>
+      </FormControl>
+
+      <FormControl isRequired>
+        <FormLabel>Requested Amount (in Ether)</FormLabel>
+        <NumberInput value={amount} onChange={handleAmountChange}>
+          <NumberInputField placeholder="Enter the amount in ETH" />
         </NumberInput>
-      </HStack>
-      <HStack width="100%">
-        <Text width="20%">Required time:</Text>
-        <NumberInput
-          width="100px"
-          step={1}
-          min={0}
-          onChange={(event: string) => setHours(Number(event))}
+        <FormHelperText>
+          Specify the amount of Ether required to complete this task.
+        </FormHelperText>
+      </FormControl>
+
+      <FormControl isRequired>
+        <FormLabel>Delivery Time</FormLabel>
+        <HStack width="100%">
+          <NumberInput
+            width="100px"
+            step={1}
+            min={0}
+            onChange={(event: string) => setHours(Number(event))}
+          >
+            <NumberInputField placeholder="Hours" />
+            <NumberInputStepper>
+              <NumberIncrementStepper />
+              <NumberDecrementStepper />
+            </NumberInputStepper>
+          </NumberInput>
+          <NumberInput
+            width="100px"
+            step={1}
+            min={0}
+            onChange={(event: string) => setDays(Number(event))}
+          >
+            <NumberInputField placeholder="Days" />
+            <NumberInputStepper>
+              <NumberIncrementStepper />
+              <NumberDecrementStepper />
+            </NumberInputStepper>
+          </NumberInput>
+        </HStack>
+        <FormHelperText>
+          Enter the estimated time needed to deliver the solution.
+        </FormHelperText>
+      </FormControl>
+
+      <FormControl>
+        <FormLabel>Protocol Fee</FormLabel>
+        <HStack>
+          <NumberInput
+            isInvalid={fee === undefined}
+            value={fee}
+            onChange={handleFeeChange}
+          >
+            <NumberInputField placeholder="Enter fee percentage" />
+          </NumberInput>
+          <Button onClick={() => setFee(10)}>10%</Button>
+          <Button onClick={() => setFee(5)}>5%</Button>
+          <Button onClick={() => setFee(15)}>15%</Button>
+        </HStack>
+        <FormHelperText>
+          The fee is optional, but it helps Propcorn running!
+        </FormHelperText>
+      </FormControl>
+
+      {account.isConnected ? (
+        <Button
+          width="100%"
+          bg="green.200"
+          disabled={!account.isConnected || isConfirming}
+          onClick={submit}
         >
-          <NumberInputField placeholder="hours" />
-          <NumberInputStepper>
-            <NumberIncrementStepper bg="white" />
-            <NumberDecrementStepper bg="white" />
-          </NumberInputStepper>
-        </NumberInput>
-        <NumberInput
-          width="100px"
-          color="white"
-          step={1}
-          min={0}
-          onChange={(event: string) => setDays(Number(event))}
-        >
-          <NumberInputField placeholder="days" />
-          <NumberInputStepper>
-            <NumberIncrementStepper bg="white" />
-            <NumberDecrementStepper bg="white" />
-          </NumberInputStepper>
-        </NumberInput>
-      </HStack>
-      <HStack width="100%">
-        <Text width="20%">Protocol fee:</Text>
-        <NumberInput
-          isInvalid={fee === undefined}
-          value={fee}
-          onChange={handleFeeChange}
-        >
-          <NumberInputField placeholder="Protocol fee" />
-        </NumberInput>
-        <Button variant="primary" onClick={() => setFee(10)}>
-          10%
+          {isConfirming ? "Confirming..." : "Submit Proposal"}
         </Button>
-        <Button variant="primary" onClick={() => setFee(5)}>
-          5%
-        </Button>
-        <Button variant="primary" onClick={() => setFee(15)}>
-          15%
-        </Button>
-      </HStack>
-      <HStack width="100%">
-        <Text width="20%">Creator:</Text>
-        <ConnectKitButton.Custom>
-          {({ isConnected, show, truncatedAddress, ensName }) => {
-            return (
-              <Box>
-                {isConnected && (ensName ?? truncatedAddress)}
-                {!isConnected && (
-                  <Button onClick={show} variant="primary">
-                    connect
-                  </Button>
-                )}
-              </Box>
-            );
-          }}
-        </ConnectKitButton.Custom>
-      </HStack>
-      <Spacer />
-      <Button
-        width="100%"
-        variant="primary"
-        disabled={!account.isConnected || isConfirming}
-        onClick={submit}
-      >
-        {isConfirming ? "Confirming..." : "Submit"}
-      </Button>
-      <Spacer />
+      ) : (
+        <Card p={5}>
+          <Alert status="info" mb={5}>
+            <AlertIcon />
+            To submit your proposal, please connect your wallet.
+          </Alert>
+
+          <ConnectButton />
+        </Card>
+      )}
     </VStack>
   );
 }
