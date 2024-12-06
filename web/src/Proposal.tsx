@@ -170,9 +170,8 @@ const Proposal = ({ proposal, issue }: ProposalProps) => {
 
       <Box>
         <Text color="gray.500" fontWeight="bold">
-          Funding progress: {progress}% (
-          {formatEther(proposal.minAmountRequested)} /{" "}
-          {formatEther(proposal.balance)} ETH)
+          Funding progress: {progress}% ({formatEther(proposal.balance)} /{" "}
+          {formatEther(proposal.minAmountRequested)}ETH )
         </Text>
         <Progress colorScheme="green" size="lg" value={progress} />
       </Box>
@@ -185,10 +184,16 @@ const Proposal = ({ proposal, issue }: ProposalProps) => {
           </Text>
 
           <Text color="gray.500">💰 Amount:</Text>
-          <Text>{formatEther(proposal.minAmountRequested)} Ether</Text>
+          <Text>{formatEther(proposal.minAmountRequested)} ETH</Text>
+
+          <Text color="gray.500">🏦 Funding:</Text>
+          <Text>
+            {progress}% ({formatEther(proposal.balance)} ETH)
+          </Text>
 
           <Text color="gray.500">💞 Network fee:</Text>
           <Text>{formatUnits(proposal.feeBasisPoints, 2)}%</Text>
+
           <Text color="gray.500">🏠 Project:</Text>
           <Text>
             <Link
