@@ -1,285 +1,231 @@
 import {
+  Box,
   Button,
+  Card,
+  CardBody,
+  CardHeader,
+  FormControl,
+  FormLabel,
   Heading,
   HStack,
-  Link,
-  NumberInput,
-  NumberInputField,
+  Input,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
+  Progress,
+  SimpleGrid,
   Spacer,
+  Stack,
   Text,
+  useDisclosure,
   useToast,
-  VStack,
 } from "@chakra-ui/react";
-import {
-  useAccount,
-  useChainId,
-  useEnsName,
-  useReadContract,
-  useWaitForTransactionReceipt,
-  useWriteContract,
-} from "wagmi";
-import { propcornAbi as abi, propcornAddress } from "./generated";
+import { useWaitForTransactionReceipt } from "wagmi";
+import { useWritePropcornFundProposal } from "./generated";
 import { useEffect, useState } from "react";
-import { formatEther, parseEther } from "viem";
-import useCountdown, { decompose } from "./Countdown";
-import { useGitHubIssueData } from "./hooks";
+import { formatEther, formatUnits, parseEther } from "viem";
+import { convertSecondsToDaysAndHours } from "./utils";
+import { GitHubIssueData } from "./github";
+import Link from "./Link";
+import Markdown from "react-markdown";
 
-interface ProposalParams {
-  author: `0x${string}`;
-  index: string;
-}
+type ProposalProps = {
+  proposal: {
+    index: bigint;
+    url: string;
+    secondsToUnlock: bigint;
+    fundingCompletedAt: bigint;
+    minAmountRequested: bigint;
+    balance: bigint;
+    feeBasisPoints: bigint;
+    author: `0x${string}`;
+    status: number;
+  };
+  issue: GitHubIssueData;
+};
 
-interface ProposalData {
-  url: string;
-  secondsToUnlock: bigint;
-  minAmountRequested: bigint;
-  feeBasisPoints: bigint;
-  balance: bigint;
-  fundingCompletedAt: bigint;
-  closed: boolean;
-}
+const FundProposal = ({ proposal, issue }: ProposalProps) => {
+  const { data: hash, writeContract } = useWritePropcornFundProposal();
+  const { isLoading, isError, isSuccess } = useWaitForTransactionReceipt({
+    hash,
+  });
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const toast = useToast();
+  const [amount, setAmount] = useState("");
 
-type ProposalDataProps = { url: string };
+  useEffect(() => {
+    if (isSuccess) {
+      toast({
+        title: "Transaction successful",
+        description: "Thank you for funding this proposal 🥰",
+        status: "success",
+        duration: 9000,
+        isClosable: true,
+      });
+    }
+  }, [isSuccess]);
 
-const ProposalData: React.FC<ProposalDataProps> = ({ url }) => {
-  const { data, isLoading, error } = useGitHubIssueData(url);
+  useEffect(() => {
+    if (isError) {
+      toast({
+        title: "Something went wrong",
+        description: "Please check your wallet and try again 🫣",
+        status: "error",
+        duration: 9000,
+        isClosable: true,
+      });
+    }
+  }, [isError]);
 
-  if (isLoading) {
-    return <p>Loading issue metadata...</p>;
-  }
-
-  if (error) {
-    return <p>Error: {error}</p>;
-  }
-
-  if (!data) {
-    return <p>No metadata available.</p>;
-  }
+  const onFundProposal = () => {
+    toast({
+      title: "Check your wallet",
+      description: "Review the transaction details and confirm to proceed 🤓",
+      status: "info",
+      duration: 4000,
+      isClosable: true,
+    });
+    writeContract({ args: [proposal.index], value: parseEther(amount) });
+  };
 
   return (
     <>
-      <Heading as="h1">Proposal for: {data.title}</Heading>
+      <Button onClick={onOpen} colorScheme="yellow">
+        Fund Proposal
+      </Button>
+
+      <Modal isOpen={isOpen} onClose={onClose}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>
+            <Heading as="h4" fontSize="large">
+              Fund Proposal #{proposal.index.toString()}
+            </Heading>
+            <Text as="span" fontSize="md" mr={1} color="gray.500">
+              {issue.title}
+            </Text>
+          </ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <FormControl mt={4}>
+              <FormLabel>Amount (Ether)</FormLabel>
+              <Input
+                onChange={(e) => setAmount(e.target.value)}
+                placeholder="amount"
+              />
+            </FormControl>
+          </ModalBody>
+
+          <ModalFooter>
+            {isSuccess ? (
+              <Button colorScheme="yellow" mr={3} onClick={onClose}>
+                Close
+              </Button>
+            ) : (
+              <Button
+                colorScheme="green"
+                mr={3}
+                onClick={onFundProposal}
+                disabled={isLoading}
+              >
+                Fund Proposal
+              </Button>
+            )}
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </>
   );
 };
 
-function Proposal(props: ProposalParams) {
-  const { author, index } = props;
-  const toast = useToast();
-
-  const account = useAccount();
-  const chainId = useChainId();
-  const ensName = useEnsName({ address: author });
-
-  const accountIsAuthor = account.address === props.author;
-
-  const result = useReadContract({
-    abi,
-    address: propcornAddress[chainId],
-    functionName: "getProposalByAccount",
-    args: [author!, BigInt(index!)],
-  });
-
-  const { data: hash, writeContract, error } = useWriteContract();
-
-  const { isLoading: isConfirming, isSuccess: isConfirmed } =
-    useWaitForTransactionReceipt({
-      hash,
-    });
-
-  const [url, setUrl] = useState<string>("");
-  const [secondsToUnlock, setSecondsToUnlock] = useState<bigint>();
-  const [fundCompletedAt, setFundCompletedAt] = useState<bigint>();
-  const [minAmountRequested, setMinAmountRequested] = useState<bigint>();
-  const [feeBasisPoints, setFeeBasisPoints] = useState<bigint>();
-  const [balance, setBalance] = useState<bigint>();
-  const { days, hours, minutes, seconds } = useCountdown(
-    fundCompletedAt && secondsToUnlock
-      ? Number(fundCompletedAt) + Number(secondsToUnlock)
-      : 0,
+const Proposal = ({ proposal, issue }: ProposalProps) => {
+  const { days, hours } = convertSecondsToDaysAndHours(
+    Number(proposal.secondsToUnlock),
   );
 
-  const {
-    days: sDays,
-    hours: sHours,
-    minutes: sMinutes,
-    seconds: sSeconds,
-  } = decompose(Number(secondsToUnlock));
-
-  const [fundAmount, setFundAmount] = useState<string>();
-  const handleFundAmountChange = (event: any) => {
-    console.log(event);
-    setFundAmount(event);
-  };
-
-  function canWithdraw() {
-    const currentTimestampInSeconds = Math.floor(Date.now() / 1000);
-    return (
-      fundCompletedAt !== undefined &&
-      fundCompletedAt > 0 &&
-      Number(fundCompletedAt) + Number(secondsToUnlock) <
-        currentTimestampInSeconds
-    );
-  }
-
-  async function submit() {
-    if (fundAmount === undefined) {
-      toast({
-        title: "Missing fields",
-        description: `Fund amount is missing`,
-        status: "error",
-        duration: 9000,
-        isClosable: true,
-      });
-      return;
-    }
-
-    console.log("funding...");
-
-    writeContract({
-      abi,
-      address: propcornAddress[chainId],
-      functionName: "fundProposal",
-      args: [author, BigInt(index)],
-      value: parseEther(fundAmount),
-    });
-  }
-
-  async function withdraw() {
-    if (!accountIsAuthor || account.address === undefined) {
-      toast({
-        title: "Unauthorized",
-        description: "You are the proposal owner",
-        status: "error",
-        duration: 9000,
-        isClosable: true,
-      });
-      return;
-    }
-
-    console.log("funding...");
-
-    writeContract({
-      abi,
-      address: propcornAddress[chainId],
-      functionName: "withdrawFunds",
-      args: [account.address, BigInt(index), account.address],
-    });
-  }
-
-  if (error) {
-    console.log(error);
-  }
-  useEffect(() => {
-    if (isConfirmed) {
-      result.refetch();
-    }
-  }, [isConfirmed]);
-
-  useEffect(() => {
-    if (result?.data) {
-      const data = result.data as ProposalData;
-      setUrl(data.url);
-      setSecondsToUnlock(data.secondsToUnlock);
-      setMinAmountRequested(data.minAmountRequested);
-      setFeeBasisPoints(data.feeBasisPoints);
-      setBalance(data.balance);
-      setFundCompletedAt(data.fundingCompletedAt);
-    }
-  }, [result]);
+  const progress = proposal.minAmountRequested
+    ? Number((proposal.balance * 100n) / proposal.minAmountRequested)
+    : 0;
 
   return (
-    <>
-      <>
-        <ProposalData url={url} />
-      </>
-      <VStack className="form" height="70vh" width="50%">
-        <Text width="100%" fontSize="30px">
-          Proposal
+    <Stack gap={10}>
+      <Box>
+        <Text fontSize="sm" color="gray.500" mb={2}>
+          Created by{" "}
+          <Text as="span" color="black">
+            {proposal.author}
+          </Text>
         </Text>
-        <HStack width="100%">
-          <Text width="30%">Github Issue:</Text>
-          <Link href={url} target="blank" textAlign="left">
-            {url}
-          </Link>
-        </HStack>
-        <HStack width="100%">
-          <Text width="30%">Requested Amount:</Text>
-          <Text>
-            {minAmountRequested
-              ? `${formatEther(minAmountRequested)} ETH`
-              : "..."}
+        <Heading as="h4" fontSize="large">
+          <Text as="span" mr={1} color="gray.500">
+            Proposal #{proposal.index.toString()}
           </Text>
-        </HStack>
-        <HStack width="100%">
-          <Text width="30%">Current Funding:</Text>
+          {issue.title}
+        </Heading>
+      </Box>
+
+      <Box>
+        <Text color="gray.500" fontWeight="bold">
+          Funding progress: {progress}% (
+          {formatEther(proposal.minAmountRequested)} /{" "}
+          {formatEther(proposal.balance)} ETH)
+        </Text>
+        <Progress colorScheme="green" size="lg" value={progress} />
+      </Box>
+
+      <HStack>
+        <SimpleGrid columns={2} spacing={2} alignItems="center">
+          <Text color="gray.500">⏱️ Duration:</Text>
           <Text>
-            {balance !== undefined ? `${formatEther(balance)} ETH` : "..."}
+            {days} day{days !== 1 && "s"} {hours} hour{hours !== 1 && "s"}
           </Text>
-        </HStack>
-        <HStack width="100%">
-          <Text width="30%">Estimated work time:</Text>
+
+          <Text color="gray.500">💰 Amount:</Text>
+          <Text>{formatEther(proposal.minAmountRequested)} Ether</Text>
+
+          <Text color="gray.500">💞 Network fee:</Text>
+          <Text>{formatUnits(proposal.feeBasisPoints, 2)}%</Text>
+          <Text color="gray.500">🏠 Project:</Text>
           <Text>
-            {secondsToUnlock !== undefined
-              ? `${sDays}d ${sHours}h ${sMinutes}m ${sSeconds}s`
-              : "..."}
-          </Text>
-        </HStack>
-        {fundCompletedAt !== undefined && fundCompletedAt > 0 && (
-          <HStack width="100%">
-            <Text width="30%">Completes in:</Text>
-            <Text width="20%" textAlign="left">
-              {days}d {hours}h {minutes}m {seconds}s
-            </Text>
-          </HStack>
-        )}
-        <HStack width="100%">
-          <Text width="30%">Protocol fee:</Text>
-          <Text>
-            {feeBasisPoints !== undefined
-              ? `${Number(feeBasisPoints) / 100}%`
-              : "..."}
-          </Text>
-        </HStack>
-        <HStack width="100%">
-          <Text width="30%">Author:</Text>
-          <Text>{ensName && ensName.data ? ensName.data : author}</Text>
-        </HStack>
-        {accountIsAuthor && canWithdraw() && (
-          <HStack width="40%">
-            <Button
-              width="80%"
-              variant="primary"
-              disabled={!account.isConnected || isConfirming}
-              onClick={withdraw}
+            <Link
+              to={`https://github.com/${issue.org}/${issue.repo}`}
+              isExternal
             >
-              {isConfirming ? "Confirming..." : "Withdraw"}
-            </Button>
-          </HStack>
-        )}
-        {(!accountIsAuthor || !canWithdraw()) && (
-          <HStack width="40%">
-            <NumberInput
-              isInvalid={fundAmount === undefined}
-              value={fundAmount}
-              onChange={handleFundAmountChange}
-            >
-              <NumberInputField fontSize="13px" placeholder="e.g. 0.5" />
-            </NumberInput>
-            <Button
-              width="80%"
-              variant="primary"
-              disabled={!account.isConnected || isConfirming}
-              onClick={submit}
-            >
-              {isConfirming ? "Confirming..." : "Fund (ETH)"}
-            </Button>
-          </HStack>
-        )}
+              {issue.org}/{issue.repo}
+            </Link>
+          </Text>
+        </SimpleGrid>
+
         <Spacer />
-      </VStack>
-    </>
+
+        <FundProposal proposal={proposal} issue={issue} />
+      </HStack>
+
+      <Card>
+        <CardHeader>
+          <Text fontSize="sm" color="gray.500" mb={2}>
+            Repository{" "}
+            <Text as="span" color="black">
+              {issue.org}/{issue.repo}
+            </Text>
+          </Text>
+          <Heading as="h4" fontSize="large">
+            <Text as="span" mr={1} color="gray.500">
+              GitHub Issue #{issue.id}
+            </Text>
+            Original content
+          </Heading>
+        </CardHeader>
+        <CardBody>
+          <Markdown>{issue.body}</Markdown>
+        </CardBody>
+      </Card>
+    </Stack>
   );
-}
+};
 
 export default Proposal;
