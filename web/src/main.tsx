@@ -20,6 +20,7 @@ import NotFound from "./NotFound.tsx";
 import HomePage from "./HomePage.tsx";
 import CreateProposalPage from "./CreateProposalPage.tsx";
 import Footer from "./Footer.tsx";
+import ProposalPage from "./ProposalPage.tsx";
 
 // globalThis.Buffer = Buffer;
 const queryClient = new QueryClient();
@@ -55,7 +56,7 @@ const router = createBrowserRouter([
       },
       {
         path: "/proposal/:index",
-        element: <App />,
+        element: <ProposalPage />,
       },
       {
         path: "*",

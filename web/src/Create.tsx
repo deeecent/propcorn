@@ -22,11 +22,13 @@ import {
 } from "./generated";
 import { type ChangeEvent, useState } from "react";
 import { parseEther } from "viem";
-import { useNavigate } from "react-router-dom";
 import ConnectButton from "./ConnectButton";
 
-function Create() {
-  const navigate = useNavigate();
+type CreateProps = {
+  onSuccess: (proposalIndex: number) => void;
+};
+
+function Create({ onSuccess }: CreateProps) {
   const account = useAccount();
   const { data: hash, writeContract } = useWritePropcornCreateProposal();
   const { isLoading: isConfirming } = useWaitForTransactionReceipt({
@@ -50,8 +52,7 @@ function Create() {
 
   useWatchPropcornProposalCreatedEvent({
     args: { from: account.address },
-    onLogs: (logs) =>
-      navigate(`/proposal/${account.address}/${logs[0].args.index}`),
+    onLogs: (logs) => onSuccess(Number(logs[0].args.index)),
   });
 
   async function submit() {

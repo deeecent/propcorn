@@ -1,4 +1,5 @@
-export interface GitHubIssueData {
+export type GitHubIssueData = {
+  id: number;
   title: string;
   body: string;
   author: string;
@@ -9,7 +10,7 @@ export interface GitHubIssueData {
   orgAvatar: string | null;
   org: string;
   repo: string;
-}
+};
 
 export async function fetchIssueData(
   issueUrl: string,
@@ -38,6 +39,7 @@ export async function fetchIssueData(
     const data = await response.json();
 
     return {
+      id: Number(issueNumber),
       title: data.title,
       body: data.body,
       author: data.user.login,

@@ -4,29 +4,18 @@ import {
   Card,
   CardHeader,
   CardBody,
-  CardFooter,
-  Tag,
-  TagLeftIcon,
-  TagLabel,
   Button,
   HStack,
-  Box,
   Spacer,
   SimpleGrid,
+  VStack,
 } from "@chakra-ui/react";
-import Markdown from "react-markdown";
 import { formatEther, formatUnits } from "viem";
 
 import { useGitHubIssueData } from "./hooks";
 import Link from "./Link";
+import { convertSecondsToDaysAndHours } from "./utils";
 
-function convertSecondsToDaysAndHours(seconds: number) {
-  const days = Math.floor(seconds / (24 * 3600));
-  const remainingSeconds = seconds % (24 * 3600);
-  const hours = Math.floor(remainingSeconds / 3600);
-
-  return { days, hours };
-}
 type ProposalCardProps = {
   index: number;
   url: string;
@@ -94,13 +83,30 @@ const ProposalCard: React.FC<ProposalCardProps> = ({
 
             <Text color="gray.500">💞 Network fee:</Text>
             <Text>{formatUnits(feeBasisPoints, 2)}%</Text>
+
+            <Text color="gray.500">🏠 Project:</Text>
+            <Text>
+              <Link
+                to={`https://github.com/${data.org}/${data.repo}`}
+                isExternal
+              >
+                {data.org}/{data.repo}
+              </Link>
+            </Text>
           </SimpleGrid>
 
           <Spacer />
 
-          <Link to={`/proposal/${index}`}>
-            <Button colorScheme="yellow">Details</Button>
-          </Link>
+          <VStack>
+            <Link to={`/proposal/${index}`}>
+              <Button colorScheme="yellow">Details</Button>
+            </Link>
+            <Link to={url} isExternal>
+              <Button colorScheme="yellow" variant="link">
+                Original issue
+              </Button>
+            </Link>
+          </VStack>
         </HStack>
       </CardBody>
     </Card>
