@@ -64,17 +64,11 @@ describe("Propcorn", function () {
     [alice, bob, carol, dan] = await ethers.getSigners();
   });
 
-  describe("Deployment", function () {
-    beforeEach(async () => {
-      ({ propcorn } = await loadFixture(deployPropcornFixture));
-    });
+  beforeEach(async () => {
+    ({ propcorn } = await loadFixture(deployPropcornFixture));
   });
 
   describe("Upgrade", function () {
-    beforeEach(async () => {
-      ({ propcorn } = await loadFixture(deployPropcornFixture));
-    });
-
     it("should upgrade to a new implementation", async () => {
       const PropcornUpgraded = (await ethers.getContractFactory(
         "PropcornUpgraded",
@@ -113,10 +107,6 @@ describe("Propcorn", function () {
     const minAmountRequested = parseEther("1");
     // 2%
     const feeBasisPoints = 2 * 100;
-
-    beforeEach(async () => {
-      ({ propcorn } = await loadFixture(deployPropcornFixture));
-    });
 
     it("shouldn't allow to create a proposal with a fee greater than 10000", async () => {
       await expect(
@@ -192,7 +182,6 @@ describe("Propcorn", function () {
     const feeBasisPoints = 2 * 100;
 
     beforeEach(async () => {
-      ({ propcorn } = await loadFixture(deployPropcornFixture));
       await propcorn
         .connect(bob)
         .createProposal(
@@ -256,7 +245,6 @@ describe("Propcorn", function () {
     const feeBasisPoints = 2 * 100;
 
     beforeEach(async () => {
-      ({ propcorn } = await loadFixture(deployPropcornFixture));
       await propcorn
         .connect(bob)
         .createProposal(
@@ -350,7 +338,6 @@ describe("Propcorn", function () {
     const index = 0;
 
     beforeEach(async () => {
-      ({ propcorn } = await loadFixture(deployPropcornFixture));
       await propcorn
         .connect(bob)
         .createProposal(
@@ -448,7 +435,6 @@ describe("Propcorn", function () {
     const index = 0;
 
     beforeEach(async () => {
-      ({ propcorn } = await loadFixture(deployPropcornFixture));
       await propcorn
         .connect(bob)
         .createProposal(
@@ -517,10 +503,6 @@ describe("Propcorn", function () {
   });
 
   describe("getProposals(uint256)", function () {
-    beforeEach(async () => {
-      ({ propcorn } = await loadFixture(deployPropcornFixture));
-    });
-
     it("returns 0 proposals and index 0 if none are there", async () => {
       const result = await propcorn["getProposals(uint256)"](0);
 
@@ -654,6 +636,49 @@ describe("Propcorn", function () {
       expect(result.proposalPage[0].balance).equal(0);
       expect(result.proposalPage[0].status).equal(ProposalStatus.FUNDING);
       expect(result.proposalPage[1].status).equal(ProposalStatus.INVALID);
+    });
+  });
+
+  describe("setProtocolFeeReceiver", function () {
+    const url = "https://github.com/deeecent/propcorn/issues/1";
+    const secondsToUnlock = 666;
+    const minAmountRequested = parseEther("1");
+    // 2%
+    const feeBasisPoints = 2 * 100;
+    const index = 0;
+
+    beforeEach(async () => {
+      await propcorn
+        .connect(bob)
+        .createProposal(
+          url,
+          secondsToUnlock,
+          minAmountRequested,
+          feeBasisPoints,
+        );
+    });
+
+    it("should fail when called by non owner", async () => {
+      await expect(
+        propcorn.connect(carol).setProtocolFeeReceiver(carol.address),
+      ).revertedWithCustomError(propcorn, "OwnableUnauthorizedAccount");
+    });
+
+    it("should change the protocol fee receiver", async () => {
+      await propcorn
+        .connect(carol)
+        .fundProposal(index, { value: minAmountRequested });
+
+      await time.increase(secondsToUnlock);
+
+      await propcorn.setProtocolFeeReceiver(carol.address);
+
+      await expect(
+        propcorn.connect(bob).withdrawFunds(index, alice.address),
+      ).to.changeEtherBalances(
+        [carol.address],
+        [(minAmountRequested * BigInt(feeBasisPoints)) / 10000n],
+      );
     });
   });
 });

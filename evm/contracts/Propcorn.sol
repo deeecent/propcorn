@@ -95,6 +95,14 @@ contract Propcorn is Initializable, UUPSUpgradeable, OwnableUpgradeable {
         _;
     }
 
+    // Permissioned
+
+    function setProtocolFeeReceiver(
+        address protocolFeeReceiver
+    ) public onlyOwner {
+        _protocolFeeReceiver = payable(protocolFeeReceiver);
+    }
+
     // Read
 
     function fundsUnlockedAt(
