@@ -638,4 +638,47 @@ describe("Propcorn", function () {
       expect(result.proposalPage[1].status).equal(ProposalStatus.INVALID);
     });
   });
+
+  describe("setProtocolFeeReceiver", function () {
+    const url = "https://github.com/deeecent/propcorn/issues/1";
+    const secondsToUnlock = 666;
+    const minAmountRequested = parseEther("1");
+    // 2%
+    const feeBasisPoints = 2 * 100;
+    const index = 0;
+
+    beforeEach(async () => {
+      await propcorn
+        .connect(bob)
+        .createProposal(
+          url,
+          secondsToUnlock,
+          minAmountRequested,
+          feeBasisPoints,
+        );
+    });
+
+    it("should fail when called by non owner", async () => {
+      await expect(
+        propcorn.connect(carol).setProtocolFeeReceiver(carol.address),
+      ).revertedWithCustomError(propcorn, "OwnableUnauthorizedAccount");
+    });
+
+    it("should change the protocol fee receiver", async () => {
+      await propcorn
+        .connect(carol)
+        .fundProposal(index, { value: minAmountRequested });
+
+      await time.increase(secondsToUnlock);
+
+      await propcorn.setProtocolFeeReceiver(carol.address);
+
+      await expect(
+        propcorn.connect(bob).withdrawFunds(index, alice.address),
+      ).to.changeEtherBalances(
+        [carol.address],
+        [(minAmountRequested * BigInt(feeBasisPoints)) / 10000n],
+      );
+    });
+  });
 });
