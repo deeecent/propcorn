@@ -115,7 +115,7 @@ contract Propcorn is Initializable, UUPSUpgradeable, OwnableUpgradeable {
     }
 
     /**
-     * Returns proposals sorted in descending chornological order
+     * Returns proposals sorted in descending chronological order
      * (last one created is first).
      * Page 0 will contains the latest 1000 proposals.
      * Last page will contain the earliest proposals.
