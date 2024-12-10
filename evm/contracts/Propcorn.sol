@@ -7,7 +7,8 @@ import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
 contract Propcorn is Initializable, UUPSUpgradeable, OwnableUpgradeable {
     // Errors
-    error NonexistentProposal();
+    error NonexistingProposal();
+    error ProposalWasCanceled();
     error ProposalFunding();
     error ProposalPaid();
     error FundsLocked();
@@ -90,7 +91,7 @@ contract Propcorn is Initializable, UUPSUpgradeable, OwnableUpgradeable {
 
     modifier proposalExists(uint256 index) {
         if (index >= proposals.length) {
-            revert NonexistentProposal();
+            revert NonexistingProposal();
         }
         _;
     }
@@ -195,7 +196,13 @@ contract Propcorn is Initializable, UUPSUpgradeable, OwnableUpgradeable {
     function fundProposal(uint256 index) public payable proposalExists(index) {
         Proposal storage proposal = proposals[index];
 
-        _checkFundability(proposal);
+        if (proposal.status == ProposalStatus.PAID) {
+            revert ProposalPaid();
+        }
+
+        if (proposal.status == ProposalStatus.CANCELED) {
+            revert ProposalWasCanceled();
+        }
 
         funderToProposalBalance[msg.sender][index] += msg.value;
         proposal.balance += msg.value;
@@ -211,7 +218,13 @@ contract Propcorn is Initializable, UUPSUpgradeable, OwnableUpgradeable {
     function defundProposal(uint256 index) public proposalExists(index) {
         Proposal storage proposal = proposals[index];
 
-        _checkFundability(proposal);
+        if (proposal.status == ProposalStatus.PAID) {
+            revert ProposalPaid();
+        }
+
+        if (proposal.status == ProposalStatus.STARTED) {
+            revert FundsLocked();
+        }
 
         uint256 toReturn = funderToProposalBalance[msg.sender][index];
 
@@ -260,6 +273,10 @@ contract Propcorn is Initializable, UUPSUpgradeable, OwnableUpgradeable {
             revert ProposalPaid();
         }
 
+        if (proposal.status == ProposalStatus.CANCELED) {
+            revert ProposalWasCanceled();
+        }
+
         if (block.timestamp < fundsUnlockedAt(proposal)) {
             revert FundsLocked();
         }
@@ -278,17 +295,5 @@ contract Propcorn is Initializable, UUPSUpgradeable, OwnableUpgradeable {
             proposal.balance - protocolFee,
             receiver
         );
-    }
-
-    // Internal
-
-    function _checkFundability(Proposal memory proposal) internal pure {
-        if (proposal.status == ProposalStatus.PAID) {
-            revert ProposalPaid();
-        }
-
-        if (proposal.status == ProposalStatus.STARTED) {
-            revert FundsLocked();
-        }
     }
 }
