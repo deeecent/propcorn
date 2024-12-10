@@ -121,23 +121,30 @@ contract Propcorn is Initializable, UUPSUpgradeable, OwnableUpgradeable {
      * Last page will contain the earliest proposals.
      * Check for proposal.status == ProposalStatus.INVALID to know
      * when the end of the list is reached.
+     * Calculate the proposal id by doing startingId - index.
      */
     function getProposals(
         uint256 page
-    ) public view returns (Proposal[PAGE_SIZE] memory proposalPage) {
+    )
+        public
+        view
+        returns (Proposal[PAGE_SIZE] memory proposalPage, uint256 startingId)
+    {
         if (proposals.length > 0) {
-            uint256 startingIndex = (
-                proposals.length > (page * PAGE_SIZE)
-                    ? proposals.length - (page * PAGE_SIZE)
-                    : proposals.length
-            ) - 1;
+            startingId =
+                (
+                    proposals.length > (page * PAGE_SIZE)
+                        ? proposals.length - (page * PAGE_SIZE)
+                        : proposals.length
+                ) -
+                1;
 
             uint256 minIndex = (
-                startingIndex < PAGE_SIZE ? 0 : startingIndex - PAGE_SIZE + 1
+                startingId < PAGE_SIZE ? 0 : startingId - PAGE_SIZE + 1
             );
 
-            for (uint256 i = startingIndex + 1; i > minIndex; i--) {
-                proposalPage[startingIndex - (i - 1)] = proposals[i - 1];
+            for (uint256 i = startingId + 1; i > minIndex; i--) {
+                proposalPage[startingId - (i - 1)] = proposals[i - 1];
             }
         }
     }
