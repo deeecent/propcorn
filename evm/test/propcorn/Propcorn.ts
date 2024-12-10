@@ -516,63 +516,28 @@ describe("Propcorn", function () {
     });
   });
 
-  describe("getProposals", function () {
+  describe("getProposals(uint256)", function () {
     beforeEach(async () => {
       ({ propcorn } = await loadFixture(deployPropcornFixture));
     });
 
-    it("returns 0 proposals if none are there", async () => {
-      const result = await propcorn["getProposals()"]();
-
-      expect(result.length).equal(0);
-    });
-
-    it("returns all proposals sorted from earliest to latest", async () => {
-      const n = 3;
-      const [
-        urls,
-        secondsToUnlocks,
-        minAmountRequesteds,
-        feeBasisPoints,
-        authors,
-      ] = await createProposals(n);
-
-      const result = await propcorn["getProposals()"]();
-
-      expect(result.length).equal(urls.length);
-
-      for (let i = 0; i < n; i++) {
-        expect(result[i].author).equal(authors[i]);
-        expect(result[i].url).equal(urls[i]);
-        expect(result[i].secondsToUnlock).equal(secondsToUnlocks[i]);
-        expect(result[i].minAmountRequested).equal(minAmountRequesteds[i]);
-        expect(result[i].feeBasisPoints).equal(feeBasisPoints[i]);
-        expect(result[i].balance).equal(0);
-        expect(result[i].status).equal(ProposalStatus.FUNDING);
-      }
-    });
-  });
-
-  describe.only("getProposals(uint256)", function () {
-    beforeEach(async () => {
-      ({ propcorn } = await loadFixture(deployPropcornFixture));
-    });
-
-    it("returns 0 proposals if none are there", async () => {
+    it("returns 0 proposals and index 0 if none are there", async () => {
       const result = await propcorn["getProposals(uint256)"](0);
 
-      expect(result.length).equal(1000);
-      expect(result[0].status).equal(ProposalStatus.INVALID);
+      expect(result.proposalPage.length).equal(1000);
+      expect(result.proposalPage[0].status).equal(ProposalStatus.INVALID);
+      expect(result.startingId).equal(0);
     });
 
-    it("returns 0 proposals for page 1 if none are there", async () => {
+    it("returns 0 proposals and index 0 for page 1 if none are there", async () => {
       const result = await propcorn["getProposals(uint256)"](1);
 
-      expect(result.length).equal(1000);
-      expect(result[0].status).equal(ProposalStatus.INVALID);
+      expect(result.proposalPage.length).equal(1000);
+      expect(result.proposalPage[0].status).equal(ProposalStatus.INVALID);
+      expect(result.startingId).equal(0);
     });
 
-    it("when less than 1000, returns all proposals for page 0 sorted from latest to earliest", async () => {
+    it("when less than 1000, returns all proposals for page 0 sorted from latest to earliest, starting index equal first element id", async () => {
       const n = 3;
       const [
         urls,
@@ -583,16 +548,21 @@ describe("Propcorn", function () {
       ] = await createProposals(n);
       const result = await propcorn["getProposals(uint256)"](0);
 
-      expect(result.length).equal(1000);
+      expect(result.proposalPage.length).equal(1000);
+      expect(result.startingId).equal(2);
 
       for (let i = 2; i >= n; i--) {
-        expect(result[i].author).equal(authors[i]);
-        expect(result[i].url).equal(urls[i]);
-        expect(result[i].secondsToUnlock).equal(secondsToUnlocks[i]);
-        expect(result[i].minAmountRequested).equal(minAmountRequesteds[i]);
-        expect(result[i].feeBasisPoints).equal(feeBasisPoints[i]);
-        expect(result[i].balance).equal(0);
-        expect(result[i].status).equal(ProposalStatus.FUNDING);
+        expect(result.proposalPage[i].author).equal(authors[i]);
+        expect(result.proposalPage[i].url).equal(urls[i]);
+        expect(result.proposalPage[i].secondsToUnlock).equal(
+          secondsToUnlocks[i],
+        );
+        expect(result.proposalPage[i].minAmountRequested).equal(
+          minAmountRequesteds[i],
+        );
+        expect(result.proposalPage[i].feeBasisPoints).equal(feeBasisPoints[i]);
+        expect(result.proposalPage[i].balance).equal(0);
+        expect(result.proposalPage[i].status).equal(ProposalStatus.FUNDING);
       }
     });
 
@@ -607,18 +577,25 @@ describe("Propcorn", function () {
       ] = await createProposals(n);
       const result = await propcorn["getProposals(uint256)"](0);
 
-      expect(result.length).equal(1000);
+      expect(result.proposalPage.length).equal(1000);
+      expect(result.startingId).equal(1000);
 
       for (let i = 1000; i > 0; i--) {
-        expect(result[1000 - i].author).equal(authors[i]);
-        expect(result[1000 - i].url).equal(urls[i]);
-        expect(result[1000 - i].secondsToUnlock).equal(secondsToUnlocks[i]);
-        expect(result[1000 - i].minAmountRequested).equal(
+        expect(result.proposalPage[1000 - i].author).equal(authors[i]);
+        expect(result.proposalPage[1000 - i].url).equal(urls[i]);
+        expect(result.proposalPage[1000 - i].secondsToUnlock).equal(
+          secondsToUnlocks[i],
+        );
+        expect(result.proposalPage[1000 - i].minAmountRequested).equal(
           minAmountRequesteds[i],
         );
-        expect(result[1000 - i].feeBasisPoints).equal(feeBasisPoints[i]);
-        expect(result[1000 - i].balance).equal(0);
-        expect(result[1000 - i].status).equal(ProposalStatus.FUNDING);
+        expect(result.proposalPage[1000 - i].feeBasisPoints).equal(
+          feeBasisPoints[i],
+        );
+        expect(result.proposalPage[1000 - i].balance).equal(0);
+        expect(result.proposalPage[1000 - i].status).equal(
+          ProposalStatus.FUNDING,
+        );
       }
     });
 
@@ -633,16 +610,23 @@ describe("Propcorn", function () {
       ] = await createProposals(n);
       const result = await propcorn["getProposals(uint256)"](1);
 
-      expect(result.length).equal(1000);
+      expect(result.proposalPage.length).equal(1000);
+      expect(result.startingId).equal(2);
 
       for (let i = 2; i >= 0; i--) {
-        expect(result[2 - i].author).equal(authors[i]);
-        expect(result[2 - i].url).equal(urls[i]);
-        expect(result[2 - i].secondsToUnlock).equal(secondsToUnlocks[i]);
-        expect(result[2 - i].minAmountRequested).equal(minAmountRequesteds[i]);
-        expect(result[2 - i].feeBasisPoints).equal(feeBasisPoints[i]);
-        expect(result[2 - i].balance).equal(0);
-        expect(result[2 - i].status).equal(ProposalStatus.FUNDING);
+        expect(result.proposalPage[2 - i].author).equal(authors[i]);
+        expect(result.proposalPage[2 - i].url).equal(urls[i]);
+        expect(result.proposalPage[2 - i].secondsToUnlock).equal(
+          secondsToUnlocks[i],
+        );
+        expect(result.proposalPage[2 - i].minAmountRequested).equal(
+          minAmountRequesteds[i],
+        );
+        expect(result.proposalPage[2 - i].feeBasisPoints).equal(
+          feeBasisPoints[i],
+        );
+        expect(result.proposalPage[2 - i].balance).equal(0);
+        expect(result.proposalPage[2 - i].status).equal(ProposalStatus.FUNDING);
       }
     });
 
@@ -657,16 +641,19 @@ describe("Propcorn", function () {
       ] = await createProposals(n);
       const result = await propcorn["getProposals(uint256)"](1);
 
-      expect(result.length).equal(1000);
+      expect(result.proposalPage.length).equal(1000);
+      expect(result.startingId).equal(0);
 
-      expect(result[0].author).equal(authors[0]);
-      expect(result[0].url).equal(urls[0]);
-      expect(result[0].secondsToUnlock).equal(secondsToUnlocks[0]);
-      expect(result[0].minAmountRequested).equal(minAmountRequesteds[0]);
-      expect(result[0].feeBasisPoints).equal(feeBasisPoints[0]);
-      expect(result[0].balance).equal(0);
-      expect(result[0].status).equal(ProposalStatus.FUNDING);
-      expect(result[1].status).equal(ProposalStatus.INVALID);
+      expect(result.proposalPage[0].author).equal(authors[0]);
+      expect(result.proposalPage[0].url).equal(urls[0]);
+      expect(result.proposalPage[0].secondsToUnlock).equal(secondsToUnlocks[0]);
+      expect(result.proposalPage[0].minAmountRequested).equal(
+        minAmountRequesteds[0],
+      );
+      expect(result.proposalPage[0].feeBasisPoints).equal(feeBasisPoints[0]);
+      expect(result.proposalPage[0].balance).equal(0);
+      expect(result.proposalPage[0].status).equal(ProposalStatus.FUNDING);
+      expect(result.proposalPage[1].status).equal(ProposalStatus.INVALID);
     });
   });
 });
