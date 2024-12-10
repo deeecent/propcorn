@@ -195,7 +195,15 @@ describe("Propcorn", function () {
     it("should fail if the proposal doesn't exist", async () => {
       await expect(
         propcorn.connect(carol).fundProposal(9999),
-      ).revertedWithCustomError(propcorn, "NonexistentProposal");
+      ).revertedWithCustomError(propcorn, "NonexistingProposal");
+    });
+
+    it("should fail if the proposal is cancelled", async () => {
+      await propcorn.connect(bob).cancelProposal(index);
+
+      await expect(
+        propcorn.connect(carol).fundProposal(index),
+      ).revertedWithCustomError(propcorn, "ProposalWasCanceled");
     });
 
     it("should fail if the proposal is paid", async () => {
@@ -258,7 +266,19 @@ describe("Propcorn", function () {
     it("should fail if the proposal doesn't exist", async () => {
       await expect(
         propcorn.connect(carol).defundProposal(9999),
-      ).revertedWithCustomError(propcorn, "NonexistentProposal");
+      ).revertedWithCustomError(propcorn, "NonexistingProposal");
+    });
+
+    it("should work if the proposal is cancelled", async () => {
+      await propcorn
+        .connect(carol)
+        .fundProposal(index, { value: minAmountRequested });
+
+      await propcorn.connect(bob).cancelProposal(index);
+
+      await expect(
+        propcorn.connect(carol).defundProposal(index),
+      ).to.changeEtherBalances([carol.address], [minAmountRequested]);
     });
 
     it("should fail if the proposal's funds are locked", async () => {
@@ -351,7 +371,20 @@ describe("Propcorn", function () {
     it("should fail if the proposal doesn't exist", async () => {
       await expect(
         propcorn.connect(bob).withdrawFunds(9999, bob.address),
-      ).revertedWithCustomError(propcorn, "NonexistentProposal");
+      ).revertedWithCustomError(propcorn, "NonexistingProposal");
+    });
+
+    it("should fail if the proposal is cancelled", async () => {
+      await propcorn
+        .connect(carol)
+        .fundProposal(index, { value: minAmountRequested });
+      await time.increase(secondsToUnlock);
+
+      await propcorn.connect(bob).cancelProposal(index);
+
+      await expect(
+        propcorn.connect(bob).withdrawFunds(index, bob.address),
+      ).revertedWithCustomError(propcorn, "ProposalWasCanceled");
     });
 
     it("should fail if the sender is not the owner of the proposal", async () => {
@@ -448,7 +481,7 @@ describe("Propcorn", function () {
     it("should fail if the proposal doesn't exist", async () => {
       await expect(
         propcorn.connect(bob).cancelProposal(9999),
-      ).revertedWithCustomError(propcorn, "NonexistentProposal");
+      ).revertedWithCustomError(propcorn, "NonexistingProposal");
     });
 
     it("should fail if the sender is not the owner of the proposal", async () => {
