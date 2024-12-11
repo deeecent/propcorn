@@ -11,6 +11,7 @@ import {
   VStack,
   Box,
   Progress,
+  Stack,
 } from "@chakra-ui/react";
 import { formatEther, formatUnits } from "viem";
 
@@ -77,7 +78,10 @@ const ProposalCard: React.FC<ProposalCardProps> = ({
       </CardHeader>
 
       <CardBody>
-        <HStack>
+        <Stack
+          direction={{ base: "column", md: "row" }} // Vertical on mobile, horizontal on larger screens
+          align="stretch" // Optional: Ensures items align properly when vertical
+        >
           <SimpleGrid columns={2} spacing={2} alignItems="center">
             <Text color="gray.500">⏱️ Duration:</Text>
             <Text>
@@ -108,12 +112,10 @@ const ProposalCard: React.FC<ProposalCardProps> = ({
 
           <Spacer />
 
-          <VStack>
-            <Link to={`/proposal/${index}`}>
-              <Button colorScheme="yellow">Details</Button>
-            </Link>
-          </VStack>
-        </HStack>
+          <Link to={`/proposal/${index}`}>
+            <Button colorScheme="yellow">Details</Button>
+          </Link>
+        </Stack>
       </CardBody>
     </Card>
   );

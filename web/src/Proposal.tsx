@@ -405,7 +405,7 @@ const Proposal = ({ proposal, issue, refetch }: ProposalProps) => {
         <CardBody>
           <Text color="gray.500" fontWeight="bold">
             Funding progress: {progress}% ({formatEther(proposal.balance)} /{" "}
-            {formatEther(proposal.minAmountRequested)}ETH )
+            {formatEther(proposal.minAmountRequested)}ETH)
           </Text>
           <Progress colorScheme="green" size="lg" value={progress} my={5} />
           <HStack justifyContent="flex-end" alignItems="flex-start" spacing={4}>
