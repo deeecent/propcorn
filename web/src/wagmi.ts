@@ -1,9 +1,9 @@
 import { http, createConfig } from "wagmi";
-import { /* localhost, mainnet, */ optimism } from "wagmi/chains";
+import { localhost /* , mainnet, */, optimism } from "wagmi/chains";
 import { coinbaseWallet, injected, walletConnect } from "wagmi/connectors";
 
 export const config = createConfig({
-  chains: [optimism],
+  chains: [localhost, optimism],
   connectors: [
     injected(),
     coinbaseWallet(),
@@ -11,6 +11,7 @@ export const config = createConfig({
   ],
   transports: {
     [optimism.id]: http(import.meta.env.VITE_RPC_URL),
+    [localhost.id]: http(import.meta.env.VITE_RPC_URL),
   },
 });
 

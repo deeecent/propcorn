@@ -331,7 +331,7 @@ export const propcornAbi = [
   { type: 'error', inputs: [], name: 'InvalidInitialization' },
   { type: 'error', inputs: [], name: 'InvalidOwner' },
   { type: 'error', inputs: [], name: 'NoFundsToReturn' },
-  { type: 'error', inputs: [], name: 'NonexistentProposal' },
+  { type: 'error', inputs: [], name: 'NonexistingProposal' },
   { type: 'error', inputs: [], name: 'NotInitializing' },
   {
     type: 'error',
@@ -343,8 +343,9 @@ export const propcornAbi = [
     inputs: [{ name: 'account', internalType: 'address', type: 'address' }],
     name: 'OwnableUnauthorizedAccount',
   },
-  { type: 'error', inputs: [], name: 'ProposalClosed' },
-  { type: 'error', inputs: [], name: 'ProposalInProgress' },
+  { type: 'error', inputs: [], name: 'ProposalFunding' },
+  { type: 'error', inputs: [], name: 'ProposalPaid' },
+  { type: 'error', inputs: [], name: 'ProposalWasCanceled' },
   { type: 'error', inputs: [], name: 'UUPSUnauthorizedCallContext' },
   {
     type: 'error',
@@ -403,6 +404,20 @@ export const propcornAbi = [
       },
     ],
     name: 'OwnershipTransferred',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      { name: 'from', internalType: 'address', type: 'address', indexed: true },
+      {
+        name: 'index',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: false,
+      },
+    ],
+    name: 'ProposalCanceled',
   },
   {
     type: 'event',
@@ -486,12 +501,6 @@ export const propcornAbi = [
         type: 'uint256',
         indexed: false,
       },
-      {
-        name: 'fundingCompletedAt',
-        internalType: 'uint256',
-        type: 'uint256',
-        indexed: false,
-      },
     ],
     name: 'ProposalFunded',
   },
@@ -517,6 +526,13 @@ export const propcornAbi = [
   },
   {
     type: 'function',
+    inputs: [{ name: 'index', internalType: 'uint256', type: 'uint256' }],
+    name: 'cancelProposal',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
     inputs: [
       { name: 'url', internalType: 'string', type: 'string' },
       { name: 'secondsToUnlock', internalType: 'uint256', type: 'uint256' },
@@ -529,20 +545,14 @@ export const propcornAbi = [
   },
   {
     type: 'function',
-    inputs: [
-      { name: 'account', internalType: 'address', type: 'address' },
-      { name: 'index', internalType: 'uint256', type: 'uint256' },
-    ],
+    inputs: [{ name: 'index', internalType: 'uint256', type: 'uint256' }],
     name: 'defundProposal',
     outputs: [],
     stateMutability: 'nonpayable',
   },
   {
     type: 'function',
-    inputs: [
-      { name: 'account', internalType: 'address', type: 'address' },
-      { name: 'index', internalType: 'uint256', type: 'uint256' },
-    ],
+    inputs: [{ name: 'index', internalType: 'uint256', type: 'uint256' }],
     name: 'fundProposal',
     outputs: [],
     stateMutability: 'payable',
@@ -550,31 +560,114 @@ export const propcornAbi = [
   {
     type: 'function',
     inputs: [
-      { name: 'account', internalType: 'address', type: 'address' },
-      { name: 'index', internalType: 'uint256', type: 'uint256' },
+      { name: '', internalType: 'address', type: 'address' },
+      { name: '', internalType: 'uint256', type: 'uint256' },
     ],
-    name: 'getProposalByAccount',
-    outputs: [
+    name: 'funderToProposalBalance',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [
       {
-        name: '',
+        name: 'proposal',
         internalType: 'struct Propcorn.Proposal',
         type: 'tuple',
         components: [
           { name: 'url', internalType: 'string', type: 'string' },
           { name: 'secondsToUnlock', internalType: 'uint256', type: 'uint256' },
           {
+            name: 'fundingCompletedAt',
+            internalType: 'uint256',
+            type: 'uint256',
+          },
+          {
             name: 'minAmountRequested',
             internalType: 'uint256',
             type: 'uint256',
           },
           { name: 'balance', internalType: 'uint256', type: 'uint256' },
+          { name: 'feeBasisPoints', internalType: 'uint256', type: 'uint256' },
+          { name: 'author', internalType: 'address', type: 'address' },
+          {
+            name: 'status',
+            internalType: 'enum Propcorn.ProposalStatus',
+            type: 'uint8',
+          },
+        ],
+      },
+    ],
+    name: 'fundsUnlockedAt',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'pure',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'page', internalType: 'uint256', type: 'uint256' }],
+    name: 'getProposals',
+    outputs: [
+      {
+        name: 'proposalPage',
+        internalType: 'struct Propcorn.Proposal[1000]',
+        type: 'tuple[1000]',
+        components: [
+          { name: 'url', internalType: 'string', type: 'string' },
+          { name: 'secondsToUnlock', internalType: 'uint256', type: 'uint256' },
           {
             name: 'fundingCompletedAt',
             internalType: 'uint256',
             type: 'uint256',
           },
+          {
+            name: 'minAmountRequested',
+            internalType: 'uint256',
+            type: 'uint256',
+          },
+          { name: 'balance', internalType: 'uint256', type: 'uint256' },
           { name: 'feeBasisPoints', internalType: 'uint256', type: 'uint256' },
-          { name: 'closed', internalType: 'bool', type: 'bool' },
+          { name: 'author', internalType: 'address', type: 'address' },
+          {
+            name: 'status',
+            internalType: 'enum Propcorn.ProposalStatus',
+            type: 'uint8',
+          },
+        ],
+      },
+      { name: 'startingId', internalType: 'uint256', type: 'uint256' },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'getProposals',
+    outputs: [
+      {
+        name: '',
+        internalType: 'struct Propcorn.Proposal[]',
+        type: 'tuple[]',
+        components: [
+          { name: 'url', internalType: 'string', type: 'string' },
+          { name: 'secondsToUnlock', internalType: 'uint256', type: 'uint256' },
+          {
+            name: 'fundingCompletedAt',
+            internalType: 'uint256',
+            type: 'uint256',
+          },
+          {
+            name: 'minAmountRequested',
+            internalType: 'uint256',
+            type: 'uint256',
+          },
+          { name: 'balance', internalType: 'uint256', type: 'uint256' },
+          { name: 'feeBasisPoints', internalType: 'uint256', type: 'uint256' },
+          { name: 'author', internalType: 'address', type: 'address' },
+          {
+            name: 'status',
+            internalType: 'enum Propcorn.ProposalStatus',
+            type: 'uint8',
+          },
         ],
       },
     ],
@@ -584,7 +677,7 @@ export const propcornAbi = [
     type: 'function',
     inputs: [
       {
-        name: 'protocolFeeReceiver',
+        name: 'protocolFeeReceiver_',
         internalType: 'address payable',
         type: 'address',
       },
@@ -602,6 +695,33 @@ export const propcornAbi = [
   },
   {
     type: 'function',
+    inputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    name: 'proposals',
+    outputs: [
+      { name: 'url', internalType: 'string', type: 'string' },
+      { name: 'secondsToUnlock', internalType: 'uint256', type: 'uint256' },
+      { name: 'fundingCompletedAt', internalType: 'uint256', type: 'uint256' },
+      { name: 'minAmountRequested', internalType: 'uint256', type: 'uint256' },
+      { name: 'balance', internalType: 'uint256', type: 'uint256' },
+      { name: 'feeBasisPoints', internalType: 'uint256', type: 'uint256' },
+      { name: 'author', internalType: 'address', type: 'address' },
+      {
+        name: 'status',
+        internalType: 'enum Propcorn.ProposalStatus',
+        type: 'uint8',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'protocolFeeReceiver',
+    outputs: [{ name: '', internalType: 'address payable', type: 'address' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
     inputs: [],
     name: 'proxiableUUID',
     outputs: [{ name: '', internalType: 'bytes32', type: 'bytes32' }],
@@ -611,6 +731,19 @@ export const propcornAbi = [
     type: 'function',
     inputs: [],
     name: 'renounceOwnership',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [
+      {
+        name: 'protocolFeeReceiver_',
+        internalType: 'address',
+        type: 'address',
+      },
+    ],
+    name: 'setProtocolFeeReceiver',
     outputs: [],
     stateMutability: 'nonpayable',
   },
@@ -634,7 +767,6 @@ export const propcornAbi = [
   {
     type: 'function',
     inputs: [
-      { name: 'account', internalType: 'address', type: 'address' },
       { name: 'index', internalType: 'uint256', type: 'uint256' },
       { name: 'receiver', internalType: 'address', type: 'address' },
     ],
@@ -971,16 +1103,39 @@ export const useReadPropcornUpgradeInterfaceVersion =
   })
 
 /**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link propcornAbi}__ and `functionName` set to `"getProposalByAccount"`
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link propcornAbi}__ and `functionName` set to `"funderToProposalBalance"`
  *
  * [__View Contract on Op Mainnet Optimism Explorer__](https://optimistic.etherscan.io/address/0xa1430c9c87D3c534EEfC429F4F29577282b8dE0F)
  */
-export const useReadPropcornGetProposalByAccount =
+export const useReadPropcornFunderToProposalBalance =
   /*#__PURE__*/ createUseReadContract({
     abi: propcornAbi,
     address: propcornAddress,
-    functionName: 'getProposalByAccount',
+    functionName: 'funderToProposalBalance',
   })
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link propcornAbi}__ and `functionName` set to `"fundsUnlockedAt"`
+ *
+ * [__View Contract on Op Mainnet Optimism Explorer__](https://optimistic.etherscan.io/address/0xa1430c9c87D3c534EEfC429F4F29577282b8dE0F)
+ */
+export const useReadPropcornFundsUnlockedAt =
+  /*#__PURE__*/ createUseReadContract({
+    abi: propcornAbi,
+    address: propcornAddress,
+    functionName: 'fundsUnlockedAt',
+  })
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link propcornAbi}__ and `functionName` set to `"getProposals"`
+ *
+ * [__View Contract on Op Mainnet Optimism Explorer__](https://optimistic.etherscan.io/address/0xa1430c9c87D3c534EEfC429F4F29577282b8dE0F)
+ */
+export const useReadPropcornGetProposals = /*#__PURE__*/ createUseReadContract({
+  abi: propcornAbi,
+  address: propcornAddress,
+  functionName: 'getProposals',
+})
 
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link propcornAbi}__ and `functionName` set to `"owner"`
@@ -992,6 +1147,29 @@ export const useReadPropcornOwner = /*#__PURE__*/ createUseReadContract({
   address: propcornAddress,
   functionName: 'owner',
 })
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link propcornAbi}__ and `functionName` set to `"proposals"`
+ *
+ * [__View Contract on Op Mainnet Optimism Explorer__](https://optimistic.etherscan.io/address/0xa1430c9c87D3c534EEfC429F4F29577282b8dE0F)
+ */
+export const useReadPropcornProposals = /*#__PURE__*/ createUseReadContract({
+  abi: propcornAbi,
+  address: propcornAddress,
+  functionName: 'proposals',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link propcornAbi}__ and `functionName` set to `"protocolFeeReceiver"`
+ *
+ * [__View Contract on Op Mainnet Optimism Explorer__](https://optimistic.etherscan.io/address/0xa1430c9c87D3c534EEfC429F4F29577282b8dE0F)
+ */
+export const useReadPropcornProtocolFeeReceiver =
+  /*#__PURE__*/ createUseReadContract({
+    abi: propcornAbi,
+    address: propcornAddress,
+    functionName: 'protocolFeeReceiver',
+  })
 
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link propcornAbi}__ and `functionName` set to `"proxiableUUID"`
@@ -1011,6 +1189,18 @@ export const useWritePropcorn = /*#__PURE__*/ createUseWriteContract({
   abi: propcornAbi,
   address: propcornAddress,
 })
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link propcornAbi}__ and `functionName` set to `"cancelProposal"`
+ *
+ * [__View Contract on Op Mainnet Optimism Explorer__](https://optimistic.etherscan.io/address/0xa1430c9c87D3c534EEfC429F4F29577282b8dE0F)
+ */
+export const useWritePropcornCancelProposal =
+  /*#__PURE__*/ createUseWriteContract({
+    abi: propcornAbi,
+    address: propcornAddress,
+    functionName: 'cancelProposal',
+  })
 
 /**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link propcornAbi}__ and `functionName` set to `"createProposal"`
@@ -1072,6 +1262,18 @@ export const useWritePropcornRenounceOwnership =
   })
 
 /**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link propcornAbi}__ and `functionName` set to `"setProtocolFeeReceiver"`
+ *
+ * [__View Contract on Op Mainnet Optimism Explorer__](https://optimistic.etherscan.io/address/0xa1430c9c87D3c534EEfC429F4F29577282b8dE0F)
+ */
+export const useWritePropcornSetProtocolFeeReceiver =
+  /*#__PURE__*/ createUseWriteContract({
+    abi: propcornAbi,
+    address: propcornAddress,
+    functionName: 'setProtocolFeeReceiver',
+  })
+
+/**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link propcornAbi}__ and `functionName` set to `"transferOwnership"`
  *
  * [__View Contract on Op Mainnet Optimism Explorer__](https://optimistic.etherscan.io/address/0xa1430c9c87D3c534EEfC429F4F29577282b8dE0F)
@@ -1116,6 +1318,18 @@ export const useSimulatePropcorn = /*#__PURE__*/ createUseSimulateContract({
   abi: propcornAbi,
   address: propcornAddress,
 })
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link propcornAbi}__ and `functionName` set to `"cancelProposal"`
+ *
+ * [__View Contract on Op Mainnet Optimism Explorer__](https://optimistic.etherscan.io/address/0xa1430c9c87D3c534EEfC429F4F29577282b8dE0F)
+ */
+export const useSimulatePropcornCancelProposal =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: propcornAbi,
+    address: propcornAddress,
+    functionName: 'cancelProposal',
+  })
 
 /**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link propcornAbi}__ and `functionName` set to `"createProposal"`
@@ -1175,6 +1389,18 @@ export const useSimulatePropcornRenounceOwnership =
     abi: propcornAbi,
     address: propcornAddress,
     functionName: 'renounceOwnership',
+  })
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link propcornAbi}__ and `functionName` set to `"setProtocolFeeReceiver"`
+ *
+ * [__View Contract on Op Mainnet Optimism Explorer__](https://optimistic.etherscan.io/address/0xa1430c9c87D3c534EEfC429F4F29577282b8dE0F)
+ */
+export const useSimulatePropcornSetProtocolFeeReceiver =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: propcornAbi,
+    address: propcornAddress,
+    functionName: 'setProtocolFeeReceiver',
   })
 
 /**
@@ -1257,6 +1483,18 @@ export const useWatchPropcornOwnershipTransferredEvent =
     abi: propcornAbi,
     address: propcornAddress,
     eventName: 'OwnershipTransferred',
+  })
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link propcornAbi}__ and `eventName` set to `"ProposalCanceled"`
+ *
+ * [__View Contract on Op Mainnet Optimism Explorer__](https://optimistic.etherscan.io/address/0xa1430c9c87D3c534EEfC429F4F29577282b8dE0F)
+ */
+export const useWatchPropcornProposalCanceledEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({
+    abi: propcornAbi,
+    address: propcornAddress,
+    eventName: 'ProposalCanceled',
   })
 
 /**

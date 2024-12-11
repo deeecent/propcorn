@@ -1,8 +1,10 @@
 # directories
+ignition/deployments/chain-31337
+ignition/deployments/chain-1337
 .coverage_artifacts
 .coverage_cache
 .coverage_contracts
-./artifacts
+/artifacts
 build
 cache
 coverage
