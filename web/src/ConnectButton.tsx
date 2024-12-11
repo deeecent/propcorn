@@ -1,18 +1,7 @@
-import { Button } from "@chakra-ui/react";
-import { ConnectKitButton } from "connectkit";
+import { ConnectButton as RainbowkitButton } from "@rainbow-me/rainbowkit";
 
 function ConnectButton() {
-  return (
-    <ConnectKitButton.Custom>
-      {({ isConnected, show, truncatedAddress, ensName }) => {
-        return (
-          <Button onClick={show}>
-            {isConnected ? (ensName ?? truncatedAddress) : "Connect wallet"}
-          </Button>
-        );
-      }}
-    </ConnectKitButton.Custom>
-  );
+  return <RainbowkitButton label="CONNECT" accountStatus="address" />;
 }
 
 export default ConnectButton;
