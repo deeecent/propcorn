@@ -2,7 +2,6 @@ import {
   Text,
   Heading,
   VStack,
-  Center,
   HStack,
   Highlight,
   Container,
@@ -12,7 +11,7 @@ import ProposalCard from "./ProposalCard";
 import Link from "./Link";
 import { useReadPropcornGetProposals } from "./generated";
 import { useEffect, useState } from "react";
-import Proposal from "./Proposal";
+import { PropcornProposal } from "./types";
 
 const Hero = () => (
   <>
@@ -85,13 +84,13 @@ const LastProposals = () => {
   const { data } = useReadPropcornGetProposals({
     args: [0n],
   });
-  const [proposals, setProposals] = useState<Proposal[]>([]);
+  const [proposals, setProposals] = useState<PropcornProposal[]>([]);
   const [startingId, setStartingId] = useState<number>(0);
 
   useEffect(() => {
     if (data !== undefined) {
       let newProposals = [];
-      const fetchedProposals = data[0] as Proposal[];
+      const fetchedProposals = data[0] as PropcornProposal[];
       for (let i = 0; i < 5; i++) {
         if (fetchedProposals[i].status !== 0) {
           newProposals.push(fetchedProposals[i]);
@@ -140,7 +139,7 @@ const CreateProposal = () => (
 
 const HomePage = () => (
   <Container maxW="container.sm">
-    <VStack gap={40}>
+    <VStack gap={20}>
       <Hero />
       <OneTwoThree />
       <LastProposals />
