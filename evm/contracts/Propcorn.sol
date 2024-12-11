@@ -69,7 +69,8 @@ contract Propcorn is Initializable, UUPSUpgradeable, OwnableUpgradeable {
         ProposalStatus status;
     }
 
-    mapping(address => mapping(uint256 => uint256)) funderToProposalBalance;
+    mapping(address => mapping(uint256 => uint256))
+        public funderToProposalBalance;
     address payable internal _protocolFeeReceiver;
 
     Proposal[] public proposals;
