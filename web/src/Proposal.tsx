@@ -510,12 +510,17 @@ const Proposal = ({ proposal, issue }: ProposalProps) => {
               {issue.org}/{issue.repo}
             </Text>
           </Text>
-          <Heading as="h4" fontSize="large">
-            <Text as="span" mr={1} color="gray.500">
-              GitHub Issue #{issue.id}
-            </Text>
-            Original content
-          </Heading>
+          <HStack>
+            <Heading as="h4" fontSize="large">
+              <Text as="span" mr={1} color="gray.500">
+                GitHub Issue #{issue.id}
+              </Text>
+            </Heading>
+            <Spacer />
+            <Link to={issue.url} isExternal>
+              <Button size="xs">Open in GitHub</Button>
+            </Link>
+          </HStack>
         </CardHeader>
         <CardBody>
           <Markdown>{issue.body}</Markdown>

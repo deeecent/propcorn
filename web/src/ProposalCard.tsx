@@ -112,11 +112,6 @@ const ProposalCard: React.FC<ProposalCardProps> = ({
             <Link to={`/proposal/${index}`}>
               <Button colorScheme="yellow">Details</Button>
             </Link>
-            <Link to={url} isExternal>
-              <Button colorScheme="yellow" variant="link">
-                Original issue
-              </Button>
-            </Link>
           </VStack>
         </HStack>
       </CardBody>
