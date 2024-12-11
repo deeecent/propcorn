@@ -1,5 +1,5 @@
 import { http, createConfig } from "wagmi";
-import { localhost /* , mainnet, */, optimism, sepolia } from "wagmi/chains";
+import { /* localhost, mainnet, optimism, */ sepolia } from "wagmi/chains";
 
 import.meta.env.VITE_RPC_URL;
 
@@ -27,12 +27,10 @@ const connectors = connectorsForWallets(
 );
 
 export const config = createConfig({
-  chains: [localhost, sepolia, optimism],
+  chains: [sepolia],
   connectors,
   transports: {
-    [optimism.id]: http(import.meta.env.VITE_RPC_URL),
     [sepolia.id]: http(import.meta.env.VITE_RPC_URL),
-    [localhost.id]: http(import.meta.env.VITE_RPC_URL),
   },
 });
 
