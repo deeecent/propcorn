@@ -343,6 +343,7 @@ const Countdown = ({ deadline, children }: CountdownProps) => {
       setTimeLeft(updatedTimeLeft);
 
       if (updatedTimeLeft.total <= 0) {
+        setTimeLeft({ total: 0, days: 0, hours: 0, minutes: 0, seconds: 0 });
         setIsExpired(true);
         clearInterval(interval);
       }
@@ -353,11 +354,9 @@ const Countdown = ({ deadline, children }: CountdownProps) => {
 
   return (
     <Box>
-      {!isExpired ? (
-        <Text fontSize="xl" fontWeight="bold">
-          {formatTime(timeLeft)}
-        </Text>
-      ) : null}
+      <Text fontSize="xl" fontWeight="bold">
+        {formatTime(timeLeft)}
+      </Text>
       {children({ isExpired })}
     </Box>
   );
