@@ -71,16 +71,16 @@ contract Propcorn is Initializable, UUPSUpgradeable, OwnableUpgradeable {
 
     mapping(address => mapping(uint256 => uint256))
         public funderToProposalBalance;
-    address payable internal _protocolFeeReceiver;
+    address payable public protocolFeeReceiver;
 
     Proposal[] public proposals;
 
     uint256 constant PAGE_SIZE = 1000;
 
     function initialize(
-        address payable protocolFeeReceiver
+        address payable protocolFeeReceiver_
     ) public initializer {
-        _protocolFeeReceiver = protocolFeeReceiver;
+        protocolFeeReceiver = protocolFeeReceiver_;
         __Ownable_init(msg.sender);
         __UUPSUpgradeable_init();
     }
@@ -100,9 +100,9 @@ contract Propcorn is Initializable, UUPSUpgradeable, OwnableUpgradeable {
     // Permissioned
 
     function setProtocolFeeReceiver(
-        address protocolFeeReceiver
+        address protocolFeeReceiver_
     ) public onlyOwner {
-        _protocolFeeReceiver = payable(protocolFeeReceiver);
+        protocolFeeReceiver = payable(protocolFeeReceiver_);
     }
 
     // Read
@@ -288,7 +288,7 @@ contract Propcorn is Initializable, UUPSUpgradeable, OwnableUpgradeable {
             10_000;
 
         payable(receiver).transfer(proposal.balance - protocolFee);
-        payable(_protocolFeeReceiver).transfer(protocolFee);
+        payable(protocolFeeReceiver).transfer(protocolFee);
 
         emit FundsWithdrawn(
             msg.sender,
