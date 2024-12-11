@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "tsc && vite build && cp dist/index.html dist/404.html",
     "preview": "vite preview",
-    "deploy:sepolia": "vite build --mode sepolia && gh-pages -d dist"
+    "deploy:sepolia": "vite build --mode sepolia && cp dist/index.html dist/404.html && gh-pages -d dist"
   },
   "dependencies": {
     "@chakra-ui/react": "^2.10.4",
