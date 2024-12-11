@@ -5,10 +5,8 @@ import {
   CardHeader,
   CardBody,
   Button,
-  HStack,
   Spacer,
   SimpleGrid,
-  VStack,
   Box,
   Progress,
   Stack,
@@ -50,10 +48,6 @@ const ProposalCard: React.FC<ProposalCardProps> = ({
     return <p>Error: {error}</p>;
   }
 
-  if (!data) {
-    return <p>No metadata available.</p>;
-  }
-
   const progress = minAmountRequested
     ? Number((balance * 100n) / minAmountRequested)
     : 0;
@@ -70,7 +64,7 @@ const ProposalCard: React.FC<ProposalCardProps> = ({
           <Text as="span" mr={1} color="gray.500">
             Proposal #{index}
           </Text>
-          {data.title}
+          {data ? data.title : "loading"}
         </Heading>
         <Box>
           <Progress colorScheme="green" size="xs" value={progress} />
@@ -102,10 +96,10 @@ const ProposalCard: React.FC<ProposalCardProps> = ({
             <Text color="gray.500">🏠 Project:</Text>
             <Text>
               <Link
-                to={`https://github.com/${data.org}/${data.repo}`}
+                to={data ? `https://github.com/${data.org}/${data.repo}` : ""}
                 isExternal
               >
-                {data.org}/{data.repo}
+                {data ? data.org : "loading"}/{data ? data.repo : "loading"}
               </Link>
             </Text>
           </SimpleGrid>

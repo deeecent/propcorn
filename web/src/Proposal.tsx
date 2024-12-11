@@ -42,7 +42,7 @@ import { STATUS_TO_LABEL, type PropcornProposal } from "./types";
 
 type ProposalProps = {
   proposal: PropcornProposal;
-  issue: GitHubIssueData;
+  issue: GitHubIssueData | null;
   refetch: () => void;
 };
 
@@ -106,7 +106,7 @@ const FundProposal = ({ proposal, issue, refetch }: ProposalProps) => {
               Fund Proposal #{proposal.index.toString()}
             </Heading>
             <Text as="span" fontSize="md" mr={1} color="gray.500">
-              {issue.title}
+              {issue ? issue.title : "loading"}
             </Text>
           </ModalHeader>
           <ModalCloseButton />
@@ -207,12 +207,10 @@ const DefundProposal = ({ index, address, refetch }: DefundProposalProps) => {
 
 const WithdrawFunds = ({
   index,
-  issue,
   defaultReceiver,
   refetch,
 }: {
   index: bigint;
-  issue: GitHubIssueData;
   defaultReceiver?: Hex | undefined;
   refetch: () => void;
 }) => {
@@ -274,9 +272,6 @@ const WithdrawFunds = ({
             <Heading as="h4" fontSize="large">
               Withdraw funds for Proposal #{index.toString()}
             </Heading>
-            <Text as="span" fontSize="md" mr={1} color="gray.500">
-              {issue.title}
-            </Text>
           </ModalHeader>
           <ModalCloseButton />
           <ModalBody>
@@ -397,7 +392,7 @@ const Proposal = ({ proposal, issue, refetch }: ProposalProps) => {
           <Text as="span" mr={1} color="gray.500">
             Proposal #{proposal.index.toString()}
           </Text>
-          {issue.title}
+          {issue ? issue.title : "loading"}
         </Heading>
       </Box>
 
@@ -451,10 +446,10 @@ const Proposal = ({ proposal, issue, refetch }: ProposalProps) => {
           <Text color="gray.500">🏠 Project:</Text>
           <Text>
             <Link
-              to={`https://github.com/${issue.org}/${issue.repo}`}
+              to={issue ? `https://github.com/${issue.org}/${issue.repo}` : ""}
               isExternal
             >
-              {issue.org}/{issue.repo}
+              {issue ? issue.org : "loading"}/{issue ? issue.repo : "loading"}
             </Link>
           </Text>
         </SimpleGrid>
@@ -475,7 +470,6 @@ const Proposal = ({ proposal, issue, refetch }: ProposalProps) => {
                     <Box mt={5}>
                       <WithdrawFunds
                         index={proposal.index}
-                        issue={issue}
                         defaultReceiver={address}
                         refetch={refetch}
                       />
@@ -493,23 +487,23 @@ const Proposal = ({ proposal, issue, refetch }: ProposalProps) => {
           <Text fontSize="sm" color="gray.500" mb={2}>
             Repository{" "}
             <Text as="span" color="black">
-              {issue.org}/{issue.repo}
+              {issue ? issue.org : ""}/{issue ? issue.repo : ""}
             </Text>
           </Text>
           <HStack>
             <Heading as="h4" fontSize="large">
               <Text as="span" mr={1} color="gray.500">
-                GitHub Issue #{issue.id}
+                GitHub Issue #{issue ? issue.id : "?"}
               </Text>
             </Heading>
             <Spacer />
-            <Link to={issue.url} isExternal>
+            <Link to={issue ? issue.url : ""} isExternal>
               <Button size="xs">Open in GitHub</Button>
             </Link>
           </HStack>
         </CardHeader>
         <CardBody>
-          <Markdown>{issue.body}</Markdown>
+          <Markdown>{issue ? issue.body : "Loading"}</Markdown>
         </CardBody>
       </Card>
     </Stack>

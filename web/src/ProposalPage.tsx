@@ -34,10 +34,6 @@ const ProposalLoader = ({ index }: { index: bigint }) => {
     return "whatever";
   }
 
-  if (!ghData) {
-    return "whatever";
-  }
-
   // There MUST be a better way!
   const proposal = {
     url: pcData[0],
