@@ -23,6 +23,7 @@ import {
   Text,
   useDisclosure,
   useToast,
+  VStack,
 } from "@chakra-ui/react";
 import { useAccount, useWaitForTransactionReceipt } from "wagmi";
 import {
@@ -39,6 +40,14 @@ import Link from "./Link";
 import Markdown from "react-markdown";
 import AddressInput from "./AddressInput";
 
+const STATUS_TO_LABEL = {
+  0: "Invalid",
+  1: "Funding",
+  2: "Working on the issue",
+  3: "Paid",
+  4: "Canceled",
+};
+
 type Proposal = {
   index: bigint;
   url: string;
@@ -48,7 +57,7 @@ type Proposal = {
   balance: bigint;
   feeBasisPoints: bigint;
   author: `0x${string}`;
-  status: number;
+  status: keyof typeof STATUS_TO_LABEL;
 };
 
 type ProposalProps = {
@@ -206,13 +215,13 @@ const DefundProposal = ({ index, address }: DefundProposalProps) => {
   }
 
   return (
-    <Box w="full">
+    <Box>
+      <Button onClick={onDefundProposal} disabled={isLoading}>
+        Defund Proposal
+      </Button>
       <Text color="gray.500" fontSize="sm" mb={2}>
         You have funded {formatEther(funding)} Ether
       </Text>
-      <Button w="full" onClick={onDefundProposal} disabled={isLoading}>
-        Defund Proposal
-      </Button>
     </Box>
   );
 };
@@ -271,7 +280,7 @@ const WithdrawFunds = ({
 
   return (
     <>
-      <Button onClick={onOpen} colorScheme="yellow">
+      <Button onClick={onOpen} colorScheme="green">
         Withdraw funds
       </Button>
 
@@ -319,6 +328,71 @@ const WithdrawFunds = ({
   );
 };
 
+type CountdownProps = {
+  deadline: Date;
+  children: (props: { isExpired: boolean }) => React.ReactNode;
+};
+
+const Countdown = ({ deadline, children }: CountdownProps) => {
+  const [timeLeft, setTimeLeft] = useState(() => calculateTimeLeft(deadline));
+  const [isExpired, setIsExpired] = useState(timeLeft.total <= 0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const updatedTimeLeft = calculateTimeLeft(deadline);
+      setTimeLeft(updatedTimeLeft);
+
+      if (updatedTimeLeft.total <= 0) {
+        setIsExpired(true);
+        clearInterval(interval);
+      }
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [deadline]);
+
+  return (
+    <Box>
+      {!isExpired ? (
+        <Text fontSize="xl" fontWeight="bold">
+          {formatTime(timeLeft)}
+        </Text>
+      ) : null}
+      {children({ isExpired })}
+    </Box>
+  );
+};
+
+function calculateTimeLeft(deadline: Date) {
+  const now = new Date();
+  const difference = deadline.getTime() - now.getTime();
+
+  const timeLeft = {
+    total: difference,
+    days: Math.floor(difference / (1000 * 60 * 60 * 24)),
+    hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
+    minutes: Math.floor((difference / (1000 * 60)) % 60),
+    seconds: Math.floor((difference / 1000) % 60),
+  };
+
+  return timeLeft;
+}
+
+function formatTime({
+  days,
+  hours,
+  minutes,
+  seconds,
+}: {
+  days: number;
+  hours: number;
+  minutes: number;
+  seconds: number;
+}) {
+  const pad = (num: number) => String(num).padStart(2, "0");
+  return `${pad(days)}:${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
+}
+
 const Proposal = ({ proposal, issue }: ProposalProps) => {
   const { address } = useAccount();
   const { days, hours } = convertSecondsToDaysAndHours(
@@ -328,6 +402,11 @@ const Proposal = ({ proposal, issue }: ProposalProps) => {
   const progress = proposal.minAmountRequested
     ? Number((proposal.balance * 100n) / proposal.minAmountRequested)
     : 0;
+
+  const deadline = new Date(
+    (Number(proposal.fundingCompletedAt) + Number(proposal.secondsToUnlock)) *
+      1000,
+  );
 
   return (
     <Stack gap={10}>
@@ -346,16 +425,29 @@ const Proposal = ({ proposal, issue }: ProposalProps) => {
         </Heading>
       </Box>
 
-      <Box>
-        <Text color="gray.500" fontWeight="bold">
-          Funding progress: {progress}% ({formatEther(proposal.balance)} /{" "}
-          {formatEther(proposal.minAmountRequested)}ETH )
-        </Text>
-        <Progress colorScheme="green" size="lg" value={progress} />
-      </Box>
+      <Card>
+        <CardBody>
+          <Text color="gray.500" fontWeight="bold">
+            Funding progress: {progress}% ({formatEther(proposal.balance)} /{" "}
+            {formatEther(proposal.minAmountRequested)}ETH )
+          </Text>
+          <Progress colorScheme="green" size="lg" value={progress} my={5} />
+          <HStack justifyContent="flex-end" alignItems="flex-start" spacing={4}>
+            {(proposal.status === 1 || proposal.status === 2) && (
+              <FundProposal proposal={proposal} issue={issue} />
+            )}
+            {(proposal.status === 1 || proposal.status === 2) && address && (
+              <DefundProposal index={proposal.index} address={address} />
+            )}
+          </HStack>
+        </CardBody>
+      </Card>
 
       <HStack>
         <SimpleGrid columns={2} spacing={2} alignItems="center">
+          <Text color="gray.500">✨ Status:</Text>
+          <Text>{STATUS_TO_LABEL[proposal.status]}</Text>
+
           <Text color="gray.500">⏱️ Duration:</Text>
           <Text>
             {days} day{days !== 1 && "s"} {hours} hour{hours !== 1 && "s"}
@@ -385,17 +477,30 @@ const Proposal = ({ proposal, issue }: ProposalProps) => {
 
         <Spacer />
 
-        <Stack gap={5}>
-          <FundProposal proposal={proposal} issue={issue} />
-          {address && (
-            <DefundProposal index={proposal.index} address={address} />
-          )}
-          <WithdrawFunds
-            index={proposal.index}
-            issue={issue}
-            defaultReceiver={address}
-          />
-        </Stack>
+        {proposal.status === 2 && (
+          <Card flexGrow={1}>
+            <CardBody>
+              <Text color="gray.500" fontWeight="bold">
+                Funds release countdown
+              </Text>
+              <Countdown deadline={deadline}>
+                {({ isExpired }) =>
+                  isExpired &&
+                  proposal.status === 2 &&
+                  address === proposal.author && (
+                    <Box mt={5}>
+                      <WithdrawFunds
+                        index={proposal.index}
+                        issue={issue}
+                        defaultReceiver={address}
+                      />
+                    </Box>
+                  )
+                }
+              </Countdown>
+            </CardBody>
+          </Card>
+        )}
       </HStack>
 
       <Card>
