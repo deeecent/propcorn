@@ -7,7 +7,7 @@ export function Header() {
     <Center>
       <Flex w="full" gap={5} mt={2} mb={10}>
         <Link to="/">
-          <Button bg="transparent" p={5}>
+          <Button bg="transparent" p={5} _hover={{}}>
             <Heading as="h1" size="lg">
               🍿 Propcorn
             </Heading>
