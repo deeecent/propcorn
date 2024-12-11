@@ -4,6 +4,7 @@ import { useReadPropcornProposals } from "./generated";
 import NotFound from "./NotFound";
 import { useGitHubIssueData } from "./hooks";
 import { Container } from "@chakra-ui/react";
+import { PropcornProposal } from "./types";
 
 type ProposalParams = {
   index: string;
@@ -14,6 +15,7 @@ const ProposalLoader = ({ index }: { index: bigint }) => {
     data: pcData,
     isLoading: pcIsLoading,
     error: pcError,
+    refetch,
   } = useReadPropcornProposals({
     args: [index],
   });
@@ -47,9 +49,9 @@ const ProposalLoader = ({ index }: { index: bigint }) => {
     feeBasisPoints: pcData[5],
     author: pcData[6],
     status: pcData[7],
-  };
+  } as PropcornProposal;
 
-  return <Proposal proposal={proposal} issue={ghData} />;
+  return <Proposal proposal={proposal} issue={ghData} refetch={refetch} />;
 };
 
 const ProposalPage = () => {

@@ -23,7 +23,6 @@ import {
   Text,
   useDisclosure,
   useToast,
-  VStack,
 } from "@chakra-ui/react";
 import { useAccount, useWaitForTransactionReceipt } from "wagmi";
 import {
@@ -39,33 +38,15 @@ import { GitHubIssueData } from "./github";
 import Link from "./Link";
 import Markdown from "react-markdown";
 import AddressInput from "./AddressInput";
-
-const STATUS_TO_LABEL = {
-  0: "Invalid",
-  1: "Funding",
-  2: "Working on the issue",
-  3: "Paid",
-  4: "Canceled",
-};
-
-type Proposal = {
-  index: bigint;
-  url: string;
-  secondsToUnlock: bigint;
-  fundingCompletedAt: bigint;
-  minAmountRequested: bigint;
-  balance: bigint;
-  feeBasisPoints: bigint;
-  author: `0x${string}`;
-  status: keyof typeof STATUS_TO_LABEL;
-};
+import { STATUS_TO_LABEL, type PropcornProposal } from "./types";
 
 type ProposalProps = {
-  proposal: Proposal;
+  proposal: PropcornProposal;
   issue: GitHubIssueData;
+  refetch: () => void;
 };
 
-const FundProposal = ({ proposal, issue }: ProposalProps) => {
+const FundProposal = ({ proposal, issue, refetch }: ProposalProps) => {
   const { data: hash, writeContract } = useWritePropcornFundProposal();
   const { isLoading, isError, isSuccess } = useWaitForTransactionReceipt({
     hash,
@@ -83,6 +64,8 @@ const FundProposal = ({ proposal, issue }: ProposalProps) => {
         duration: 9000,
         isClosable: true,
       });
+      refetch();
+      onClose();
     }
   }, [isSuccess]);
 
@@ -138,20 +121,14 @@ const FundProposal = ({ proposal, issue }: ProposalProps) => {
           </ModalBody>
 
           <ModalFooter>
-            {isSuccess ? (
-              <Button colorScheme="yellow" mr={3} onClick={onClose}>
-                Close
-              </Button>
-            ) : (
-              <Button
-                colorScheme="green"
-                mr={3}
-                onClick={onFundProposal}
-                disabled={isLoading}
-              >
-                Fund Proposal
-              </Button>
-            )}
+            <Button
+              colorScheme="green"
+              mr={3}
+              onClick={onFundProposal}
+              disabled={isLoading}
+            >
+              Fund Proposal
+            </Button>
           </ModalFooter>
         </ModalContent>
       </Modal>
@@ -162,9 +139,10 @@ const FundProposal = ({ proposal, issue }: ProposalProps) => {
 type DefundProposalProps = {
   index: bigint;
   address: Hex;
+  refetch: () => void;
 };
 
-const DefundProposal = ({ index, address }: DefundProposalProps) => {
+const DefundProposal = ({ index, address, refetch }: DefundProposalProps) => {
   const { data: funding } = useReadPropcornFunderToProposalBalance({
     args: [address, index],
   });
@@ -184,6 +162,7 @@ const DefundProposal = ({ index, address }: DefundProposalProps) => {
         duration: 9000,
         isClosable: true,
       });
+      refetch();
     }
   }, [isSuccess]);
 
@@ -230,10 +209,12 @@ const WithdrawFunds = ({
   index,
   issue,
   defaultReceiver,
+  refetch,
 }: {
   index: bigint;
   issue: GitHubIssueData;
   defaultReceiver?: Hex | undefined;
+  refetch: () => void;
 }) => {
   const { data: hash, writeContract } = useWritePropcornWithdrawFunds();
   const { isLoading, isError, isSuccess } = useWaitForTransactionReceipt({
@@ -252,6 +233,8 @@ const WithdrawFunds = ({
         duration: 9000,
         isClosable: true,
       });
+      refetch();
+      onClose();
     }
   }, [isSuccess]);
 
@@ -307,20 +290,14 @@ const WithdrawFunds = ({
           </ModalBody>
 
           <ModalFooter>
-            {isSuccess ? (
-              <Button colorScheme="yellow" mr={3} onClick={onClose}>
-                Close
-              </Button>
-            ) : (
-              <Button
-                colorScheme="green"
-                mr={3}
-                onClick={onWithdrawFunds}
-                disabled={isLoading}
-              >
-                Withdraw funds
-              </Button>
-            )}
+            <Button
+              colorScheme="green"
+              mr={3}
+              onClick={onWithdrawFunds}
+              disabled={isLoading}
+            >
+              Withdraw funds
+            </Button>
           </ModalFooter>
         </ModalContent>
       </Modal>
@@ -392,7 +369,7 @@ function formatTime({
   return `${pad(days)}:${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
 }
 
-const Proposal = ({ proposal, issue }: ProposalProps) => {
+const Proposal = ({ proposal, issue, refetch }: ProposalProps) => {
   const { address } = useAccount();
   const { days, hours } = convertSecondsToDaysAndHours(
     Number(proposal.secondsToUnlock),
@@ -433,10 +410,18 @@ const Proposal = ({ proposal, issue }: ProposalProps) => {
           <Progress colorScheme="green" size="lg" value={progress} my={5} />
           <HStack justifyContent="flex-end" alignItems="flex-start" spacing={4}>
             {(proposal.status === 1 || proposal.status === 2) && (
-              <FundProposal proposal={proposal} issue={issue} />
+              <FundProposal
+                proposal={proposal}
+                issue={issue}
+                refetch={refetch}
+              />
             )}
             {(proposal.status === 1 || proposal.status === 2) && address && (
-              <DefundProposal index={proposal.index} address={address} />
+              <DefundProposal
+                index={proposal.index}
+                address={address}
+                refetch={refetch}
+              />
             )}
           </HStack>
         </CardBody>
@@ -492,6 +477,7 @@ const Proposal = ({ proposal, issue }: ProposalProps) => {
                         index={proposal.index}
                         issue={issue}
                         defaultReceiver={address}
+                        refetch={refetch}
                       />
                     </Box>
                   )
