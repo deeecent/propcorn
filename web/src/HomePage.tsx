@@ -111,8 +111,8 @@ const LastProposals = () => {
       <VStack w="full" gap={8}>
         {proposals.map((p, i) => (
           <ProposalCard
-            key={i - startingId}
-            index={i - startingId}
+            key={startingId - i}
+            index={startingId - i}
             url={p.url}
             author={p.author}
             minAmountRequested={p.minAmountRequested}
