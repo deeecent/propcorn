@@ -4,6 +4,7 @@ import {
   Button,
   Card,
   FormControl,
+  FormErrorMessage,
   FormHelperText,
   FormLabel,
   HStack,
@@ -13,6 +14,7 @@ import {
   NumberInput,
   NumberInputField,
   NumberInputStepper,
+  useToast,
   VStack,
 } from "@chakra-ui/react";
 import { useAccount, useWaitForTransactionReceipt } from "wagmi";
@@ -29,6 +31,7 @@ type CreateProps = {
 };
 
 function Create({ onSuccess }: CreateProps) {
+  const toast = useToast();
   const account = useAccount();
   const { data: hash, writeContract } = useWritePropcornCreateProposal();
   const { isLoading: isConfirming } = useWaitForTransactionReceipt({
@@ -55,13 +58,31 @@ function Create({ onSuccess }: CreateProps) {
     onLogs: (logs) => onSuccess(Number(logs[0].args.index)),
   });
 
+  function isInputInvalid() {
+    return !link?.startsWith("https://github.com");
+  }
+
+  function isDeliveryTimeInvalid() {
+    return (
+      (days === undefined && hours === undefined) ||
+      (days === undefined && Number(hours) === 0) ||
+      (hours === undefined && Number(days) === 0) ||
+      (Number(days) === 0 && hours === 0)
+    );
+  }
+
   async function submit() {
-    if (!link) {
-      throw new Error("Link has no value");
+    if (!link || isInputInvalid() || !amount || isDeliveryTimeInvalid()) {
+      toast({
+        title: "Check your input",
+        status: "error",
+        description: "Some input fields are invalid. Check the errors",
+        duration: 5000,
+        isClosable: true,
+      });
+      throw new Error("Invalid inputs");
     }
-    if (!amount) {
-      throw new Error("Amount has no value");
-    }
+
     const totalTime = Number(hours ?? 0) * 3600 + Number(days ?? 0) * 86400;
     writeContract({
       args: [link, BigInt(totalTime), parseEther(amount), BigInt(fee * 100)],
@@ -70,28 +91,37 @@ function Create({ onSuccess }: CreateProps) {
 
   return (
     <VStack gap={5}>
-      <FormControl isRequired>
+      <FormControl isRequired isInvalid={isInputInvalid()}>
         <FormLabel>GitHub Issue Link</FormLabel>
         <Input
           onChange={handleLinkChange}
           placeholder="https://github.com/user/repo/issues/123"
         />
+        <FormErrorMessage>
+          You need to input a valid Github issue link
+        </FormErrorMessage>
         <FormHelperText>
           Provide the link to the GitHub issue this proposal will address.
         </FormHelperText>
       </FormControl>
 
-      <FormControl isRequired>
+      <FormControl
+        isRequired
+        isInvalid={
+          amount === undefined || parseFloat(amount) === 0 || amount === ""
+        }
+      >
         <FormLabel>Requested Amount (in Ether)</FormLabel>
         <NumberInput value={amount} onChange={handleAmountChange}>
           <NumberInputField placeholder="Enter the amount in ETH" />
         </NumberInput>
+        <FormErrorMessage>This cannot be 0</FormErrorMessage>
         <FormHelperText>
           Specify the amount of Ether required to complete this task.
         </FormHelperText>
       </FormControl>
 
-      <FormControl isRequired>
+      <FormControl isRequired isInvalid={isDeliveryTimeInvalid()}>
         <FormLabel>Delivery Time</FormLabel>
         <HStack width="100%">
           <NumberInput
@@ -119,6 +149,7 @@ function Create({ onSuccess }: CreateProps) {
             </NumberInputStepper>
           </NumberInput>
         </HStack>
+        <FormErrorMessage>At least 1 hour</FormErrorMessage>
         <FormHelperText>
           Enter the estimated time needed to deliver the solution.
         </FormHelperText>
