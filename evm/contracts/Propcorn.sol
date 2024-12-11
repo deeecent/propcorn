@@ -117,14 +117,6 @@ contract Propcorn is Initializable, UUPSUpgradeable, OwnableUpgradeable {
     }
 
     /**
-     * Returns all proposals, sorted in ascending chronological order
-     * (first one created first).
-     */
-    function getProposals() public view returns (Proposal[] memory) {
-        return proposals;
-    }
-
-    /**
      * Returns proposals sorted in descending chronological order
      * (last one created is first).
      * Page 0 will contains the latest 1000 proposals.
