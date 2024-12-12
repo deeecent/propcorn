@@ -37,13 +37,15 @@ export function useGitHubIssueData(url: string | undefined) {
         setData(fetchedData);
 
         // Save to cache
-        localStorage.setItem(
-          cacheKey,
-          JSON.stringify({
-            data: fetchedData,
-            timestamp: Date.now(),
-          }),
-        );
+        if (fetchedData) {
+          localStorage.setItem(
+            cacheKey,
+            JSON.stringify({
+              data: fetchedData,
+              timestamp: Date.now(),
+            }),
+          );
+        }
       } catch (err) {
         setError((err as Error).message);
       } finally {
