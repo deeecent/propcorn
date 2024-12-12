@@ -138,14 +138,11 @@ const FundProposal = ({ proposal, issue, refetch }: ProposalProps) => {
 
 type DefundProposalProps = {
   index: bigint;
-  address: Hex;
+  funding: bigint | undefined;
   refetch: () => void;
 };
 
-const DefundProposal = ({ index, address, refetch }: DefundProposalProps) => {
-  const { data: funding } = useReadPropcornFunderToProposalBalance({
-    args: [address, index],
-  });
+const DefundProposal = ({ index, funding, refetch }: DefundProposalProps) => {
   const { data: hash, writeContract } = useWritePropcornDefundProposal();
   const { isLoading, isError, isSuccess } = useWaitForTransactionReceipt({
     hash,
@@ -366,6 +363,19 @@ function formatTime({
 
 const Proposal = ({ proposal, issue, refetch }: ProposalProps) => {
   const { address } = useAccount();
+  const { data: funding, refetch: refetchProposalBalance } =
+    useReadPropcornFunderToProposalBalance({
+      args: [
+        address ?? "0x0000000000000000000000000000000000000000",
+        proposal.index,
+      ],
+    });
+
+  const refetchAll = () => {
+    refetch();
+    refetchProposalBalance();
+  };
+
   const { days, hours } = convertSecondsToDaysAndHours(
     Number(proposal.secondsToUnlock),
   );
@@ -408,14 +418,14 @@ const Proposal = ({ proposal, issue, refetch }: ProposalProps) => {
               <FundProposal
                 proposal={proposal}
                 issue={issue}
-                refetch={refetch}
+                refetch={refetchAll}
               />
             )}
             {proposal.status === 1 && address && (
               <DefundProposal
                 index={proposal.index}
-                address={address}
-                refetch={refetch}
+                funding={funding}
+                refetch={refetchAll}
               />
             )}
           </HStack>
@@ -471,7 +481,7 @@ const Proposal = ({ proposal, issue, refetch }: ProposalProps) => {
                       <WithdrawFunds
                         index={proposal.index}
                         defaultReceiver={address}
-                        refetch={refetch}
+                        refetch={refetchAll}
                       />
                     </Box>
                   )
