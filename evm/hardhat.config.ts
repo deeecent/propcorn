@@ -5,7 +5,7 @@ import "hardhat-deploy";
 import type { HardhatUserConfig } from "hardhat/config";
 import { vars } from "hardhat/config";
 
-import "./tasks/accounts";
+import "./tasks/admin";
 
 // Run 'npx hardhat vars setup' to see the list of variables that need to be set
 const NETWORK: string = vars.get("NETWORK");
