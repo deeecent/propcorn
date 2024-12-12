@@ -60,11 +60,19 @@ const ProposalCard: React.FC<ProposalCardProps> = ({
         <Text fontSize="sm" color="gray.500" mb={2}>
           Created by {author}
         </Text>
-        <Heading as="h4" fontSize="large" mb={3}>
-          <Text as="span" mr={1} color="gray.500">
-            Proposal #{index}
-          </Text>
-          {data ? data.title : "loading"}
+        <Heading
+          as="h4"
+          fontSize="large"
+          textDecoration="underline"
+          textDecorationColor="gray.400"
+          mb={3}
+        >
+          <Link to={`/proposal/${index}`}>
+            <Text as="span" mr={1} color="gray.500">
+              Proposal #{index}
+            </Text>
+            {data ? data.title : "loading"}
+          </Link>
         </Heading>
         <Box>
           <Progress colorScheme="green" size="xs" value={progress} />
