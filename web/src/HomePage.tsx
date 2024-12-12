@@ -6,11 +6,12 @@ import {
   Highlight,
   Container,
   Button,
+  Box,
 } from "@chakra-ui/react";
 import ProposalCard from "./ProposalCard";
 import Link from "./Link";
 import { useReadPropcornGetProposals } from "./generated";
-import { useEffect, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { PropcornProposal } from "./types";
 
 const Hero = () => (
@@ -33,7 +34,7 @@ const Hero = () => (
 interface StepProps {
   emoji: string;
   title: string;
-  description: string;
+  description: string | ReactNode;
 }
 
 const Step = ({ emoji, title, description }: StepProps) => (
@@ -137,6 +138,23 @@ const CreateProposal = () => (
   </Link>
 );
 
+const JoinTelegram = () => (
+  <Box>
+    <Step
+      emoji="🤔"
+      title="Questions?"
+      description={
+        <Text>
+          Join our{" "}
+          <Link to="https://t.me/propcornprotocol" isExternal>
+            <Button variant="link">Telegram Group</Button>
+          </Link>
+        </Text>
+      }
+    />
+  </Box>
+);
+
 const HomePage = () => (
   <Container maxW="container.sm">
     <VStack gap={20}>
@@ -144,6 +162,7 @@ const HomePage = () => (
       <OneTwoThree />
       <LastProposals />
       <CreateProposal />
+      <JoinTelegram />
     </VStack>
   </Container>
 );
