@@ -411,7 +411,7 @@ const Proposal = ({ proposal, issue, refetch }: ProposalProps) => {
                 refetch={refetch}
               />
             )}
-            {(proposal.status === 1 || proposal.status === 2) && address && (
+            {proposal.status === 1 && address && (
               <DefundProposal
                 index={proposal.index}
                 address={address}
