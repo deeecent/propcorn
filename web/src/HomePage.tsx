@@ -128,14 +128,27 @@ const LastProposals = () => {
 };
 
 const CreateProposal = () => (
-  <Link to="/new">
-    <Button size="lg" bg="green.300">
-      <Text fontSize="xl" mr={2}>
-        🌽
-      </Text>{" "}
-      Create your proposal
-    </Button>
-  </Link>
+  <VStack>
+    <Link to="/new">
+      <Button size="lg" bg="green.300" p={7}>
+        <Text
+          fontSize="2xl"
+          display="flex"
+          alignItems="center"
+          justifyContent="center"
+          bg="yellow.200"
+          p={5}
+          w={10}
+          h={10}
+          borderRadius="full"
+          mr={3}
+        >
+          🌽
+        </Text>
+        Create a Proposal
+      </Button>
+    </Link>
+  </VStack>
 );
 
 const JoinTelegram = () => (
@@ -160,8 +173,8 @@ const HomePage = () => (
     <VStack gap={20}>
       <Hero />
       <OneTwoThree />
-      <LastProposals />
       <CreateProposal />
+      <LastProposals />
       <JoinTelegram />
     </VStack>
   </Container>
