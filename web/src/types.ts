@@ -10,7 +10,7 @@ export type PropcornProposal = {
   index: bigint;
   url: string;
   secondsToUnlock: bigint;
-  fundingCompletedAt: bigint;
+  startedAt: bigint;
   minAmountRequested: bigint;
   balance: bigint;
   feeBasisPoints: bigint;

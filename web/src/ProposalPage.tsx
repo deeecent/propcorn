@@ -39,7 +39,7 @@ const ProposalLoader = ({ index }: { index: bigint }) => {
     url: pcData[0],
     index,
     secondsToUnlock: pcData[1],
-    fundingCompletedAt: pcData[2],
+    startedAt: pcData[2],
     minAmountRequested: pcData[3],
     balance: pcData[4],
     feeBasisPoints: pcData[5],

@@ -309,6 +309,7 @@ export const ownableUpgradeableAbi = [
 
 /**
  * - [__View Contract on Op Mainnet Optimism Explorer__](https://optimistic.etherscan.io/address/0xe31A21eC01CcA7b95FCcd6eDd4Ac56CB743a4112)
+ * -
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xC4b3736A804837715C41Abe7438A4033DAa58D80)
  */
 export const propcornAbi = [
@@ -578,11 +579,7 @@ export const propcornAbi = [
         components: [
           { name: 'url', internalType: 'string', type: 'string' },
           { name: 'secondsToUnlock', internalType: 'uint256', type: 'uint256' },
-          {
-            name: 'fundingCompletedAt',
-            internalType: 'uint256',
-            type: 'uint256',
-          },
+          { name: 'startedAt', internalType: 'uint256', type: 'uint256' },
           {
             name: 'minAmountRequested',
             internalType: 'uint256',
@@ -615,11 +612,7 @@ export const propcornAbi = [
         components: [
           { name: 'url', internalType: 'string', type: 'string' },
           { name: 'secondsToUnlock', internalType: 'uint256', type: 'uint256' },
-          {
-            name: 'fundingCompletedAt',
-            internalType: 'uint256',
-            type: 'uint256',
-          },
+          { name: 'startedAt', internalType: 'uint256', type: 'uint256' },
           {
             name: 'minAmountRequested',
             internalType: 'uint256',
@@ -666,7 +659,7 @@ export const propcornAbi = [
     outputs: [
       { name: 'url', internalType: 'string', type: 'string' },
       { name: 'secondsToUnlock', internalType: 'uint256', type: 'uint256' },
-      { name: 'fundingCompletedAt', internalType: 'uint256', type: 'uint256' },
+      { name: 'startedAt', internalType: 'uint256', type: 'uint256' },
       { name: 'minAmountRequested', internalType: 'uint256', type: 'uint256' },
       { name: 'balance', internalType: 'uint256', type: 'uint256' },
       { name: 'feeBasisPoints', internalType: 'uint256', type: 'uint256' },
@@ -715,6 +708,13 @@ export const propcornAbi = [
   },
   {
     type: 'function',
+    inputs: [{ name: 'index', internalType: 'uint256', type: 'uint256' }],
+    name: 'startProposal',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
     inputs: [{ name: 'newOwner', internalType: 'address', type: 'address' }],
     name: 'transferOwnership',
     outputs: [],
@@ -744,15 +744,18 @@ export const propcornAbi = [
 
 /**
  * - [__View Contract on Op Mainnet Optimism Explorer__](https://optimistic.etherscan.io/address/0xe31A21eC01CcA7b95FCcd6eDd4Ac56CB743a4112)
+ * -
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xC4b3736A804837715C41Abe7438A4033DAa58D80)
  */
 export const propcornAddress = {
   10: '0xe31A21eC01CcA7b95FCcd6eDd4Ac56CB743a4112',
+  1337: '0x8a22225eD7eD460D7ee3842bce2402B9deaD23D3',
   11155111: '0xC4b3736A804837715C41Abe7438A4033DAa58D80',
 } as const
 
 /**
  * - [__View Contract on Op Mainnet Optimism Explorer__](https://optimistic.etherscan.io/address/0xe31A21eC01CcA7b95FCcd6eDd4Ac56CB743a4112)
+ * -
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xC4b3736A804837715C41Abe7438A4033DAa58D80)
  */
 export const propcornConfig = {
@@ -1053,6 +1056,7 @@ export const useWatchOwnableUpgradeableOwnershipTransferredEvent =
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link propcornAbi}__
  *
  * - [__View Contract on Op Mainnet Optimism Explorer__](https://optimistic.etherscan.io/address/0xe31A21eC01CcA7b95FCcd6eDd4Ac56CB743a4112)
+ * -
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xC4b3736A804837715C41Abe7438A4033DAa58D80)
  */
 export const useReadPropcorn = /*#__PURE__*/ createUseReadContract({
@@ -1064,6 +1068,7 @@ export const useReadPropcorn = /*#__PURE__*/ createUseReadContract({
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link propcornAbi}__ and `functionName` set to `"UPGRADE_INTERFACE_VERSION"`
  *
  * - [__View Contract on Op Mainnet Optimism Explorer__](https://optimistic.etherscan.io/address/0xe31A21eC01CcA7b95FCcd6eDd4Ac56CB743a4112)
+ * -
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xC4b3736A804837715C41Abe7438A4033DAa58D80)
  */
 export const useReadPropcornUpgradeInterfaceVersion =
@@ -1077,6 +1082,7 @@ export const useReadPropcornUpgradeInterfaceVersion =
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link propcornAbi}__ and `functionName` set to `"funderToProposalBalance"`
  *
  * - [__View Contract on Op Mainnet Optimism Explorer__](https://optimistic.etherscan.io/address/0xe31A21eC01CcA7b95FCcd6eDd4Ac56CB743a4112)
+ * -
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xC4b3736A804837715C41Abe7438A4033DAa58D80)
  */
 export const useReadPropcornFunderToProposalBalance =
@@ -1090,6 +1096,7 @@ export const useReadPropcornFunderToProposalBalance =
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link propcornAbi}__ and `functionName` set to `"fundsUnlockedAt"`
  *
  * - [__View Contract on Op Mainnet Optimism Explorer__](https://optimistic.etherscan.io/address/0xe31A21eC01CcA7b95FCcd6eDd4Ac56CB743a4112)
+ * -
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xC4b3736A804837715C41Abe7438A4033DAa58D80)
  */
 export const useReadPropcornFundsUnlockedAt =
@@ -1103,6 +1110,7 @@ export const useReadPropcornFundsUnlockedAt =
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link propcornAbi}__ and `functionName` set to `"getProposals"`
  *
  * - [__View Contract on Op Mainnet Optimism Explorer__](https://optimistic.etherscan.io/address/0xe31A21eC01CcA7b95FCcd6eDd4Ac56CB743a4112)
+ * -
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xC4b3736A804837715C41Abe7438A4033DAa58D80)
  */
 export const useReadPropcornGetProposals = /*#__PURE__*/ createUseReadContract({
@@ -1115,6 +1123,7 @@ export const useReadPropcornGetProposals = /*#__PURE__*/ createUseReadContract({
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link propcornAbi}__ and `functionName` set to `"owner"`
  *
  * - [__View Contract on Op Mainnet Optimism Explorer__](https://optimistic.etherscan.io/address/0xe31A21eC01CcA7b95FCcd6eDd4Ac56CB743a4112)
+ * -
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xC4b3736A804837715C41Abe7438A4033DAa58D80)
  */
 export const useReadPropcornOwner = /*#__PURE__*/ createUseReadContract({
@@ -1127,6 +1136,7 @@ export const useReadPropcornOwner = /*#__PURE__*/ createUseReadContract({
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link propcornAbi}__ and `functionName` set to `"proposals"`
  *
  * - [__View Contract on Op Mainnet Optimism Explorer__](https://optimistic.etherscan.io/address/0xe31A21eC01CcA7b95FCcd6eDd4Ac56CB743a4112)
+ * -
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xC4b3736A804837715C41Abe7438A4033DAa58D80)
  */
 export const useReadPropcornProposals = /*#__PURE__*/ createUseReadContract({
@@ -1139,6 +1149,7 @@ export const useReadPropcornProposals = /*#__PURE__*/ createUseReadContract({
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link propcornAbi}__ and `functionName` set to `"protocolFeeReceiver"`
  *
  * - [__View Contract on Op Mainnet Optimism Explorer__](https://optimistic.etherscan.io/address/0xe31A21eC01CcA7b95FCcd6eDd4Ac56CB743a4112)
+ * -
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xC4b3736A804837715C41Abe7438A4033DAa58D80)
  */
 export const useReadPropcornProtocolFeeReceiver =
@@ -1152,6 +1163,7 @@ export const useReadPropcornProtocolFeeReceiver =
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link propcornAbi}__ and `functionName` set to `"proxiableUUID"`
  *
  * - [__View Contract on Op Mainnet Optimism Explorer__](https://optimistic.etherscan.io/address/0xe31A21eC01CcA7b95FCcd6eDd4Ac56CB743a4112)
+ * -
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xC4b3736A804837715C41Abe7438A4033DAa58D80)
  */
 export const useReadPropcornProxiableUuid = /*#__PURE__*/ createUseReadContract(
@@ -1162,6 +1174,7 @@ export const useReadPropcornProxiableUuid = /*#__PURE__*/ createUseReadContract(
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link propcornAbi}__
  *
  * - [__View Contract on Op Mainnet Optimism Explorer__](https://optimistic.etherscan.io/address/0xe31A21eC01CcA7b95FCcd6eDd4Ac56CB743a4112)
+ * -
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xC4b3736A804837715C41Abe7438A4033DAa58D80)
  */
 export const useWritePropcorn = /*#__PURE__*/ createUseWriteContract({
@@ -1173,6 +1186,7 @@ export const useWritePropcorn = /*#__PURE__*/ createUseWriteContract({
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link propcornAbi}__ and `functionName` set to `"cancelProposal"`
  *
  * - [__View Contract on Op Mainnet Optimism Explorer__](https://optimistic.etherscan.io/address/0xe31A21eC01CcA7b95FCcd6eDd4Ac56CB743a4112)
+ * -
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xC4b3736A804837715C41Abe7438A4033DAa58D80)
  */
 export const useWritePropcornCancelProposal =
@@ -1186,6 +1200,7 @@ export const useWritePropcornCancelProposal =
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link propcornAbi}__ and `functionName` set to `"createProposal"`
  *
  * - [__View Contract on Op Mainnet Optimism Explorer__](https://optimistic.etherscan.io/address/0xe31A21eC01CcA7b95FCcd6eDd4Ac56CB743a4112)
+ * -
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xC4b3736A804837715C41Abe7438A4033DAa58D80)
  */
 export const useWritePropcornCreateProposal =
@@ -1199,6 +1214,7 @@ export const useWritePropcornCreateProposal =
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link propcornAbi}__ and `functionName` set to `"defundProposal"`
  *
  * - [__View Contract on Op Mainnet Optimism Explorer__](https://optimistic.etherscan.io/address/0xe31A21eC01CcA7b95FCcd6eDd4Ac56CB743a4112)
+ * -
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xC4b3736A804837715C41Abe7438A4033DAa58D80)
  */
 export const useWritePropcornDefundProposal =
@@ -1212,6 +1228,7 @@ export const useWritePropcornDefundProposal =
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link propcornAbi}__ and `functionName` set to `"fundProposal"`
  *
  * - [__View Contract on Op Mainnet Optimism Explorer__](https://optimistic.etherscan.io/address/0xe31A21eC01CcA7b95FCcd6eDd4Ac56CB743a4112)
+ * -
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xC4b3736A804837715C41Abe7438A4033DAa58D80)
  */
 export const useWritePropcornFundProposal =
@@ -1225,6 +1242,7 @@ export const useWritePropcornFundProposal =
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link propcornAbi}__ and `functionName` set to `"initialize"`
  *
  * - [__View Contract on Op Mainnet Optimism Explorer__](https://optimistic.etherscan.io/address/0xe31A21eC01CcA7b95FCcd6eDd4Ac56CB743a4112)
+ * -
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xC4b3736A804837715C41Abe7438A4033DAa58D80)
  */
 export const useWritePropcornInitialize = /*#__PURE__*/ createUseWriteContract({
@@ -1237,6 +1255,7 @@ export const useWritePropcornInitialize = /*#__PURE__*/ createUseWriteContract({
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link propcornAbi}__ and `functionName` set to `"renounceOwnership"`
  *
  * - [__View Contract on Op Mainnet Optimism Explorer__](https://optimistic.etherscan.io/address/0xe31A21eC01CcA7b95FCcd6eDd4Ac56CB743a4112)
+ * -
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xC4b3736A804837715C41Abe7438A4033DAa58D80)
  */
 export const useWritePropcornRenounceOwnership =
@@ -1250,6 +1269,7 @@ export const useWritePropcornRenounceOwnership =
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link propcornAbi}__ and `functionName` set to `"setProtocolFeeReceiver"`
  *
  * - [__View Contract on Op Mainnet Optimism Explorer__](https://optimistic.etherscan.io/address/0xe31A21eC01CcA7b95FCcd6eDd4Ac56CB743a4112)
+ * -
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xC4b3736A804837715C41Abe7438A4033DAa58D80)
  */
 export const useWritePropcornSetProtocolFeeReceiver =
@@ -1260,9 +1280,24 @@ export const useWritePropcornSetProtocolFeeReceiver =
   })
 
 /**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link propcornAbi}__ and `functionName` set to `"startProposal"`
+ *
+ * - [__View Contract on Op Mainnet Optimism Explorer__](https://optimistic.etherscan.io/address/0xe31A21eC01CcA7b95FCcd6eDd4Ac56CB743a4112)
+ * -
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xC4b3736A804837715C41Abe7438A4033DAa58D80)
+ */
+export const useWritePropcornStartProposal =
+  /*#__PURE__*/ createUseWriteContract({
+    abi: propcornAbi,
+    address: propcornAddress,
+    functionName: 'startProposal',
+  })
+
+/**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link propcornAbi}__ and `functionName` set to `"transferOwnership"`
  *
  * - [__View Contract on Op Mainnet Optimism Explorer__](https://optimistic.etherscan.io/address/0xe31A21eC01CcA7b95FCcd6eDd4Ac56CB743a4112)
+ * -
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xC4b3736A804837715C41Abe7438A4033DAa58D80)
  */
 export const useWritePropcornTransferOwnership =
@@ -1276,6 +1311,7 @@ export const useWritePropcornTransferOwnership =
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link propcornAbi}__ and `functionName` set to `"upgradeToAndCall"`
  *
  * - [__View Contract on Op Mainnet Optimism Explorer__](https://optimistic.etherscan.io/address/0xe31A21eC01CcA7b95FCcd6eDd4Ac56CB743a4112)
+ * -
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xC4b3736A804837715C41Abe7438A4033DAa58D80)
  */
 export const useWritePropcornUpgradeToAndCall =
@@ -1289,6 +1325,7 @@ export const useWritePropcornUpgradeToAndCall =
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link propcornAbi}__ and `functionName` set to `"withdrawFunds"`
  *
  * - [__View Contract on Op Mainnet Optimism Explorer__](https://optimistic.etherscan.io/address/0xe31A21eC01CcA7b95FCcd6eDd4Ac56CB743a4112)
+ * -
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xC4b3736A804837715C41Abe7438A4033DAa58D80)
  */
 export const useWritePropcornWithdrawFunds =
@@ -1302,6 +1339,7 @@ export const useWritePropcornWithdrawFunds =
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link propcornAbi}__
  *
  * - [__View Contract on Op Mainnet Optimism Explorer__](https://optimistic.etherscan.io/address/0xe31A21eC01CcA7b95FCcd6eDd4Ac56CB743a4112)
+ * -
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xC4b3736A804837715C41Abe7438A4033DAa58D80)
  */
 export const useSimulatePropcorn = /*#__PURE__*/ createUseSimulateContract({
@@ -1313,6 +1351,7 @@ export const useSimulatePropcorn = /*#__PURE__*/ createUseSimulateContract({
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link propcornAbi}__ and `functionName` set to `"cancelProposal"`
  *
  * - [__View Contract on Op Mainnet Optimism Explorer__](https://optimistic.etherscan.io/address/0xe31A21eC01CcA7b95FCcd6eDd4Ac56CB743a4112)
+ * -
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xC4b3736A804837715C41Abe7438A4033DAa58D80)
  */
 export const useSimulatePropcornCancelProposal =
@@ -1326,6 +1365,7 @@ export const useSimulatePropcornCancelProposal =
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link propcornAbi}__ and `functionName` set to `"createProposal"`
  *
  * - [__View Contract on Op Mainnet Optimism Explorer__](https://optimistic.etherscan.io/address/0xe31A21eC01CcA7b95FCcd6eDd4Ac56CB743a4112)
+ * -
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xC4b3736A804837715C41Abe7438A4033DAa58D80)
  */
 export const useSimulatePropcornCreateProposal =
@@ -1339,6 +1379,7 @@ export const useSimulatePropcornCreateProposal =
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link propcornAbi}__ and `functionName` set to `"defundProposal"`
  *
  * - [__View Contract on Op Mainnet Optimism Explorer__](https://optimistic.etherscan.io/address/0xe31A21eC01CcA7b95FCcd6eDd4Ac56CB743a4112)
+ * -
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xC4b3736A804837715C41Abe7438A4033DAa58D80)
  */
 export const useSimulatePropcornDefundProposal =
@@ -1352,6 +1393,7 @@ export const useSimulatePropcornDefundProposal =
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link propcornAbi}__ and `functionName` set to `"fundProposal"`
  *
  * - [__View Contract on Op Mainnet Optimism Explorer__](https://optimistic.etherscan.io/address/0xe31A21eC01CcA7b95FCcd6eDd4Ac56CB743a4112)
+ * -
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xC4b3736A804837715C41Abe7438A4033DAa58D80)
  */
 export const useSimulatePropcornFundProposal =
@@ -1365,6 +1407,7 @@ export const useSimulatePropcornFundProposal =
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link propcornAbi}__ and `functionName` set to `"initialize"`
  *
  * - [__View Contract on Op Mainnet Optimism Explorer__](https://optimistic.etherscan.io/address/0xe31A21eC01CcA7b95FCcd6eDd4Ac56CB743a4112)
+ * -
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xC4b3736A804837715C41Abe7438A4033DAa58D80)
  */
 export const useSimulatePropcornInitialize =
@@ -1378,6 +1421,7 @@ export const useSimulatePropcornInitialize =
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link propcornAbi}__ and `functionName` set to `"renounceOwnership"`
  *
  * - [__View Contract on Op Mainnet Optimism Explorer__](https://optimistic.etherscan.io/address/0xe31A21eC01CcA7b95FCcd6eDd4Ac56CB743a4112)
+ * -
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xC4b3736A804837715C41Abe7438A4033DAa58D80)
  */
 export const useSimulatePropcornRenounceOwnership =
@@ -1391,6 +1435,7 @@ export const useSimulatePropcornRenounceOwnership =
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link propcornAbi}__ and `functionName` set to `"setProtocolFeeReceiver"`
  *
  * - [__View Contract on Op Mainnet Optimism Explorer__](https://optimistic.etherscan.io/address/0xe31A21eC01CcA7b95FCcd6eDd4Ac56CB743a4112)
+ * -
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xC4b3736A804837715C41Abe7438A4033DAa58D80)
  */
 export const useSimulatePropcornSetProtocolFeeReceiver =
@@ -1401,9 +1446,24 @@ export const useSimulatePropcornSetProtocolFeeReceiver =
   })
 
 /**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link propcornAbi}__ and `functionName` set to `"startProposal"`
+ *
+ * - [__View Contract on Op Mainnet Optimism Explorer__](https://optimistic.etherscan.io/address/0xe31A21eC01CcA7b95FCcd6eDd4Ac56CB743a4112)
+ * -
+ * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xC4b3736A804837715C41Abe7438A4033DAa58D80)
+ */
+export const useSimulatePropcornStartProposal =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: propcornAbi,
+    address: propcornAddress,
+    functionName: 'startProposal',
+  })
+
+/**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link propcornAbi}__ and `functionName` set to `"transferOwnership"`
  *
  * - [__View Contract on Op Mainnet Optimism Explorer__](https://optimistic.etherscan.io/address/0xe31A21eC01CcA7b95FCcd6eDd4Ac56CB743a4112)
+ * -
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xC4b3736A804837715C41Abe7438A4033DAa58D80)
  */
 export const useSimulatePropcornTransferOwnership =
@@ -1417,6 +1477,7 @@ export const useSimulatePropcornTransferOwnership =
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link propcornAbi}__ and `functionName` set to `"upgradeToAndCall"`
  *
  * - [__View Contract on Op Mainnet Optimism Explorer__](https://optimistic.etherscan.io/address/0xe31A21eC01CcA7b95FCcd6eDd4Ac56CB743a4112)
+ * -
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xC4b3736A804837715C41Abe7438A4033DAa58D80)
  */
 export const useSimulatePropcornUpgradeToAndCall =
@@ -1430,6 +1491,7 @@ export const useSimulatePropcornUpgradeToAndCall =
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link propcornAbi}__ and `functionName` set to `"withdrawFunds"`
  *
  * - [__View Contract on Op Mainnet Optimism Explorer__](https://optimistic.etherscan.io/address/0xe31A21eC01CcA7b95FCcd6eDd4Ac56CB743a4112)
+ * -
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xC4b3736A804837715C41Abe7438A4033DAa58D80)
  */
 export const useSimulatePropcornWithdrawFunds =
@@ -1443,6 +1505,7 @@ export const useSimulatePropcornWithdrawFunds =
  * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link propcornAbi}__
  *
  * - [__View Contract on Op Mainnet Optimism Explorer__](https://optimistic.etherscan.io/address/0xe31A21eC01CcA7b95FCcd6eDd4Ac56CB743a4112)
+ * -
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xC4b3736A804837715C41Abe7438A4033DAa58D80)
  */
 export const useWatchPropcornEvent = /*#__PURE__*/ createUseWatchContractEvent({
@@ -1454,6 +1517,7 @@ export const useWatchPropcornEvent = /*#__PURE__*/ createUseWatchContractEvent({
  * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link propcornAbi}__ and `eventName` set to `"FundsWithdrawn"`
  *
  * - [__View Contract on Op Mainnet Optimism Explorer__](https://optimistic.etherscan.io/address/0xe31A21eC01CcA7b95FCcd6eDd4Ac56CB743a4112)
+ * -
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xC4b3736A804837715C41Abe7438A4033DAa58D80)
  */
 export const useWatchPropcornFundsWithdrawnEvent =
@@ -1467,6 +1531,7 @@ export const useWatchPropcornFundsWithdrawnEvent =
  * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link propcornAbi}__ and `eventName` set to `"Initialized"`
  *
  * - [__View Contract on Op Mainnet Optimism Explorer__](https://optimistic.etherscan.io/address/0xe31A21eC01CcA7b95FCcd6eDd4Ac56CB743a4112)
+ * -
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xC4b3736A804837715C41Abe7438A4033DAa58D80)
  */
 export const useWatchPropcornInitializedEvent =
@@ -1480,6 +1545,7 @@ export const useWatchPropcornInitializedEvent =
  * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link propcornAbi}__ and `eventName` set to `"OwnershipTransferred"`
  *
  * - [__View Contract on Op Mainnet Optimism Explorer__](https://optimistic.etherscan.io/address/0xe31A21eC01CcA7b95FCcd6eDd4Ac56CB743a4112)
+ * -
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xC4b3736A804837715C41Abe7438A4033DAa58D80)
  */
 export const useWatchPropcornOwnershipTransferredEvent =
@@ -1493,6 +1559,7 @@ export const useWatchPropcornOwnershipTransferredEvent =
  * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link propcornAbi}__ and `eventName` set to `"ProposalCanceled"`
  *
  * - [__View Contract on Op Mainnet Optimism Explorer__](https://optimistic.etherscan.io/address/0xe31A21eC01CcA7b95FCcd6eDd4Ac56CB743a4112)
+ * -
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xC4b3736A804837715C41Abe7438A4033DAa58D80)
  */
 export const useWatchPropcornProposalCanceledEvent =
@@ -1506,6 +1573,7 @@ export const useWatchPropcornProposalCanceledEvent =
  * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link propcornAbi}__ and `eventName` set to `"ProposalCreated"`
  *
  * - [__View Contract on Op Mainnet Optimism Explorer__](https://optimistic.etherscan.io/address/0xe31A21eC01CcA7b95FCcd6eDd4Ac56CB743a4112)
+ * -
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xC4b3736A804837715C41Abe7438A4033DAa58D80)
  */
 export const useWatchPropcornProposalCreatedEvent =
@@ -1519,6 +1587,7 @@ export const useWatchPropcornProposalCreatedEvent =
  * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link propcornAbi}__ and `eventName` set to `"ProposalDefunded"`
  *
  * - [__View Contract on Op Mainnet Optimism Explorer__](https://optimistic.etherscan.io/address/0xe31A21eC01CcA7b95FCcd6eDd4Ac56CB743a4112)
+ * -
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xC4b3736A804837715C41Abe7438A4033DAa58D80)
  */
 export const useWatchPropcornProposalDefundedEvent =
@@ -1532,6 +1601,7 @@ export const useWatchPropcornProposalDefundedEvent =
  * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link propcornAbi}__ and `eventName` set to `"ProposalFunded"`
  *
  * - [__View Contract on Op Mainnet Optimism Explorer__](https://optimistic.etherscan.io/address/0xe31A21eC01CcA7b95FCcd6eDd4Ac56CB743a4112)
+ * -
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xC4b3736A804837715C41Abe7438A4033DAa58D80)
  */
 export const useWatchPropcornProposalFundedEvent =
@@ -1545,6 +1615,7 @@ export const useWatchPropcornProposalFundedEvent =
  * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link propcornAbi}__ and `eventName` set to `"Upgraded"`
  *
  * - [__View Contract on Op Mainnet Optimism Explorer__](https://optimistic.etherscan.io/address/0xe31A21eC01CcA7b95FCcd6eDd4Ac56CB743a4112)
+ * -
  * - [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0xC4b3736A804837715C41Abe7438A4033DAa58D80)
  */
 export const useWatchPropcornUpgradedEvent =

@@ -25,7 +25,7 @@ type ProposalCardProps = {
   balance: bigint;
   feeBasisPoints: bigint;
   secondsToUnlock: bigint;
-  fundCompletedAt?: bigint;
+  startedAt?: bigint;
 };
 
 const ProposalCard: React.FC<ProposalCardProps> = ({
@@ -36,7 +36,6 @@ const ProposalCard: React.FC<ProposalCardProps> = ({
   balance,
   feeBasisPoints,
   secondsToUnlock,
-  fundCompletedAt,
 }) => {
   const { data, isLoading, error } = useGitHubIssueData(url);
 

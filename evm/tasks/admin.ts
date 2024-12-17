@@ -19,3 +19,15 @@ task("proposal:create", "Create a proposal", async (_, hre) => {
   );
   await tx.wait(1);
 });
+
+task("proposal:get", "Get a proposal", async (_, hre) => {
+  const propcorn = (await loadContract(
+    hre,
+    "Propcorn",
+    "PropcornModule#Proxy",
+  )) as unknown as Propcorn;
+
+  const result = await propcorn.proposals(0);
+
+  console.log(result.startedAt);
+});
