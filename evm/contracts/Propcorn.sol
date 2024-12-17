@@ -42,6 +42,8 @@ contract Propcorn is Initializable, UUPSUpgradeable, OwnableUpgradeable {
 
     event ProposalCanceled(address indexed from, uint256 index);
 
+    event WorkStarted(address indexed from, uint256 index);
+
     event FundsWithdrawn(
         address indexed from,
         uint256 index,
@@ -61,7 +63,7 @@ contract Propcorn is Initializable, UUPSUpgradeable, OwnableUpgradeable {
     struct Proposal {
         string url;
         uint256 secondsToUnlock;
-        uint256 fundingCompletedAt;
+        uint256 startedAt;
         uint256 minAmountRequested;
         uint256 balance;
         uint256 feeBasisPoints;
@@ -111,8 +113,8 @@ contract Propcorn is Initializable, UUPSUpgradeable, OwnableUpgradeable {
         Proposal memory proposal
     ) public pure returns (uint256) {
         return
-            proposal.fundingCompletedAt > 0
-                ? proposal.fundingCompletedAt + proposal.secondsToUnlock
+            proposal.startedAt > 0
+                ? proposal.startedAt + proposal.secondsToUnlock
                 : type(uint256).max;
     }
 
@@ -200,12 +202,28 @@ contract Propcorn is Initializable, UUPSUpgradeable, OwnableUpgradeable {
         funderToProposalBalance[msg.sender][index] += msg.value;
         proposal.balance += msg.value;
 
-        if (proposal.balance >= proposal.minAmountRequested) {
-            proposal.status = ProposalStatus.STARTED;
-            proposal.fundingCompletedAt = block.timestamp;
+        emit ProposalFunded(msg.sender, proposal.author, index, msg.value);
+    }
+
+    function startProposal(uint256 index) public proposalExists(index) {
+        Proposal storage proposal = proposals[index];
+
+        if (proposal.author != msg.sender) {
+            revert InvalidOwner();
         }
 
-        emit ProposalFunded(msg.sender, proposal.author, index, msg.value);
+        if (proposal.status == ProposalStatus.PAID) {
+            revert ProposalPaid();
+        }
+
+        if (proposal.status == ProposalStatus.CANCELED) {
+            revert ProposalWasCanceled();
+        }
+
+        proposal.status = ProposalStatus.STARTED;
+        proposal.startedAt = block.timestamp;
+
+        emit WorkStarted(msg.sender, index);
     }
 
     function defundProposal(uint256 index) public proposalExists(index) {

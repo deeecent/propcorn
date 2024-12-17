@@ -212,6 +212,9 @@ describe("Propcorn", function () {
         .connect(carol)
         .fundProposal(index, { value: minAmountRequested });
 
+      // start
+      await propcorn.connect(bob).startProposal(index);
+
       // Let time passes
       await time.increase(secondsToUnlock);
 
@@ -287,6 +290,8 @@ describe("Propcorn", function () {
         .connect(carol)
         .fundProposal(index, { value: minAmountRequested });
 
+      await propcorn.connect(bob).startProposal(index);
+
       await expect(
         propcorn.connect(carol).defundProposal(0),
       ).revertedWithCustomError(propcorn, "FundsLocked");
@@ -297,6 +302,9 @@ describe("Propcorn", function () {
       await propcorn
         .connect(carol)
         .fundProposal(index, { value: minAmountRequested });
+
+      // Start
+      await propcorn.connect(bob).startProposal(index);
 
       // Let time passes
       await time.increase(secondsToUnlock);
@@ -403,6 +411,10 @@ describe("Propcorn", function () {
       await propcorn
         .connect(carol)
         .fundProposal(index, { value: minAmountRequested });
+
+      // Start
+      await propcorn.connect(bob).startProposal(index);
+
       await expect(
         propcorn.connect(bob).withdrawFunds(index, bob.address),
       ).revertedWithCustomError(propcorn, "FundsLocked");
@@ -413,6 +425,7 @@ describe("Propcorn", function () {
         .connect(carol)
         .fundProposal(index, { value: minAmountRequested });
 
+      await propcorn.connect(bob).startProposal(index);
       await time.increase(secondsToUnlock);
 
       await propcorn.connect(bob).withdrawFunds(index, dan.address);
@@ -426,6 +439,8 @@ describe("Propcorn", function () {
       await propcorn
         .connect(carol)
         .fundProposal(index, { value: minAmountRequested });
+
+      await propcorn.connect(bob).startProposal(index);
       await time.increase(secondsToUnlock);
 
       await expect(
@@ -445,6 +460,8 @@ describe("Propcorn", function () {
       await propcorn
         .connect(carol)
         .fundProposal(index, { value: minAmountRequested });
+
+      await propcorn.connect(bob).startProposal(index);
       await time.increase(secondsToUnlock);
 
       await expect(propcorn.connect(bob).withdrawFunds(index, dan.address))
@@ -495,6 +512,7 @@ describe("Propcorn", function () {
         .connect(carol)
         .fundProposal(index, { value: minAmountRequested });
 
+      await propcorn.connect(bob).startProposal(index);
       await time.increase(secondsToUnlock);
 
       await propcorn.connect(bob).withdrawFunds(index, dan.address);
@@ -535,9 +553,78 @@ describe("Propcorn", function () {
     });
   });
 
+  describe("startProposal", function () {
+    const url = "https://github.com/deeecent/propcorn/issues/1";
+    const secondsToUnlock = 666;
+    const minAmountRequested = parseEther("1");
+    // 2%
+    const feeBasisPoints = 2 * 100;
+    const index = 0;
+
+    beforeEach(async () => {
+      await propcorn
+        .connect(bob)
+        .createProposal(
+          url,
+          secondsToUnlock,
+          minAmountRequested,
+          feeBasisPoints,
+        );
+    });
+
+    it("should fail if the proposal doesn't exist", async () => {
+      await expect(
+        propcorn.connect(bob).startProposal(9999),
+      ).revertedWithCustomError(propcorn, "NonexistingProposal");
+    });
+
+    it("should fail if the sender is not the owner of the proposal", async () => {
+      await expect(
+        propcorn.connect(carol).startProposal(index),
+      ).revertedWithCustomError(propcorn, "InvalidOwner");
+    });
+
+    it("should fail if the proposal is already paid", async () => {
+      await propcorn
+        .connect(carol)
+        .fundProposal(index, { value: minAmountRequested });
+
+      await propcorn.connect(bob).startProposal(index);
+      await time.increase(secondsToUnlock);
+
+      await propcorn.connect(bob).withdrawFunds(index, dan.address);
+
+      await expect(
+        propcorn.connect(bob).startProposal(index),
+      ).revertedWithCustomError(propcorn, "ProposalPaid");
+    });
+
+    it("should fail if the proposal is cancelled", async () => {
+      await propcorn.connect(bob).cancelProposal(index);
+
+      await expect(
+        propcorn.connect(bob).startProposal(index),
+      ).revertedWithCustomError(propcorn, "ProposalWasCanceled");
+    });
+
+    it("should start the proposal", async () => {
+      await propcorn.connect(bob).startProposal(index);
+
+      const result = await propcorn.proposals(index);
+
+      expect(result.status).equal(ProposalStatus.STARTED);
+    });
+
+    it("should emit an event", async () => {
+      await expect(propcorn.connect(bob).startProposal(index))
+        .to.emit(propcorn, "WorkStarted")
+        .withArgs(bob.address, index);
+    });
+  });
+
   describe("getProposals(uint256)", function () {
     it("returns 0 proposals and index 0 if none are there", async () => {
-      const result = await propcorn["getProposals(uint256)"](0);
+      const result = await propcorn.getProposals(0);
 
       expect(result.proposalPage.length).equal(1000);
       expect(result.proposalPage[0].status).equal(ProposalStatus.INVALID);
@@ -545,7 +632,7 @@ describe("Propcorn", function () {
     });
 
     it("returns 0 proposals and index 0 for page 1 if none are there", async () => {
-      const result = await propcorn["getProposals(uint256)"](1);
+      const result = await propcorn.getProposals(1);
 
       expect(result.proposalPage.length).equal(1000);
       expect(result.proposalPage[0].status).equal(ProposalStatus.INVALID);
@@ -561,7 +648,7 @@ describe("Propcorn", function () {
         feeBasisPoints,
         authors,
       ] = await createProposals(n);
-      const result = await propcorn["getProposals(uint256)"](0);
+      const result = await propcorn.getProposals(0);
 
       expect(result.proposalPage.length).equal(1000);
       expect(result.startingId).equal(2);
@@ -590,7 +677,7 @@ describe("Propcorn", function () {
         feeBasisPoints,
         authors,
       ] = await createProposals(n);
-      const result = await propcorn["getProposals(uint256)"](0);
+      const result = await propcorn.getProposals(0);
 
       expect(result.proposalPage.length).equal(1000);
       expect(result.startingId).equal(1000);
@@ -623,7 +710,7 @@ describe("Propcorn", function () {
         feeBasisPoints,
         authors,
       ] = await createProposals(n);
-      const result = await propcorn["getProposals(uint256)"](1);
+      const result = await propcorn.getProposals(1);
 
       expect(result.proposalPage.length).equal(1000);
       expect(result.startingId).equal(2);
@@ -654,7 +741,7 @@ describe("Propcorn", function () {
         feeBasisPoints,
         authors,
       ] = await createProposals(n);
-      const result = await propcorn["getProposals(uint256)"](1);
+      const result = await propcorn.getProposals(1);
 
       expect(result.proposalPage.length).equal(1000);
       expect(result.startingId).equal(0);
@@ -702,6 +789,7 @@ describe("Propcorn", function () {
         .connect(carol)
         .fundProposal(index, { value: minAmountRequested });
 
+      await propcorn.connect(bob).startProposal(index);
       await time.increase(secondsToUnlock);
 
       await propcorn.setProtocolFeeReceiver(carol.address);
