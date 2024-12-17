@@ -29,6 +29,7 @@ import {
   useReadPropcornFunderToProposalBalance,
   useWritePropcornDefundProposal,
   useWritePropcornFundProposal,
+  useWritePropcornStartProposal,
   useWritePropcornWithdrawFunds,
 } from "./generated";
 import { useEffect, useState } from "react";
@@ -202,6 +203,62 @@ const DefundProposal = ({ index, funding, refetch }: DefundProposalProps) => {
   );
 };
 
+const StartProposal = ({
+  index,
+  refetch,
+}: {
+  index: bigint;
+  defaultReceiver?: Hex | undefined;
+  refetch: () => void;
+}) => {
+  const { data: hash, writeContract } = useWritePropcornStartProposal();
+  const { isLoading, isError, isSuccess } = useWaitForTransactionReceipt({
+    hash,
+  });
+  const toast = useToast();
+
+  useEffect(() => {
+    if (isSuccess) {
+      toast({
+        title: "Transaction successful",
+        description: "Proposal started 🚀",
+        status: "success",
+        duration: 9000,
+        isClosable: true,
+      });
+      refetch();
+    }
+  }, [isSuccess]);
+
+  useEffect(() => {
+    if (isError) {
+      toast({
+        title: "Something went wrong",
+        description: "Please check your wallet and try again 🫣",
+        status: "error",
+        duration: 9000,
+        isClosable: true,
+      });
+    }
+  }, [isError]);
+
+  const onStartProposal = () => {
+    toast({
+      title: "Check your wallet",
+      description: "Review the transaction details and confirm to proceed 🤓",
+      status: "info",
+      duration: 4000,
+      isClosable: true,
+    });
+    writeContract({ args: [index] });
+  };
+
+  return (
+    <Button onClick={onStartProposal} colorScheme="green" disabled={isLoading}>
+      Start Work
+    </Button>
+  );
+};
 const WithdrawFunds = ({
   index,
   defaultReceiver,
@@ -385,8 +442,7 @@ const Proposal = ({ proposal, issue, refetch }: ProposalProps) => {
     : 0;
 
   const deadline = new Date(
-    (Number(proposal.fundingCompletedAt) + Number(proposal.secondsToUnlock)) *
-      1000,
+    (Number(proposal.startedAt) + Number(proposal.secondsToUnlock)) * 1000,
   );
 
   return (
@@ -463,12 +519,27 @@ const Proposal = ({ proposal, issue, refetch }: ProposalProps) => {
             </Link>
           </Text>
         </SimpleGrid>
-
         <Spacer />
+
+        {proposal.status === 1 && (
+          <Card>
+            <CardBody>
+              <Text>Not started yet</Text>
+              {address === proposal.author && (
+                <Box mt={2}>
+                  <StartProposal index={proposal.index} refetch={refetchAll} />
+                </Box>
+              )}
+            </CardBody>
+          </Card>
+        )}
 
         {proposal.status === 2 && (
           <Card flexGrow={1}>
             <CardBody>
+              <Text color="green.500" fontWeight="bold">
+                Work in progress
+              </Text>
               <Text color="gray.500" fontWeight="bold">
                 Funds release countdown
               </Text>
