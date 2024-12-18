@@ -293,7 +293,7 @@ contract Propcorn is Initializable, UUPSUpgradeable, OwnableUpgradeable {
 
     // Internal
 
-    function _enforceProposalIsActive(Proposal memory proposal) internal {
+    function _enforceProposalIsActive(Proposal memory proposal) internal pure {
         if (proposal.status == ProposalStatus.PAID) {
             revert ProposalPaid();
         }
