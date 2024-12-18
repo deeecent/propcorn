@@ -522,6 +522,14 @@ describe("Propcorn", function () {
       ).revertedWithCustomError(propcorn, "ProposalPaid");
     });
 
+    it("should fail if the proposal is already cancelled", async () => {
+      await propcorn.connect(bob).startProposal(index);
+      await propcorn.connect(bob).cancelProposal(index);
+      await expect(
+        propcorn.connect(bob).cancelProposal(index),
+      ).revertedWithCustomError(propcorn, "ProposalWasCanceled");
+    });
+
     it("should cancel the proposal during funding", async () => {
       await propcorn.connect(carol).fundProposal(index, {
         value: minAmountRequested - BigInt(1),
