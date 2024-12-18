@@ -120,12 +120,15 @@ contract Propcorn is Initializable, UUPSUpgradeable, OwnableUpgradeable {
 
     /**
      * Returns proposals sorted in descending chronological order
-     * (last one created is first).
-     * Page 0 will contains the latest 1000 proposals.
+     * (last one created is on the first position).
+     * @param page A page number.
+     * @notice 0 is the page with the latest proposals.
      * Last page will contain the earliest proposals.
-     * Check for proposal.status == ProposalStatus.INVALID to know
-     * when the end of the list is reached.
-     * Calculate the proposal id by doing startingId - index.
+     * @return proposalPage A page with 1000 proposals.
+     * @notice When a proposals has `status` == ProposalStatus.INVALID, there are
+     * no more proposals and the current page is the last one.
+     * @return startingId The id of the proposal at position 0. It then continues
+     * in decreasing order. To know the proposal id for a given index, do `startingId - index`.
      */
     function getProposals(
         uint256 page
