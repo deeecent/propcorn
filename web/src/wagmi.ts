@@ -21,7 +21,7 @@ const connectors = connectorsForWallets(
   ],
   {
     appName: "Propcorn",
-    appUrl: "https://propcorn.deeecent.website",
+    appUrl: "https://propcorn.xyz",
     projectId: import.meta.env.VITE_WC_PROJECT_ID,
   },
 );
