@@ -7,7 +7,7 @@ export const STATUS_TO_LABEL = {
 };
 
 export type PropcornProposal = {
-  index: bigint;
+  index?: bigint;
   url: string;
   secondsToUnlock: bigint;
   startedAt: bigint;
