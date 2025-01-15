@@ -56,7 +56,7 @@ const Step = ({ emoji, title, description }: StepProps) => (
       <Heading as="h2" fontSize="larger">
         {title}
       </Heading>
-      <Text>{description}</Text>
+      <div>{description}</div>
     </VStack>
   </HStack>
 );
