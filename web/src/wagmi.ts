@@ -1,5 +1,5 @@
 import { http, createConfig } from "wagmi";
-import { optimism } from "wagmi/chains";
+import { localhost, optimism, sepolia } from "wagmi/chains";
 
 import.meta.env.VITE_RPC_URL;
 
@@ -26,14 +26,27 @@ const connectors = connectorsForWallets(
   },
 );
 
-export const config = createConfig({
-  chains: [optimism],
-  connectors,
-  syncConnectedChain: false,
-  transports: {
-    [optimism.id]: http(import.meta.env.VITE_RPC_URL_OPTIMISM),
-  },
-});
+export let config: ReturnType<typeof createConfig>;
+if (import.meta.env.DEV === true) {
+  config = createConfig({
+    chains: [optimism, sepolia, localhost],
+    connectors,
+    transports: {
+      [optimism.id]: http(import.meta.env.VITE_RPC_URL_OPTIMISM),
+      [sepolia.id]: http(import.meta.env.VITE_RPC_URL_SEPOLIA),
+      [localhost.id]: http(import.meta.env.VITE_RPC_URL_LOCALHOST),
+    },
+  });
+} else {
+  config = createConfig({
+    chains: [optimism],
+    syncConnectedChain: false,
+    connectors,
+    transports: {
+      [optimism.id]: http(import.meta.env.VITE_RPC_URL_OPTIMISM),
+    },
+  });
+}
 
 declare module "wagmi" {
   interface Register {
