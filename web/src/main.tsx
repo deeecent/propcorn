@@ -20,6 +20,7 @@ import Footer from "./Footer.tsx";
 import ProposalPage from "./ProposalPage.tsx";
 import { RainbowKitProvider } from "@rainbow-me/rainbowkit";
 import About from "./About.tsx";
+import ListPage from "./ListPage.tsx";
 
 // globalThis.Buffer = Buffer;
 const queryClient = new QueryClient();
@@ -56,6 +57,10 @@ const router = createBrowserRouter([
       {
         path: "/proposal/:index",
         element: <ProposalPage />,
+      },
+      {
+        path: "/proposals",
+        element: <ListPage />,
       },
       {
         path: "/about",

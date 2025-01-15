@@ -119,9 +119,27 @@ const LastProposals = () => {
             balance={p.balance}
             feeBasisPoints={p.feeBasisPoints}
             secondsToUnlock={p.secondsToUnlock}
-            fundCompletedAt={p.fundingCompletedAt}
           />
         ))}
+        <Link to="/proposals">
+          <Button size="lg" bg="green.300" p={7}>
+            <Text
+              fontSize="2xl"
+              display="flex"
+              alignItems="center"
+              justifyContent="center"
+              bg="yellow.200"
+              p={5}
+              w={10}
+              h={10}
+              borderRadius="full"
+              mr={3}
+            >
+              🍿
+            </Text>
+            Browse More...
+          </Button>
+        </Link>
       </VStack>
     </>
   );
