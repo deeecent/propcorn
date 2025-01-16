@@ -29,6 +29,7 @@ const connectors = connectorsForWallets(
 export const config = createConfig({
   chains: [optimism],
   connectors,
+  syncConnectedChain: false,
   transports: {
     [optimism.id]: http(import.meta.env.VITE_RPC_URL_OPTIMISM),
   },
