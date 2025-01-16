@@ -5,7 +5,7 @@ function ConnectButton() {
     <RainbowkitButton
       label="Connect"
       accountStatus="address"
-      chainStatus="none"
+      chainStatus="full"
       showBalance={{
         smallScreen: false,
         largeScreen: true,
