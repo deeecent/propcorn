@@ -23,7 +23,7 @@
     "react-markdown": "^9.0.1",
     "react-router-dom": "6.27",
     "viem": "^2.21.51",
-    "wagmi": "^2.13.0"
+    "wagmi": "^2.14.8"
   },
   "devDependencies": {
     "@types/react": "^18.3.12",
