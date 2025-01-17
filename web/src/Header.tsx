@@ -14,6 +14,15 @@ export function Header() {
           </Button>
         </Link>
         <Spacer />
+        <Link to="/proposals">
+          <Button
+            border="2px solid"
+            borderColor="green.300"
+            backgroundColor="white"
+          >
+            Explore
+          </Button>
+        </Link>
         <ConnectButton />
       </Flex>
     </Center>
